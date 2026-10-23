@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
+---
+
+<BaseLayout title="关于" description="关于这个站，和写它的人。">
+  <div class="container container--narrow">
+    <header class="page-head">
+      <p class="page-head__kicker">ABOUT</p>
+      <h1 class="page-head__title">关于</h1>
+      <p class="page-head__lede">一个不太完整的自我介绍，和一些关于这个站的事。</p>
+    </header>
+
+    <article class="prose about-prose">
+      <p>这里是一个人的笔记本，写点日常、照片和一些没想清楚的事。</p>
+      <p>不做订阅，不开评论。看到就是缘分。</p>
+
+      <h2>为什么自己搭</h2>
+      <p>
+        这些年写过的东西散在太多地方，每换一个工具就丢掉一批。所以干脆找一块自己的地方，
+        把想留下的都放在这里——不用登录，不用等加载，也不用担心哪天平台关了。
+      </p>
+
+      <h2>这里有什么</h2>
+      <ul>
+        <li>日常：走走路、看看山、随手记下的一些念头；</li>
+        <li>照片：原图会放在这里，点开可以看细节；</li>
+        <li>技术笔记：偶尔折腾工具和代码时踩过的坑。</li>
+      </ul>
+
+      <h2>关于工具</h2>
+      <p>
+        本站用 <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+        构建，生成静态页面，放在一台自己的服务器上，由 nginx 提供服务。
+        没有统计脚本，没有评论框，也没有 Cookie。
+      </p>
+
+      <p class="signature">—— 我，于 {SITE.startYear} 年秋</p>
+
+      <p class="about-note">
+        这个站不会主动通知你什么。想看的时候来看看就好。<br />
+        如果发现哪里排版坏了，那大概是我还没发现。
+      </p>
+    </article>
+  </div>
+</BaseLayout>

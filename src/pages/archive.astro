@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+import { groupByYear, getPosts } from '../lib/posts';
+
+const posts = await getPosts();
+const groups = groupByYear(posts);
+---
+
+<BaseLayout title="归档" description="按年份排列的全部文字。">
+  <div class="container">
+    <header class="page-head">
+      <p class="page-head__kicker">ARCHIVE</p>
+      <h1 class="page-head__title">归档</h1>
+      <p class="page-head__lede">
+        共 {posts.length} 篇{groups.length === 1 ? `，都写在 ${groups[0].year} 年。` : `，跨越 ${groups.length} 个年份。`}旧的东西不一定过时，只是放得远了一点。
+      </p>
+    </header>
+
+    {
+      groups.map((group) => (
+        <section class="year-block" aria-label={`${group.year} 年`}>
+          <div class="year-head">
+            <strong>{group.year}</strong>
+            <span>{group.posts.length} 篇</span>
+          </div>
+          <ol class="post-list">
+            {group.posts.map((post) => (
+              <PostRow post={post} />
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

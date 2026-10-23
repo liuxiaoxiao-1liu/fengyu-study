@@ -1,0 +1,37 @@
+---
+import { SITE } from '../lib/site';
+
+const year = new Date().getFullYear();
+const years = year > SITE.startYear ? `${SITE.startYear}–${year}` : `${SITE.startYear}`;
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__inner">
+      <div>
+        <a class="site-footer__brand" href="/">
+          <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <rect width="64" height="64" rx="10" fill="var(--accent)"></rect>
+            <circle cx="32" cy="32" r="16" fill="none" stroke="var(--paper)" stroke-width="3.5"></circle>
+            <circle cx="32" cy="32" r="4.5" fill="var(--paper)"></circle>
+          </svg>
+          <span>小圈子</span>
+        </a>
+        <p class="site-footer__motto">写点日常、照片和一些没想清楚的事。<br />不做订阅，不开评论。看到就是缘分。</p>
+      </div>
+
+      <nav class="site-footer__links" aria-label="页脚导航">
+        <a href="/archive/">归档</a>
+        <a href="/about/">关于</a>
+        <a href="/rss.xml">RSS</a>
+        <a href="/sitemap.xml">站点地图</a>
+        <a href="#top">回到顶部 ↑</a>
+      </nav>
+    </div>
+
+    <div class="site-footer__bottom">
+      <span>© {years} {SITE.title}</span>
+      <span>由 Astro 构建 · 托管在自己的服务器上 · 无统计、无评论、无 Cookie</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+import { SITE } from '../lib/site';
+import {
+  chineseYear,
+  collectTags,
+  formatDate,
+  getPosts,
+  postPath,
+  readingTime,
+} from '../lib/posts';
+
+const posts = await getPosts();
+const [featured, ...rest] = posts;
+const tags = collectTags(posts);
+---
+
+<BaseLayout title={SITE.title} description={SITE.description}>
+  <div class="container">
+    <header class="masthead">
+      <p class="eyebrow fade-up">私人笔记本 · 自 {SITE.startYear} 年秋</p>
+      <h1 class="masthead__title fade-up fade-up--1">小圈子</h1>
+      <p class="masthead__lede fade-up fade-up--2">
+        这里是一个人的笔记本，写点日常、照片和一些没想清楚的事。<br />
+        不做订阅，不开评论。看到就是缘分。
+      </p>
+      <div class="masthead__meta fade-up fade-up--3">
+        <span>{posts.length} 篇文字</span>
+        {featured && <span>最近更新 {formatDate(featured.data.date)}</span>}
+        <span>{tags.length} 个标签</span>
+      </div>
+      <span class="masthead__aside" aria-hidden="true">
+        {featured ? `${chineseYear(featured.data.date)} · 记事` : '记事'}
+      </span>
+    </header>
+
+    {
+      featured && (
+        <article class="featured fade-up fade-up--2">
+          <a class="featured__media" href={postPath(featured)} aria-hidden="true" tabindex="-1">
+            {featured.data.cover ? (
+              <img
+                src={featured.data.cover}
+                alt=""
+                width="1800"
+                height="1013"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+              />
+            ) : (
+              <span></span>
+            )}
+          </a>
+          <div class="featured__body">
+            <p class="kicker">最新</p>
+            <h2 class="featured__title">
+              <a href={postPath(featured)}>{featured.data.title}</a>
+            </h2>
+            <p class="featured__summary">{featured.data.summary}</p>
+            <p class="featured__meta">
+              {formatDate(featured.data.date)} · 约 {readingTime(featured)} 分钟
+              {featured.data.tags.length > 0 && ` · ${featured.data.tags.join(' / ')}`}
+            </p>
+            <a class="read-more" href={postPath(featured)}>
+              读这一篇 <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </article>
+      )
+    }
+
+    {
+      rest.length > 0 && (
+        <section aria-labelledby="recent-heading">
+          <div class="section-head">
+            <h2 id="recent-heading">最近写的</h2>
+            <a href="/archive/">全部 {posts.length} 篇 →</a>
+          </div>
+          <ol class="post-list">
+            {rest.map((post) => <PostRow post={post} />)}
+          </ol>
+        </section>
+      )
+    }
+
+    <a class="all-link" href="/archive/">
+      查看全部文字 <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</BaseLayout>

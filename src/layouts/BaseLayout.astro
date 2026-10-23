@@ -1,0 +1,54 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  published?: Date;
+  progress?: boolean;
+}
+
+const { title, description, image, type, published, progress = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN" id="top">
+  <head>
+    <BaseHead {title} {description} {image} {type} {published} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+    {progress && (
+      <div class="progress" aria-hidden="true"><span></span></div>
+    )}
+    <Header />
+    <main id="main" class="site-main">
+      <slot />
+    </main>
+    <Footer />
+    {
+      progress && (
+        <script is:inline>
+          (function () {
+            var bar = document.querySelector('.progress span');
+            if (!bar) return;
+            function update() {
+              var doc = document.documentElement;
+              var max = doc.scrollHeight - doc.clientHeight;
+              var value = max > 0 ? (doc.scrollTop || document.body.scrollTop) / max : 0;
+              bar.style.width = (Math.min(1, Math.max(0, value)) * 100).toFixed(2) + '%';
+            }
+            update();
+            document.addEventListener('scroll', update, { passive: true });
+            window.addEventListener('resize', update);
+          })();
+        </script>
+      )
+    }
+  </body>
+</html>

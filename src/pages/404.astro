@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404 · 这里没有东西" description="你要找的页面不在这里。">
+  <div class="container">
+    <div class="not-found">
+      <p class="not-found__code" aria-hidden="true">404</p>
+      <h1 class="not-found__title">这条小路通向一片空地。</h1>
+      <p class="not-found__text">
+        可能是我改过地址，也可能是这个链接从来就不存在。要不要回首页看看？
+      </p>
+      <a class="all-link" href="/">回到首页 <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostRow from '../../components/PostRow.astro';
+import { collectTags, getPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const tags = collectTags(posts);
+
+  return tags.map(({ name }) => ({
+    params: { tag: name },
+    props: {
+      tag: name,
+      posts: posts.filter((post) => post.data.tags.includes(name)),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`标签：${tag}`} description={`标记为「${tag}」的全部文字。`}>
+  <div class="container tag-list-page">
+    <header class="page-head">
+      <p class="page-head__kicker">TAG</p>
+      <h1 class="page-head__title">#{tag}</h1>
+      <p class="page-head__lede">共 {posts.length} 篇被归到这个词下面。</p>
+    </header>
+
+    <ol class="post-list">
+      {posts.map((post) => <PostRow post={post} />)}
+    </ol>
+
+    <a class="all-link" href="/archive/" style="margin-top: 2.5rem;">
+      回到全部文章 <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</BaseLayout>

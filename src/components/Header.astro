@@ -1,0 +1,38 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+
+const path = Astro.url.pathname;
+
+const links = [
+  { href: '/', label: '首页' },
+  { href: '/archive/', label: '归档' },
+  { href: '/about/', label: '关于' },
+];
+
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="/" aria-label="小圈子 · 首页">
+      <svg class="brand__seal" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <rect width="64" height="64" rx="10" fill="var(--accent)"></rect>
+        <circle cx="32" cy="32" r="16" fill="none" stroke="var(--paper)" stroke-width="3.5"></circle>
+        <circle cx="32" cy="32" r="4.5" fill="var(--paper)"></circle>
+      </svg>
+      <span class="brand__name">小圈子</span>
+    </a>
+
+    <nav class="site-nav" aria-label="主导航">
+      {
+        links.map((link) => (
+          <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))
+      }
+      <ThemeToggle />
+    </nav>
+  </div>
+</header>

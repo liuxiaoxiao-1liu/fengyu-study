@@ -53,7 +53,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <span class="material-symbols-outlined text-xs text-on-tertiary-container">replay</span><span class="">酷狗单曲循回</span>
 </button>
 </div>
-
 </div>
 </section>
 <section class="w-full max-w-7xl mx-auto px-gutter" id="shelf">
@@ -70,11 +69,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                   Marginalia</span>
 </div>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant hidden md:flex items-center gap-1 opacity-80">网文卡片 · 本章说与书评存档
+<span class="font-label-sm text-label-sm text-on-surface-variant hidden md:flex items-center gap-1 opacity-80">点击书卡跳转起点阅读
               <span class="material-symbols-outlined text-xs">south_east</span></span>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
-<div class="lg:col-span-7 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow relative group cursor-pointer border border-surface-container-high/40" data-card="book" data-category="webnovel">
+<a aria-label="去起点中文网阅读《诡秘之主》" class="lg:col-span-7 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow relative group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="webnovel" href="https://www.qidian.com/book/1010868264/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《诡秘之主》">
 <div class="flex flex-col gap-4">
 <div class="flex items-center justify-between">
 <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">克苏鲁奇幻 · 蒸汽朋克</span><span class="font-label-sm text-label-sm text-on-surface-variant">446万字 · 完结二刷</span>
@@ -101,10 +100,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 <div class="flex items-center justify-between pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant">
 <span class="font-label-sm text-label-sm flex items-center gap-1.5 text-secondary font-medium"><span class="material-symbols-outlined text-xs">forum</span>
-                  查看 99+ 条高赞本章说与书友圈长评</span><span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                  在起点阅读《诡秘之主》</span><span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">open_in_new</span>
 </div>
-</div>
-<div class="lg:col-span-5 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40" data-card="book" data-category="suspense">
+</a>
+<a aria-label="去起点中文网阅读《道诡异仙》" class="lg:col-span-5 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="suspense" href="https://www.qidian.com/book/1031794030/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《道诡异仙》">
 <div class="flex flex-col gap-4">
 <div class="flex items-center justify-between">
 <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">悬疑志怪 · 克系修仙</span><span class="font-label-sm text-label-sm text-on-surface-variant">210万字 · 追读进度 100%</span>
@@ -125,11 +124,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </div>
 <div class="flex items-center justify-between pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-<span class="font-label-sm text-label-sm text-secondary">坐忘道心素篇 · 白灵淼线评析</span><span class="font-label-sm text-label-sm text-primary group-hover:underline flex items-center gap-1 font-medium">书评手记
+<span class="font-label-sm text-label-sm text-secondary">坐忘道心素篇 · 白灵淼线评析</span><span class="font-label-sm text-label-sm text-primary group-hover:underline flex items-center gap-1 font-medium">去起点阅读
                   <span class="material-symbols-outlined text-xs">open_in_new</span></span>
 </div>
-</div>
-<div class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40" data-card="book" data-category="webnovel">
+</a>
+<a aria-label="去起点中文网阅读《赤心巡天》" class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="webnovel" href="https://www.qidian.com/book/1016530091/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《赤心巡天》">
 <div class="flex flex-col gap-4">
 <div class="flex items-center justify-between">
 <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">仙侠传统 · 争鸣热血</span><span class="font-label-sm text-label-sm text-on-surface-variant">650万字 · 追更中</span>
@@ -150,10 +149,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </div>
 <div class="pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant flex items-center justify-between">
-<span class="font-label-sm text-label-sm">太虚幻境与临淄天下演武</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">chevron_right</span>
+<span class="font-label-sm text-label-sm">太虚幻境与临淄天下演武</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">open_in_new</span>
 </div>
-</div>
-<div class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40" data-card="book" data-category="webnovel">
+</a>
+<a aria-label="去起点中文网阅读《深空彼岸》" class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="webnovel" href="https://www.qidian.com/book/1027339371/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《深空彼岸》">
 <div class="flex flex-col gap-4">
 <div class="flex items-center justify-between">
 <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">科幻修真 · 星际长河</span><span class="font-label-sm text-label-sm text-on-surface-variant">530万字 · 完结精修</span>
@@ -174,10 +173,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </div>
 <div class="pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant flex items-center justify-between">
-<span class="font-label-sm text-label-sm">神明熄灭与地仙泉探索笔记</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">chevron_right</span>
+<span class="font-label-sm text-label-sm">神明熄灭与地仙泉探索笔记</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">open_in_new</span>
 </div>
-</div>
-<div class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40" data-card="book" data-category="webnovel">
+</a>
+<a aria-label="去起点中文网阅读《放开那个女巫》" class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="webnovel" href="https://www.qidian.com/book/1003306811/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《放开那个女巫》">
 <div class="flex flex-col gap-4">
 <div class="flex items-center justify-between">
 <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">种田奇幻 · 工业革命</span><span class="font-label-sm text-label-sm text-on-surface-variant">336万字 · 经典馆藏</span>
@@ -198,9 +197,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </div>
 <div class="pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant flex items-center justify-between">
-<span class="font-label-sm text-label-sm">无冬城工业蓝图与魔力解析</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">chevron_right</span>
+<span class="font-label-sm text-label-sm">无冬城工业蓝图与魔力解析</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">open_in_new</span>
 </div>
-</div>
+</a>
 </div>
 </section>
 <section class="w-full max-w-7xl mx-auto px-gutter" id="music">

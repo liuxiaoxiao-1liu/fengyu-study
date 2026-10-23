@@ -78,7 +78,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-12 gap-space-lg my-space-md items-center">
 <div class="sm:col-span-4 flex justify-center">
-<div class="w-36 h-48 bg-primary rounded shadow-md overflow-hidden relative transform group-hover:-translate-y-1 transition-transform duration-300 flex flex-col justify-between p-3.5 text-on-primary">
+<a aria-label="去起点中文网阅读《诡秘之主》" class="w-36 h-48 bg-primary rounded shadow-md overflow-hidden relative transform group-hover:-translate-y-1 transition-transform duration-300 flex flex-col justify-between p-3.5 text-on-primary block" href="https://www.qidian.com/book/1010868264/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《诡秘之主》">
 <div class="flex justify-between items-center">
 <span class="px-1.5 py-0.5 rounded text-[0.625rem] font-label-sm bg-secondary text-on-secondary font-medium">克苏鲁西幻</span><span class="material-symbols-outlined text-outline-variant text-sm">bookmark</span>
 </div>
@@ -94,7 +94,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="pt-2 border-t border-outline-variant/30 flex items-center justify-between text-[0.625rem] font-label-sm text-outline-variant">
 <span class="">序列途径</span><span class="">二刷高光卷</span>
 </div>
-</div>
+</a>
 </div>
 <div class="sm:col-span-8 flex flex-col gap-space-xs justify-center">
 <div class="flex items-center gap-2">
@@ -122,7 +122,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                     “赞美愚者！不属于这个时代的愚者，灰雾之上的神秘主宰，执掌好运的黄黑之王。”
                   </blockquote>
 </div>
-</article>
+<a class="mt-space-sm inline-flex items-center gap-1 font-label-md text-label-md text-on-tertiary-container hover:text-primary transition-colors font-medium" data-qidian-text="" href="https://www.qidian.com/book/1010868264/" rel="noopener noreferrer external" target="_blank">去起点读全书<span class="material-symbols-outlined text-sm">open_in_new</span></a></article>
 <article class="lg:col-span-5 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" id="music">
 <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
 <div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
@@ -306,20 +306,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </div>
 <form class="flex flex-col gap-space-md pt-space-xs" id="home-letter-form">
-<input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+<input aria-hidden="true" autocomplete="off" class="hidden" name="website" tabindex="-1" type="text"/>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
 <div class="flex flex-col gap-1.5">
-<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">称呼 / 笔名</label><input class="w-full bg-surface-container-low px-space-md py-2 rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="例：远方的夜行者" type="text" id="home-name" name="name"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">称呼 / 笔名</label><input class="w-full bg-surface-container-low px-space-md py-2 rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary" id="home-name" name="name" placeholder="例：远方的夜行者" type="text"/>
 </div>
 <div class="flex flex-col gap-1.5">
-<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">常驻城市 / 留声机单曲</label><input class="w-full bg-surface-container-low px-space-md py-2 rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="例：成都 · 酷狗单曲《大鱼》 / 《诡秘之主》" type="text" id="home-station" name="station"/>
+<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">常驻城市 / 留声机单曲</label><input class="w-full bg-surface-container-low px-space-md py-2 rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary" id="home-station" name="station" placeholder="例：成都 · 酷狗单曲《大鱼》 / 《诡秘之主》" type="text"/>
 </div>
 </div>
 <div class="flex flex-col gap-1.5">
-<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">写下你想说的话...</label><textarea class="w-full bg-surface-container-low p-space-md rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary resize-none leading-relaxed" placeholder="说说你今天的夕阳，或是正在翻开的下一页..." rows="3" id="home-message" name="message"></textarea>
+<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">写下你想说的话...</label><textarea class="w-full bg-surface-container-low p-space-md rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary resize-none leading-relaxed" id="home-message" name="message" placeholder="说说你今天的夕阳，或是正在翻开的下一页..." rows="3"></textarea>
 </div>
 <div class="flex items-center justify-between pt-space-xs">
-<label class="flex items-center gap-2 text-xs font-label-sm text-on-surface-variant cursor-pointer select-none"><input class="accent-secondary rounded" type="checkbox" id="home-private" name="private"/><span class="">仅房主可见 (悄悄话模式)</span></label><button class="px-space-md py-2 bg-primary text-on-primary rounded font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1.5" type="submit">
+<label class="flex items-center gap-2 text-xs font-label-sm text-on-surface-variant cursor-pointer select-none"><input class="accent-secondary rounded" id="home-private" name="private" type="checkbox"/><span class="">仅房主可见 (悄悄话模式)</span></label><button class="px-space-md py-2 bg-primary text-on-primary rounded font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1.5" type="submit">
 <span class="">投递留言</span><span class="material-symbols-outlined text-sm">send</span>
 </button>
 </div>

@@ -44,7 +44,7 @@ ssh "${SSH_OPTS[@]}" "$SERVER" '
 
 echo "==> 同步静态文件到 $SERVER:$REMOTE_DIR"
 ssh "${SSH_OPTS[@]}" "$SERVER" "mkdir -p '$REMOTE_DIR'"
-rsync -az --delete --delay-updates --chmod=D755,F644 \
+rsync -az --delete --delay-updates --chmod=D755,F644 --chown=root:root \
   -e "$RSYNC_SSH" dist/ "$SERVER:$REMOTE_DIR/"
 
 echo "==> 启用站点并重载 nginx"

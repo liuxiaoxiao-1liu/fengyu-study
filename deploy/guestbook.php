@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
-header('X-Content-Type-Options: nosniff');
 
 const DATA_DIR = '/var/lib/xiaoquanzi';
 const STORE_FILE = DATA_DIR . '/guestbook.json';

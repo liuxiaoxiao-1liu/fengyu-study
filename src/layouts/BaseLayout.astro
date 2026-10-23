@@ -1,54 +1,68 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { SITE, type NavKey } from '../lib/site';
+import '../styles/fonts.css';
+import '../styles/icons.css';
 import '../styles/global.css';
 
 interface Props {
-  title: string;
+  title?: string;
   description?: string;
   image?: string;
-  type?: 'website' | 'article';
-  published?: Date;
-  progress?: boolean;
+  current: NavKey;
 }
 
-const { title, description, image, type, published, progress = false } = Astro.props;
+const {
+  title,
+  description = SITE.description,
+  image = '/og.jpg',
+  current,
+} = Astro.props;
+
+const site = Astro.site ?? new URL(SITE.url);
+const canonical = new URL(Astro.url.pathname, site);
+const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} / ${SITE.latin}`;
+const socialImage = new URL(image, site);
 ---
 
 <!doctype html>
-<html lang="zh-CN" id="top">
+<html lang="zh-CN">
   <head>
-    <BaseHead {title} {description} {image} {type} {published} />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="icon" href="/images/logo.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/images/logo.png" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} · RSS`} href={new URL('/rss.xml', site)} />
+    <meta name="theme-color" content="#fcf9f4" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
   </head>
-  <body>
-    <a class="skip-link" href="#main">跳到正文</a>
-    {progress && (
-      <div class="progress" aria-hidden="true"><span></span></div>
-    )}
-    <Header />
-    <main id="main" class="site-main">
-      <slot />
-    </main>
+
+  <body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+    <a
+      href="#main"
+      class="fixed left-space-md top-[-4rem] z-[100] px-space-md py-space-sm bg-primary text-on-primary font-label-md text-label-md rounded focus:top-space-md transition-all"
+    >
+      跳到正文
+    </a>
+    <Header current={current} />
+    <slot />
     <Footer />
-    {
-      progress && (
-        <script is:inline>
-          (function () {
-            var bar = document.querySelector('.progress span');
-            if (!bar) return;
-            function update() {
-              var doc = document.documentElement;
-              var max = doc.scrollHeight - doc.clientHeight;
-              var value = max > 0 ? (doc.scrollTop || document.body.scrollTop) / max : 0;
-              bar.style.width = (Math.min(1, Math.max(0, value)) * 100).toFixed(2) + '%';
-            }
-            update();
-            document.addEventListener('scroll', update, { passive: true });
-            window.addEventListener('resize', update);
-          })();
-        </script>
-      )
-    }
   </body>
 </html>

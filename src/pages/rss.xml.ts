@@ -1,24 +1,24 @@
 import type { APIRoute } from 'astro';
-import { getPosts, postPath } from '../lib/posts';
+import { essays, formatEssayDate } from '../data/essays';
 import { SITE } from '../lib/site';
 import { escapeXml } from '../lib/xml';
 
 export const GET: APIRoute = async ({ site }) => {
-  const posts = await getPosts();
   const base = site ?? new URL(SITE.url);
-  const lastBuild = posts[0]?.data.date ?? new Date();
+  const sorted = [...essays].sort((a, b) => b.date.localeCompare(a.date));
+  const lastBuild = sorted[0] ? new Date(`${sorted[0].date}T00:00:00Z`) : new Date();
 
-  const items = posts
-    .map((post) => {
-      const url = new URL(postPath(post), base).href;
+  const items = sorted
+    .map((essay) => {
+      const url = new URL(`/essays/${essay.slug}/`, base).href;
       return [
         '    <item>',
-        `      <title>${escapeXml(post.data.title)}</title>`,
+        `      <title>${escapeXml(essay.title)}</title>`,
         `      <link>${escapeXml(url)}</link>`,
         `      <guid isPermaLink="true">${escapeXml(url)}</guid>`,
-        `      <pubDate>${post.data.date.toUTCString()}</pubDate>`,
-        `      <description>${escapeXml(post.data.summary)}</description>`,
-        ...post.data.tags.map((tag) => `      <category>${escapeXml(tag)}</category>`),
+        `      <pubDate>${new Date(`${essay.date}T00:00:00Z`).toUTCString()}</pubDate>`,
+        `      <description>${escapeXml(essay.summary)}</description>`,
+        ...essay.tags.map((tag) => `      <category>${escapeXml(tag)}</category>`),
         '    </item>',
       ].join('\n');
     })
@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ site }) => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${escapeXml(SITE.title)}</title>
+    <title>${escapeXml(SITE.name)} / ${escapeXml(SITE.latin)}</title>
     <link>${escapeXml(base.href)}</link>
     <description>${escapeXml(SITE.description)}</description>
     <language>zh-CN</language>
@@ -46,5 +46,4 @@ ${items}
   });
 };
 
-// 让构建期明确生成静态文件
 export const prerender = true;

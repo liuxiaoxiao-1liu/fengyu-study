@@ -1,92 +1,360 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PostRow from '../components/PostRow.astro';
-import { SITE } from '../lib/site';
-import {
-  chineseYear,
-  collectTags,
-  formatDate,
-  getPosts,
-  postPath,
-  readingTime,
-} from '../lib/posts';
-
-const posts = await getPosts();
-const [featured, ...rest] = posts;
-const tags = collectTags(posts);
 ---
 
-<BaseLayout title={SITE.title} description={SITE.description}>
-  <div class="container">
-    <header class="masthead">
-      <p class="eyebrow fade-up">私人笔记本 · 自 {SITE.startYear} 年秋</p>
-      <h1 class="masthead__title fade-up fade-up--1">小圈子</h1>
-      <p class="masthead__lede fade-up fade-up--2">
-        这里是一个人的笔记本，写点日常、照片和一些没想清楚的事。<br />
-        不做订阅，不开评论。看到就是缘分。
-      </p>
-      <div class="masthead__meta fade-up fade-up--3">
-        <span>{posts.length} 篇文字</span>
-        {featured && <span>最近更新 {formatDate(featured.data.date)}</span>}
-        <span>{tags.length} 个标签</span>
-      </div>
-      <span class="masthead__aside" aria-hidden="true">
-        {featured ? `${chineseYear(featured.data.date)} · 记事` : '记事'}
-      </span>
-    </header>
+<BaseLayout current="home">
+<main class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)]" id="main">
+<div class="flex flex-col w-full">
+<!-- Top Welcome & Ticker Header -->
+<section class="w-full max-w-7xl mx-auto px-gutter pt-space-xl pb-space-xl">
+<div class="flex flex-col gap-space-lg">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+<div class="lg:col-span-8 flex flex-col gap-space-md justify-center">
+<div class="inline-flex items-center gap-2 text-secondary font-label-sm text-label-sm font-semibold tracking-wider uppercase">
+<span class="material-symbols-outlined text-base">waving_hand</span><span class="">你好，欢迎光临我的数字秘密基地</span>
+</div>
+<h1 class="font-display text-primary leading-tight font-normal tracking-tight text-display-mobile sm:text-display">
+                  沉迷网文修仙，在酷狗声浪里漫游现实与异次元。
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed max-w-2xl">
+                  白天是穿梭于教室与自习室的大学生，夜晚是在网文世界修仙斩妖、在酷狗音乐里找回平静的数字漫游者。这里收纳了我追过的网文、循环的歌单，以及搜罗的动漫、现实与虚拟世界的画面。
+                </p>
+<div class="flex flex-wrap items-center gap-2 pt-1">
+<span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">#网文迷</span><span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">#酷狗老粉</span><span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">#动漫控</span><span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">#现实捕捉</span><span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">#虚拟漫游</span>
+</div>
+</div>
+<div class="lg:col-span-4 flex flex-col justify-between gap-space-md bg-surface-container-low p-space-lg rounded-xl border border-surface-container-high/60 shadow-sm h-full" id="profile">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-headline-sm font-semibold shrink-0 shadow-sm">
+                    屿
+                  </div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-primary leading-none">岛屿同学</span><span class="px-1.5 py-0.5 rounded text-[0.625rem] font-label-sm bg-secondary text-on-secondary leading-none">在读大三</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1 truncate">普通大学生 / 杂食性生活观察者</span>
+</div>
+</div>
+<div class="bg-surface-container p-space-md rounded font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                  “在充斥速食信息的节奏里，依然为几万字的网文高潮心潮澎湃，依然会在傍晚单曲循环酷狗里那首老歌。”
+                </div>
+<div class="flex items-center gap-space-sm pt-space-xs">
+<a class="flex-1 py-2 bg-primary text-on-primary rounded text-center font-label-md text-label-md hover:bg-primary-container transition-all flex items-center justify-center gap-1 shadow-sm" href="/guestbook/"><span class="material-symbols-outlined text-sm">forum</span><span class="">投递留言</span></a><a class="px-space-md py-2 bg-surface-container-high text-on-surface rounded font-label-md text-label-md hover:bg-surface-container transition-all text-center" href="#stats">数字存根</a>
+</div>
+</div>
+</div>
+<div class="w-full bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-2 bg-surface-container-high/70 px-space-sm py-1.5 rounded text-primary shrink-0">
+<span class="material-symbols-outlined text-sm text-on-tertiary-container animate-pulse">wifi_tethering</span><span class="font-label-sm text-label-sm tracking-wider uppercase font-semibold">NOW / 状态广播</span>
+</div>
+<div class="flex-1 flex flex-wrap items-center gap-x-space-md gap-y-1 font-body-sm text-body-sm text-on-surface-variant px-space-xs">
+<span class="inline-flex items-center gap-1.5"><span class="text-secondary">📖</span><span class="text-on-surface font-medium">追读网文：</span><span class="">《诡秘之主》· 愚者先生归来</span></span><span class="text-outline-variant hidden sm:inline">·</span><span class="inline-flex items-center gap-1.5"><span class="text-on-tertiary-container">🎵</span><span class="text-on-surface font-medium">酷狗单曲：</span><span class="">周深《大鱼》(蝰蛇全景声)</span></span><span class="text-outline-variant hidden lg:inline">·</span><span class="inline-flex items-center gap-1.5"><span class="text-secondary">🎨</span><span class="text-on-surface font-medium">最新灵感：</span><span class="">新海诚风天空插画 + 校园黄昏街拍</span></span>
+</div>
+<div class="text-on-surface-variant text-xs font-label-sm shrink-0 hidden xl:block pr-space-xs">
+                刚刚更新
+              </div>
+</div>
+</div>
+</section>
+<!-- Four Highlight Feature Quadrants / Bento Grid -->
+<section class="w-full max-w-7xl mx-auto px-gutter py-space-xl">
+<div class="flex flex-col gap-space-xl" id="reading-music">
+<div class="flex items-baseline justify-between border-b border-surface-container-high/60 pb-space-sm">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">01 / Hobbies &amp; Passions</span>
+<h2 class="font-headline-md text-headline-md text-primary font-normal">
+                  精神自留地四重奏：网文·酷狗·画界·随笔
+                </h2>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline">网文追更 · 酷狗音乐 · 多元画境 · 杂谈笔记</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-stretch">
+<article class="lg:col-span-7 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group" id="reading">
+<div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+<span class="material-symbols-outlined text-base">menu_book</span><span class="uppercase tracking-widest font-semibold">网文书架 · Web Novel Shelf</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">追更中 · 第 841 章</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-space-lg my-space-md items-center">
+<div class="sm:col-span-4 flex justify-center">
+<div class="w-36 h-48 bg-primary rounded shadow-md overflow-hidden relative transform group-hover:-translate-y-1 transition-transform duration-300 flex flex-col justify-between p-3.5 text-on-primary">
+<div class="flex justify-between items-center">
+<span class="px-1.5 py-0.5 rounded text-[0.625rem] font-label-sm bg-secondary text-on-secondary font-medium">克苏鲁西幻</span><span class="material-symbols-outlined text-outline-variant text-sm">bookmark</span>
+</div>
+<div>
+<span class="font-label-sm text-[0.625rem] text-outline-variant uppercase tracking-wider block mb-0.5">Lord of Mysteries</span>
+<h4 class="font-headline-sm text-headline-sm leading-snug font-normal">
+                          《诡秘之主》
+                        </h4>
+<p class="font-label-sm text-[0.625rem] text-outline-variant mt-1">
+                          爱潜水的乌贼 著
+                        </p>
+</div>
+<div class="pt-2 border-t border-outline-variant/30 flex items-center justify-between text-[0.625rem] font-label-sm text-outline-variant">
+<span class="">序列途径</span><span class="">二刷高光卷</span>
+</div>
+</div>
+</div>
+<div class="sm:col-span-8 flex flex-col gap-space-xs justify-center">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-high px-space-xs py-0.5 rounded font-medium">年度二刷神作</span><span class="font-label-sm text-label-sm text-on-surface-variant">同步追读：《道诡异仙》</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-normal mt-1">
+                      《诡秘之主》· 塔罗会与序列途径
+                    </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mt-1">
+                      “我们是守护者，也是一群时刻对抗疯狂的可怜虫。”在深夜自习室合上教科书后，一头扎进廷根与贝克兰德的雨雾中。
+                    </p>
+<div class="flex flex-col gap-1.5 mt-space-sm">
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span class="">当前进度 · 第六卷 逐光者</span><span class="font-semibold text-primary">84%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full transition-all duration-500" style="width: 84%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container p-space-md rounded-lg flex items-start gap-space-sm mt-space-xs">
+<span class="material-symbols-outlined text-on-tertiary-container text-xl shrink-0 mt-0.5">format_quote</span>
+<blockquote class="font-quote text-quote italic text-primary leading-relaxed">
+                    “赞美愚者！不属于这个时代的愚者，灰雾之上的神秘主宰，执掌好运的黄黑之王。”
+                  </blockquote>
+</div>
+</article>
+<article class="lg:col-span-5 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" id="music">
+<div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+<span class="material-symbols-outlined text-base">graphic_eq</span><span class="uppercase tracking-widest font-semibold">酷狗音乐 · KuGou VIP</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-high px-space-xs py-0.5 rounded font-medium">蝰蛇全景声 ON</span>
+</div>
+<div class="my-space-md flex items-center gap-space-md bg-surface-container p-space-md rounded-lg">
+<div class="relative w-16 h-16 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-md">
+<div class="w-12 h-12 rounded-full border border-surface-container-highest/30 flex items-center justify-center animate-[spin_8s_linear_infinite]">
+<div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-on-secondary font-label-sm text-[0.625rem]">
+                        KG
+                      </div>
+</div>
+</div>
+<div class="flex flex-col min-w-0 flex-1 justify-center">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-medium uppercase tracking-wider">酷狗正在播放</span><span class="text-[0.625rem] bg-secondary-container text-on-secondary-container px-1 rounded">Hi-Res无损</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary truncate leading-tight mt-1">大鱼 (动画电影《大鱼海棠》印象曲)</span><span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">周深 · 酷狗热歌循环TOP1</span>
+<div class="flex items-center gap-space-sm mt-space-xs">
+<span class="text-xs text-on-surface-variant font-label-sm">03:12</span>
+<div class="flex-1 h-1 bg-surface-container-high rounded-full overflow-hidden">
+<div class="w-3/5 h-full bg-secondary"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-label-sm">05:13</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">酷狗歌单精选循环</span>
+<div class="space-y-1">
+<div class="flex items-center justify-between p-2 rounded hover:bg-surface-container transition-colors">
+<span class="font-body-sm text-body-sm text-primary truncate">《起风了》· 买辣椒也用券</span><span class="font-label-sm text-label-sm text-on-surface-variant shrink-0">国语流行</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded hover:bg-surface-container transition-colors">
+<span class="font-body-sm text-body-sm text-primary truncate">《打上花火》· 米津玄师 &amp; DAOKO</span><span class="font-label-sm text-label-sm text-on-surface-variant shrink-0">ACG动漫</span>
+</div>
+</div>
+</div>
+</article>
+<article class="lg:col-span-5 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" id="visual-gallery">
+<div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+<span class="material-symbols-outlined text-base">palette</span><span class="uppercase tracking-widest font-semibold">光影图鉴 · Visual Mix</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">动漫 / 摄影 / 3D虚拟</span>
+</div>
+<div class="my-space-md bg-surface-container p-space-md rounded-lg shadow-sm flex flex-col gap-space-sm">
+<div class="grid grid-cols-3 gap-2">
+<div class="rounded overflow-hidden aspect-square bg-surface-container-highest relative group">
+<img alt="Anime aesthetic sky" class="w-full h-full object-cover" decoding="async" height="279" loading="lazy" src="/images/anime-sky.jpg" width="512"/><span class="absolute bottom-1 left-1 px-1 rounded bg-primary/70 text-on-primary font-label-sm text-[0.625rem]">校园摄影</span>
+</div>
+<div class="rounded overflow-hidden aspect-square bg-surface-container-highest relative group">
+<img alt="Anime city night view" class="w-full h-full object-cover" decoding="async" height="279" loading="lazy" src="/images/photos/store.jpg" width="512"/><span class="absolute bottom-1 left-1 px-1 rounded bg-primary/70 text-on-primary font-label-sm text-[0.625rem]">动漫氛围</span>
+</div>
+<div class="rounded overflow-hidden aspect-square bg-primary/10 flex flex-col items-center justify-center p-2 text-center border border-dashed border-secondary">
+<span class="material-symbols-outlined text-secondary text-xl">token</span><span class="font-label-sm text-[0.625rem] text-primary font-medium mt-1">虚拟CG探索</span><span class="font-label-sm text-[0.625rem] text-on-surface-variant">Blender渲染</span>
+</div>
+</div>
+<div class="pt-1 flex items-end justify-between">
+<div>
+<p class="font-body-md text-body-md text-primary font-medium tracking-tight">
+                        现实与二次元的色彩交界
+                      </p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">
+                        从校园余晖到新海诚风天空
+                      </p>
+</div>
+<span class="font-label-sm text-label-sm text-secondary tracking-widest font-mono">58 张收录</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm bg-surface-container px-space-xs py-0.5 rounded text-on-surface-variant">#动漫壁纸</span><span class="font-label-sm text-label-sm bg-surface-container px-space-xs py-0.5 rounded text-on-surface-variant">#扫街胶片</span>
+</div>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-primary transition-colors flex items-center gap-1 font-medium" href="/photos/"><span class="">浏览完整相册</span><span class="material-symbols-outlined text-xs">arrow_forward</span></a>
+</div>
+</article>
+<article class="lg:col-span-7 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" id="notes">
+<div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+<span class="material-symbols-outlined text-base">history_edu</span><span class="uppercase tracking-widest font-semibold">杂感随笔 · Reading &amp; Listening Notes</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">3 min read</span>
+</div>
+<div class="my-space-md flex flex-col gap-space-sm">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">2025年11月 · 熬夜追更</span><span class="text-outline-variant">/</span><span class="font-label-sm text-label-sm text-secondary font-medium">网文与酷狗听歌杂记</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary font-normal mt-1">
+                    为什么当代大学生依然离不开网文与老歌？
+                  </h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed line-clamp-3 mt-1">
+                    白天在课堂和实验报告里被各种DDL推着往前跑，只有到了深夜，戴上耳机打开酷狗的蝰蛇音效，再点开最新更新的网文章节，那片波澜壮阔的世界才真正属于自己。网文不是逃避，而是给紧绷的现实搭起的一座避风港……
+                  </p>
+</div>
+<div class="bg-surface-container p-space-md rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm mt-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant italic">“用想象力对抗生活的琐碎平庸。”</span><a class="font-label-md text-label-md text-primary hover:text-on-tertiary-container transition-colors inline-flex items-center gap-1 font-medium" href="/essays/"><span class="">阅读随想全文</span><span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+</div>
+</article>
+</div>
+</div>
+</section>
+<!-- Quick Stats & Vibe Bar -->
+<section class="w-full max-w-7xl mx-auto px-gutter py-space-xl" id="stats">
+<div class="bg-surface-container-low rounded-xl p-space-xl shadow-sm">
+<div class="flex flex-col md:flex-row items-center justify-between gap-space-xl">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Life Artifacts</span>
+<h3 class="font-headline-sm text-headline-sm text-primary font-normal mt-1">
+                  书房与精神刻度
+                </h3>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-space-md w-full md:w-auto flex-1 lg:max-w-3xl">
+<div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">网文追读</span>
+<div class="flex items-baseline gap-1.5 mt-1.5">
+<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">42</span><span class="font-label-sm text-label-sm text-secondary font-medium">部神作</span>
+</div>
+</div>
+<div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">酷狗收藏</span>
+<div class="flex items-baseline gap-1.5 mt-1.5">
+<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">560</span><span class="font-label-sm text-label-sm text-secondary font-medium">首红心</span>
+</div>
+</div>
+<div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">视觉图集</span>
+<div class="flex items-baseline gap-1.5 mt-1.5">
+<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">128</span><span class="font-label-sm text-label-sm text-secondary font-medium">张插画照片</span>
+</div>
+</div>
+<div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">随想随笔</span>
+<div class="flex items-baseline gap-1.5 mt-1.5">
+<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">36</span><span class="font-label-sm text-label-sm text-secondary font-medium">篇记录</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Guestbook / Letterbox Mini Preview Section -->
+<section class="w-full max-w-7xl mx-auto px-gutter pb-space-xl" id="guestbook">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-center bg-surface-container-low rounded-xl p-space-lg lg:p-space-xl shadow-sm relative overflow-hidden">
+<!-- Left Column: Invitation text -->
+<div class="lg:col-span-5 flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-secondary">
+<span class="material-symbols-outlined text-base">mark_email_unread</span>
+<span class="uppercase tracking-widest font-semibold">时光信箱 · Letterbox</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary font-normal leading-snug">
+                留下一枚字句，<br/>像向大海投递一只漂流瓶。
+              </h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                若你也恰巧在某个静默的夜晚途经此处，欢迎留下近况、推荐一首近期陪伴你的好歌，或仅仅是一句简单的“见字如面”。
+              </p>
+<div class="flex items-center gap-space-md pt-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-secondary">lock</span>
+                  支持公开或仅博主可见
+                </span>
+<span class="">·</span>
+<span class="">回复率 100%</span>
+</div>
+</div>
+<!-- Right Column: Interactive Mini Form & Recent Notes -->
+<div class="lg:col-span-7 flex flex-col gap-space-md bg-surface-container p-space-lg rounded-lg">
+<div class="bg-surface-container-low p-space-md rounded-lg border border-surface-container-high/40 flex items-start gap-space-sm shadow-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-sm font-semibold shrink-0">
+                  修
+                </div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm font-medium text-primary">修仙考研人 (来自广州)</span><span class="font-label-sm text-[0.625rem] text-on-surface-variant">今天 14:20</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+                    “同在二刷《诡秘之主》！酷狗里开着蝰蛇音效听《大鱼》看网文真是一绝，强烈安利你去听听周深的现场版，氛围感拉满。”
+                  </p>
+</div>
+</div>
+<form class="flex flex-col gap-space-md pt-space-xs" id="home-letter-form">
+<input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">称呼 / 笔名</label><input class="w-full bg-surface-container-low px-space-md py-2 rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="例：远方的夜行者" type="text" id="home-name" name="name"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">常驻城市 / 留声机单曲</label><input class="w-full bg-surface-container-low px-space-md py-2 rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="例：成都 · 酷狗单曲《大鱼》 / 《诡秘之主》" type="text" id="home-station" name="station"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">写下你想说的话...</label><textarea class="w-full bg-surface-container-low p-space-md rounded text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary resize-none leading-relaxed" placeholder="说说你今天的夕阳，或是正在翻开的下一页..." rows="3" id="home-message" name="message"></textarea>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<label class="flex items-center gap-2 text-xs font-label-sm text-on-surface-variant cursor-pointer select-none"><input class="accent-secondary rounded" type="checkbox" id="home-private" name="private"/><span class="">仅房主可见 (悄悄话模式)</span></label><button class="px-space-md py-2 bg-primary text-on-primary rounded font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1.5" type="submit">
+<span class="">投递留言</span><span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+<div class="hidden p-space-sm bg-secondary-container text-on-secondary-container rounded font-label-sm text-label-sm flex items-center gap-space-xs shadow-sm" id="letter-toast">
+<span class="material-symbols-outlined text-sm">check_circle</span><span class="">纸飞机已寄出！感谢你把一束微光照进书房。</span>
+</div>
+</form>
+</div>
+</div>
+</section>
+</div>
+</main>
 
-    {
-      featured && (
-        <article class="featured fade-up fade-up--2">
-          <a class="featured__media" href={postPath(featured)} aria-hidden="true" tabindex="-1">
-            {featured.data.cover ? (
-              <img
-                src={featured.data.cover}
-                alt=""
-                width="1800"
-                height="1013"
-                loading="eager"
-                decoding="async"
-                fetchpriority="high"
-              />
-            ) : (
-              <span></span>
-            )}
-          </a>
-          <div class="featured__body">
-            <p class="kicker">最新</p>
-            <h2 class="featured__title">
-              <a href={postPath(featured)}>{featured.data.title}</a>
-            </h2>
-            <p class="featured__summary">{featured.data.summary}</p>
-            <p class="featured__meta">
-              {formatDate(featured.data.date)} · 约 {readingTime(featured)} 分钟
-              {featured.data.tags.length > 0 && ` · ${featured.data.tags.join(' / ')}`}
-            </p>
-            <a class="read-more" href={postPath(featured)}>
-              读这一篇 <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </article>
-      )
+<script>
+  const homeForm = document.getElementById('home-letter-form');
+  const homeToast = document.getElementById('letter-toast');
+  const showHomeToast = (message) => {
+    if (!homeToast) return;
+    const label = homeToast.querySelector('span:last-child');
+    if (label) label.textContent = message;
+    homeToast.classList.remove('hidden');
+    window.setTimeout(() => homeToast.classList.add('hidden'), 3500);
+  };
+  homeForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = document.getElementById('home-name')?.value.trim() || '';
+    const station = document.getElementById('home-station')?.value.trim() || '';
+    const message = document.getElementById('home-message')?.value.trim() || '';
+    const isPrivate = document.getElementById('home-private')?.checked || false;
+    if (!name || !message) {
+      showHomeToast('昵称和正文都要写一点，才好投递。');
+      return;
     }
-
-    {
-      rest.length > 0 && (
-        <section aria-labelledby="recent-heading">
-          <div class="section-head">
-            <h2 id="recent-heading">最近写的</h2>
-            <a href="/archive/">全部 {posts.length} 篇 →</a>
-          </div>
-          <ol class="post-list">
-            {rest.map((post) => <PostRow post={post} />)}
-          </ol>
-        </section>
-      )
-    }
-
-    <a class="all-link" href="/archive/">
-      查看全部文字 <span aria-hidden="true">→</span>
-    </a>
-  </div>
+    const params = new URLSearchParams({ name, station, message, private: isPrivate ? '1' : '0' });
+    window.location.href = `/guestbook/?${params.toString()}#guestbook-form`;
+  });
+</script>
 </BaseLayout>

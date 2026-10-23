@@ -1,38 +1,211 @@
 ---
-import ThemeToggle from './ThemeToggle.astro';
+import { SITE, NAV, type NavKey } from '../lib/site';
+import { searchIndex } from '../data/search';
 
-const path = Astro.url.pathname;
+interface Props {
+  current: NavKey;
+}
 
-const links = [
-  { href: '/', label: '首页' },
-  { href: '/archive/', label: '归档' },
-  { href: '/about/', label: '关于' },
-];
+const { current } = Astro.props;
+const playing = {
+  title: 'Autumn Leaves',
+  subtitle: 'Lo-Fi Chill Rotation',
+};
 
-const isActive = (href: string) =>
-  href === '/' ? path === '/' : path === href || path.startsWith(href);
+const navBase = 'px-space-md py-space-xs rounded-full font-label-md text-label-md transition-colors';
+const navActive = 'bg-surface-container-high text-on-surface font-medium shadow-sm';
+const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container';
 ---
 
-<header class="site-header">
-  <div class="container site-header__inner">
-    <a class="brand" href="/" aria-label="小圈子 · 首页">
-      <svg class="brand__seal" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-        <rect width="64" height="64" rx="10" fill="var(--accent)"></rect>
-        <circle cx="32" cy="32" r="16" fill="none" stroke="var(--paper)" stroke-width="3.5"></circle>
-        <circle cx="32" cy="32" r="4.5" fill="var(--paper)"></circle>
-      </svg>
-      <span class="brand__name">小圈子</span>
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)]">
+  <div class="h-20 w-full px-gutter flex items-center justify-between gap-space-md">
+    <a class="flex items-center gap-space-md min-w-0" href="/" aria-label="风屿书房 · 首页">
+      <img alt="" class="h-8 w-auto object-contain shrink-0" src="/images/logo.png" width="96" height="96" />
+      <span class="flex flex-col min-w-0">
+        <span class="font-headline-sm text-headline-sm tracking-tight text-primary leading-none truncate">{SITE.name}</span>
+        <span class="hidden sm:block font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase mt-space-xs truncate">{SITE.tagline}</span>
+      </span>
     </a>
 
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="hidden lg:flex items-center gap-space-xs bg-surface-container-low px-space-xs py-space-xs rounded-full" aria-label="主导航">
       {
-        links.map((link) => (
-          <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
-            {link.label}
+        NAV.map((item) => (
+          <a
+            href={item.href}
+            aria-current={current === item.key ? 'page' : undefined}
+            class:list={[navBase, current === item.key ? navActive : navIdle]}
+          >
+            {item.label}
           </a>
         ))
       }
-      <ThemeToggle />
     </nav>
+
+    <div class="flex items-center gap-space-sm sm:gap-space-md shrink-0">
+      <a
+        class="hidden sm:flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.02)] hover:bg-surface-container transition-colors group"
+        href="/reading/#music"
+        aria-label={`正在播放 ${playing.title}，查看酷狗歌单`}
+      >
+        <span class="material-symbols-outlined text-secondary text-base animate-[spin_8s_linear_infinite] group-hover:[animation-play-state:paused]">album</span>
+        <span class="flex flex-col max-w-[130px] xl:max-w-[170px]">
+          <span class="font-label-sm text-label-sm text-primary truncate leading-tight">{playing.title}</span>
+          <span class="font-label-sm text-[0.625rem] text-on-surface-variant truncate leading-none">{playing.subtitle}</span>
+        </span>
+        <span class="material-symbols-outlined text-base text-on-surface-variant group-hover:text-on-surface transition-colors">headphones</span>
+      </a>
+
+      <button
+        type="button"
+        aria-label="搜索文字、书与歌"
+        class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-on-surface transition-colors"
+        data-search-open
+      >
+        <span class="material-symbols-outlined text-lg">search</span>
+      </button>
+
+      <a class="block shrink-0" href="/#profile" aria-label="关于岛屿同学">
+        <img
+          alt="岛屿同学的头像"
+          class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/40 hover:ring-secondary transition-all"
+          src="/images/profile.jpg"
+          width="160"
+          height="160"
+        />
+      </a>
+
+      <button
+        type="button"
+        class="lg:hidden flex items-center justify-center p-space-xs text-on-surface-variant hover:text-on-surface transition-colors"
+        aria-label="打开导航菜单"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        data-menu-toggle
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
+    </div>
   </div>
+
+  <nav id="mobile-nav" class="hidden lg:hidden border-t border-surface-container-high bg-surface px-gutter py-space-md" aria-label="移动端导航">
+    <ul class="grid grid-cols-2 gap-space-xs">
+      {
+        NAV.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={current === item.key ? 'page' : undefined}
+              class:list={[
+                'block px-space-md py-space-sm rounded-lg font-label-lg text-label-lg transition-colors',
+                current === item.key ? 'bg-surface-container-high text-on-surface' : 'text-on-surface-variant hover:bg-surface-container-low',
+              ]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
 </header>
+
+<dialog id="search-dialog" class="search-dialog" aria-labelledby="search-title">
+  <div class="bg-surface rounded-xl border border-surface-container-high shadow-[0_20px_60px_-20px_rgba(42,36,33,0.35)] overflow-hidden">
+    <div class="flex items-center justify-between px-space-lg py-space-md border-b border-surface-container-high">
+      <h2 id="search-title" class="font-headline-sm text-headline-sm text-primary">翻一翻书房</h2>
+      <button type="button" class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-on-surface" aria-label="关闭搜索" data-search-close>
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+    <div class="px-space-lg pt-space-md">
+      <label class="sr-only" for="search-input">搜索文字、书与歌</label>
+      <input
+        id="search-input"
+        type="search"
+        autocomplete="off"
+        placeholder="搜一本书、一首歌，或者一句想不起的话……"
+        class="w-full bg-transparent border-0 border-b border-surface-container-high pb-space-sm font-body-lg text-body-lg text-primary placeholder:text-on-surface-variant/50 focus:outline-none focus:border-secondary"
+      />
+    </div>
+    <div class="max-h-[60vh] overflow-y-auto px-space-sm py-space-sm" data-search-results>
+      {
+        searchIndex.map((item) => (
+          <a
+            href={item.href}
+            data-result
+            data-search={[item.title, item.summary, item.kind].join(' ')}
+            class="block px-space-md py-space-sm rounded-lg hover:bg-surface-container-low transition-colors"
+          >
+            <span class="flex items-baseline gap-space-sm">
+              <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider shrink-0">{item.kind}</span>
+              <span class="font-body-md text-body-md text-primary">{item.title}</span>
+            </span>
+            <span class="block font-body-sm text-body-sm text-on-surface-variant truncate">{item.summary}</span>
+          </a>
+        ))
+      }
+      <p class="hidden px-space-md py-space-lg text-center font-body-sm text-body-sm text-on-surface-variant" data-search-empty>没有找到。换个词试试，或者去<a class="text-on-tertiary-container underline underline-offset-4" href="/essays/">随记</a>里翻翻。</p>
+    </div>
+    <div class="px-space-lg py-space-sm border-t border-surface-container-high font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between">
+      <span>Esc 关闭</span>
+      <span>共 {searchIndex.length} 条索引</span>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const menuToggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const mobileNav = document.getElementById('mobile-nav');
+  menuToggle?.addEventListener('click', () => {
+    const open = menuToggle.getAttribute('aria-expanded') === 'true';
+    menuToggle.setAttribute('aria-expanded', String(!open));
+    mobileNav?.classList.toggle('hidden', open);
+  });
+  mobileNav?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      menuToggle?.setAttribute('aria-expanded', 'false');
+      mobileNav.classList.add('hidden');
+    });
+  });
+
+  const dialog = document.getElementById('search-dialog') as HTMLDialogElement | null;
+  const input = document.getElementById('search-input') as HTMLInputElement | null;
+  const results = [...document.querySelectorAll<HTMLElement>('[data-result]')];
+  const empty = document.querySelector<HTMLElement>('[data-search-empty]');
+
+  function filterResults(query: string) {
+    const q = query.trim().toLowerCase();
+    let shown = 0;
+    for (const item of results) {
+      const haystack = (item.dataset.search ?? '').toLowerCase();
+      const match = !q || haystack.includes(q);
+      item.classList.toggle('hidden', !match);
+      if (match) shown += 1;
+    }
+    empty?.classList.toggle('hidden', shown !== 0);
+  }
+
+  function openSearch() {
+    if (!dialog) return;
+    if (!dialog.open) dialog.showModal();
+    if (input) {
+      input.value = '';
+      filterResults('');
+      window.setTimeout(() => input.focus(), 30);
+    }
+  }
+
+  document.querySelectorAll('[data-search-open]').forEach((button) => {
+    button.addEventListener('click', openSearch);
+  });
+  document.querySelector('[data-search-close]')?.addEventListener('click', () => dialog?.close());
+  dialog?.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  input?.addEventListener('input', () => filterResults(input.value));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && dialog?.open) dialog.close();
+  });
+</script>

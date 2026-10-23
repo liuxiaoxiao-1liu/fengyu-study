@@ -1,11 +1,12 @@
-# 小圈子
+# 风屿书房 / Island of Solitude
 
-一个安静的个人笔记站点，用 [Astro](https://astro.build) 构建，部署在自己的服务器上。
+一个大学生收藏网文、酷狗歌单、影像与随笔的数字秘密基地。视觉参考 `stitch_astro_personal_website/` 中的 *Warm Editorial Literary Journal* 设计稿，用 Astro 重建为可部署的独立站点。
 
-- 纯静态输出，不依赖数据库和运行时服务
-- 文章用 Markdown 写在 `src/content/blog/`
-- 支持归档、标签、RSS、站点地图、暗色模式、文章阅读进度
-- 无统计脚本、无评论框、无 Cookie
+- 纯静态页面（Astro 7）+ Tailwind CSS 3
+- 自托管字体与图标（Newsreader / Space Grotesk / Material Symbols），不依赖 Google Fonts
+- 首页、读听、影集、随记、留言五个板块
+- 随记详情页、站内搜索、分类筛选、打捞漂流瓶、暗色以外的纸感排版
+- 留言箱带一个轻量 PHP API（公开留言直接上墙，悄悄话只存服务器）
 
 线上地址：<http://example.com/>
 
@@ -18,28 +19,50 @@ npm run build        # 输出到 dist/
 npm run preview      # 预览构建结果
 ```
 
-> 这台机器的 `$HOME` 和 `/etc/ssh` 有一部分是只读的，所以脚本会把 npm / Astro 的缓存和配置写到项目内（`.npm-cache/`、`.config/`）。在正常机器上不需要这些设置。
+这台机器的 `$HOME`、`/etc/ssh` 有部分只读限制，所以脚本会把 npm / Astro 的缓存和配置写进项目内（`.npm-cache/`、`.config/`）。普通开发机不需要这些设置。
 
-## 写一篇新文章
+## 页面与内容
 
-在 `src/content/blog/` 新建 `.md` 文件，文件名会成为 URL：`my-post.md` → `/posts/my-post/`。
+| 路由 | 内容 |
+| --- | --- |
+| `/` | 首页：欢迎语、状态广播、网文/酷狗/影集/随记四宫格、数据存根、留言预览 |
+| `/reading/` | 读听：追更书架、年度网文、酷狗歌单与听歌月报 |
+| `/photos/` | 影集：动漫 / 现实 / 虚拟 CG 图像档案与手记 |
+| `/essays/` | 随记：文章列表、书写脉络、即刻手记、主题检索、季刊订阅 |
+| `/essays/[slug]/` | 随记详情页 |
+| `/guestbook/` | 留言：投递信笺、房主公告、友链、留言回廊、漂流瓶 |
+| `/rss.xml`、`/sitemap.xml`、`/404.html` | 订阅、站点地图、404 |
 
-```md
----
-title: "标题"
-date: 2026-10-10
-tags: ["随笔"]
-summary: "列表页显示的一句话摘要。"
-cover: "/img/road.jpg"        # 可选
-coverAlt: "封面图说明"         # 可选
-coverCaption: "图片说明"       # 可选
-draft: false                  # true 则不会发布
----
+内容目前是设计稿中的示例文案，直接改这些地方即可换成自己的：
 
-正文……
+- 随记正文：`src/data/essays.ts`
+- 站内搜索索引：`src/data/search.ts`
+- 首页与各栏目的文案、书籍/歌单信息：直接在各页面的 `.astro` 文件里改
+- 首页/栏目图片：`public/images/`
+- 书籍封面与专辑封面：`public/images/covers/`（由 `stitch-assets/make-covers.py` 生成，可直接替换）
+- 站点名、简介、页脚：`src/lib/site.ts`
+
+字体文件在 `public/fonts/`，CSS 在 `src/styles/fonts.css` 与 `src/styles/icons.css`。
+
+## 留言 API
+
+`POST /api/guestbook` 接收 JSON：
+
+```json
+{
+  "name": "称呼",
+  "station": "城市 / 推荐单曲",
+  "tag": "网文同好",
+  "message": "信笺正文",
+  "private": false,
+  "website": ""
+}
 ```
 
-正文里的图片放在 `public/img/`，引用 `/img/xxx.jpg`；原图放 `public/original/`，供“点开看原图”链接使用。示例照片来自 [Unsplash](https://unsplash.com/)，可以直接替换成自己的照片。
+- 公开留言写入后立即上墙；`private: true` 只保存在服务器，不在页面返回
+- 有蜜罐字段、长度限制和每 IP 60 秒一次的频率限制
+- 数据文件：`/var/lib/xiaoquanzi/guestbook.json`（在 web 根目录之外，www-data 读写）
+- 后台实现：`deploy/guestbook.php`，通过 nginx 的 `/api/guestbook` 交给 php8.3-fpm
 
 ## 部署
 
@@ -50,56 +73,38 @@ draft: false                  # true 则不会发布
 脚本会：
 
 1. `npm run build`
-2. 上传 `deploy/nginx.conf` 到服务器的 `/etc/nginx/sites-available/xiaoquanzi`
-3. `rsync` 上传 `dist/` 到 `/var/www/xiaoquanzi`
-4. 停用 nginx 默认站点、启用本站、检查配置并重载 nginx
-5. 验证首页、RSS、站点地图
+2. 上传 `deploy/nginx.conf` 到 `/etc/nginx/sites-available/xiaoquanzi`
+3. 上传留言 API 并准备数据目录
+4. `rsync` 上传 `dist/` 到 `/var/www/xiaoquanzi`
+5. 停用 nginx 默认站点、启用本站、检查配置并重载
+6. 验证首页、RSS、站点地图、留言 API
 
-可覆盖的变量：
+可覆盖变量：
 
 ```bash
 SERVER=root@1.2.3.4 REMOTE_DIR=/var/www/site ./deploy.sh
 SSH_KEY=~/.ssh/other_key SSH_CONFIG=~/.ssh/config ./deploy.sh
 ```
 
-服务器上第一次部署前的默认站点配置会备份到 `/root/nginx-default-site.bak`。
-
 ### 服务器约定
 
 | 项目 | 值 |
 | --- | --- |
-| 服务器 | `example.com`（Ubuntu 24.04） |
+| 服务器 | `example.com`（Ubuntu 24.04 / nginx 1.24） |
 | 登录 | `root` + `~/.ssh/id_ed25519` |
 | Web 根目录 | `/var/www/xiaoquanzi` |
+| 留言 API | `/var/www/xiaoquanzi-api/guestbook.php` |
+| 留言数据 | `/var/lib/xiaoquanzi/guestbook.json` |
 | Nginx 站点 | `/etc/nginx/sites-enabled/xiaoquanzi` |
-| 端口 | `80`（`443` 由 xray 占用，未改动） |
+| 端口 | `80`；`443` 由 xray 占用，未改动 |
 
 ### 以后绑定域名
 
-1. 把域名 A 记录指向 `example.com`
+1. 域名 A 记录指向 `example.com`
 2. 修改 `astro.config.mjs` 的 `site` 和 `deploy/nginx.conf` 的 `server_name`
 3. 重新执行 `./deploy.sh`
-4. 如需 HTTPS，需要让 443 端口可用（目前被 xray 占用）后再用 certbot 签证书
+4. 如需 HTTPS，需要先让 443 端口可用（目前被 xray 占用），再用 certbot 签证书
 
-## 目录
+## 设计参考
 
-```text
-src/
-  components/       页头、页脚、主题切换、文章行
-  content/blog/     Markdown 文章
-  layouts/          基础布局
-  lib/              日期、标签、阅读时间等工具
-  pages/            首页、文章、归档、标签、关于、404、RSS、sitemap
-  styles/           全站样式
-public/
-  img/              页面使用的压缩图片
-  original/         原图（“点开看原图”）
-deploy/
-  nginx.conf        服务器 nginx 配置
-deploy.sh           一键构建 + 发布
-```
-
-## 说明
-
-- 站点内容（文字与示例照片）是演示用的，发布前可以换成自己的。
-- `_trial/` 是之前 Hugo 方案的试验目录，未纳入构建，已在 `.gitignore` 中忽略。
+`stitch_astro_personal_website/` 是设计稿导出（5 个页面截图 + 设计 token），只作为参考，不参与构建；已在 `.gitignore` 中忽略。照片与头像为设计稿里的示例素材，字体与图标已本地化。

@@ -2,15 +2,27 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="404 · 这里没有东西" description="你要找的页面不在这里。">
-  <div class="container">
-    <div class="not-found">
-      <p class="not-found__code" aria-hidden="true">404</p>
-      <h1 class="not-found__title">这条小路通向一片空地。</h1>
-      <p class="not-found__text">
-        可能是我改过地址，也可能是这个链接从来就不存在。要不要回首页看看？
+<BaseLayout current="home" title="404 · 这里没有东西" description="你要找的页面不在这里。">
+  <main id="main" class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)]">
+    <div class="max-w-3xl mx-auto px-gutter py-space-xl flex flex-col items-start">
+      <p class="font-label-sm text-label-sm uppercase tracking-[0.25em] text-secondary">Lost in the stacks</p>
+      <p class="font-display text-[6rem] sm:text-[9rem] leading-none text-surface-dim mt-space-sm select-none" aria-hidden="true">404</p>
+      <h1 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary tracking-tight font-normal mt-space-sm">
+        这条小路通向一片空地。
+      </h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed max-w-lg mt-space-md">
+        可能是我改过地址，也可能是这个链接从来就不存在。要不要回书房坐坐，或者去随记里翻两页？
       </p>
-      <a class="all-link" href="/">回到首页 <span aria-hidden="true">→</span></a>
+      <div class="flex flex-wrap items-center gap-space-sm mt-space-lg">
+        <a class="inline-flex items-center gap-space-xs bg-primary text-on-primary px-space-lg py-space-sm rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm" href="/">
+          <span class="material-symbols-outlined text-base">auto_stories</span>
+          <span>回到首页</span>
+        </a>
+        <a class="inline-flex items-center gap-space-xs border border-surface-container-high px-space-lg py-space-sm rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container-low transition-colors" href="/essays/">
+          <span>翻翻随记</span>
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
     </div>
-  </div>
+  </main>
 </BaseLayout>

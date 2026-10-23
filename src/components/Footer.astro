@@ -2,36 +2,34 @@
 import { SITE } from '../lib/site';
 
 const year = new Date().getFullYear();
-const years = year > SITE.startYear ? `${SITE.startYear}–${year}` : `${SITE.startYear}`;
+const span = year > SITE.startYear ? `${SITE.startYear}–${year}` : String(SITE.startYear);
 ---
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="site-footer__inner">
-      <div>
-        <a class="site-footer__brand" href="/">
-          <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-            <rect width="64" height="64" rx="10" fill="var(--accent)"></rect>
-            <circle cx="32" cy="32" r="16" fill="none" stroke="var(--paper)" stroke-width="3.5"></circle>
-            <circle cx="32" cy="32" r="4.5" fill="var(--paper)"></circle>
-          </svg>
-          <span>小圈子</span>
-        </a>
-        <p class="site-footer__motto">写点日常、照片和一些没想清楚的事。<br />不做订阅，不开评论。看到就是缘分。</p>
-      </div>
-
-      <nav class="site-footer__links" aria-label="页脚导航">
-        <a href="/archive/">归档</a>
-        <a href="/about/">关于</a>
-        <a href="/rss.xml">RSS</a>
-        <a href="/sitemap.xml">站点地图</a>
-        <a href="#top">回到顶部 ↑</a>
-      </nav>
+<footer class="w-full bg-surface-container-low py-space-xl mt-space-xl shadow-[0_-1px_6px_rgba(0,0,0,0.02)]">
+  <div class="w-full max-w-5xl mx-auto px-gutter flex flex-col items-center text-center gap-space-lg">
+    <div class="flex flex-col items-center gap-space-sm max-w-2xl">
+      <span class="material-symbols-outlined text-secondary/70 text-2xl" aria-hidden="true">auto_stories</span>
+      <p class="font-quote text-quote italic text-primary leading-relaxed">
+        “生活原本沉闷，但跑起来就有风。保持阅读，保持聆听，用镜头与笔触留住微光。”
+      </p>
+      <span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">— Island of Solitude Journal Log</span>
     </div>
 
-    <div class="site-footer__bottom">
-      <span>© {years} {SITE.title}</span>
-      <span>由 Astro 构建 · 托管在自己的服务器上 · 无统计、无评论、无 Cookie</span>
+    <nav class="flex flex-wrap items-center justify-center gap-space-md text-on-surface-variant" aria-label="页脚导航">
+      <a class="font-label-md text-label-md hover:text-on-surface transition-colors" href="https://www.douban.com/" target="_blank" rel="noopener noreferrer external">豆瓣 Douban</a>
+      <span class="text-outline-variant text-xs" aria-hidden="true">·</span>
+      <a class="font-label-md text-label-md hover:text-on-surface transition-colors" href="https://music.163.com/" target="_blank" rel="noopener noreferrer external">网易云音乐 Netease</a>
+      <span class="text-outline-variant text-xs" aria-hidden="true">·</span>
+      <a class="font-label-md text-label-md hover:text-on-surface transition-colors" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer external">摄影录 Instagram</a>
+      <span class="text-outline-variant text-xs" aria-hidden="true">·</span>
+      <a class="font-label-md text-label-md hover:text-on-surface transition-colors" href="/rss.xml">RSS 订阅</a>
+      <span class="text-outline-variant text-xs" aria-hidden="true">·</span>
+      <a class="font-label-md text-label-md hover:text-on-surface transition-colors" href="/guestbook/">拾光留言箱</a>
+    </nav>
+
+    <div class="flex flex-wrap items-center justify-center gap-space-sm font-label-sm text-label-sm text-on-surface-variant">
+      <span class="bg-surface-container px-space-sm py-0.5 rounded text-on-surface-variant">Built with Astro &amp; Tailwind</span>
+      <span>© {span} {SITE.name} {SITE.latin}. All rights reserved.</span>
     </div>
   </div>
 </footer>

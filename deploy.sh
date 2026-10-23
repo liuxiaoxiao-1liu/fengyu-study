@@ -29,6 +29,19 @@ npm run build
 echo "==> 上传 nginx 配置"
 ssh "${SSH_OPTS[@]}" "$SERVER" "cat > /etc/nginx/sites-available/xiaoquanzi" < deploy/nginx.conf
 
+echo "==> 部署留言 API"
+ssh "${SSH_OPTS[@]}" "$SERVER" "mkdir -p /var/www/xiaoquanzi-api /var/lib/xiaoquanzi"
+ssh "${SSH_OPTS[@]}" "$SERVER" "cat > /var/www/xiaoquanzi-api/guestbook.php" < deploy/guestbook.php
+ssh "${SSH_OPTS[@]}" "$SERVER" '
+  set -e
+  chown www-data:www-data /var/lib/xiaoquanzi
+  chmod 775 /var/lib/xiaoquanzi
+  if [ ! -f /var/lib/xiaoquanzi/guestbook.json ]; then echo "[]" > /var/lib/xiaoquanzi/guestbook.json; fi
+  chown www-data:www-data /var/lib/xiaoquanzi/guestbook.json
+  chmod 664 /var/lib/xiaoquanzi/guestbook.json
+  chmod 644 /var/www/xiaoquanzi-api/guestbook.php
+'
+
 echo "==> 同步静态文件到 $SERVER:$REMOTE_DIR"
 ssh "${SSH_OPTS[@]}" "$SERVER" "mkdir -p '$REMOTE_DIR'"
 rsync -az --delete --delay-updates --chmod=D755,F644 \
@@ -60,4 +73,5 @@ fi
 echo "首页 200 OK"
 curl -fsS --max-time 15 "http://$HOST/rss.xml" >/dev/null && echo "RSS OK"
 curl -fsS --max-time 15 "http://$HOST/sitemap.xml" >/dev/null && echo "Sitemap OK"
+curl -fsS --max-time 15 "http://$HOST/api/guestbook" >/dev/null && echo "留言 API OK"
 echo "完成：http://$HOST/"

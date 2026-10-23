@@ -24,3 +24,7 @@ _scratch/
 
 # local tool config
 .config/
+
+# design reference / working assets
+stitch_astro_personal_website/
+stitch-assets/

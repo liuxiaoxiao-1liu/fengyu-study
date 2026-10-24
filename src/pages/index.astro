@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Player from '../components/Player.astro';
 import { books, featuredBook } from '../data/books';
 import { featuredTrack, tracks, kugouSearchUrl } from '../data/music';
 import { photos } from '../data/photos';
@@ -304,7 +303,6 @@ const latestEssay = [...essays].sort((a, b) => b.date.localeCompare(a.date))[0]!
                   ))}
                 </div>
               </div>
-              <Player audioCount={tracks.length} />
             </article>
             <article
               class="lg:col-span-5 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"

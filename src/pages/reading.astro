@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Player from '../components/Player.astro';
 import TrackRow from '../components/TrackRow.astro';
 import { books } from '../data/books';
 import { albums, tracks, kugouSearchUrl } from '../data/music';
@@ -10,7 +9,6 @@ const initialPlaylist = playlists[0]!;
 const PAGE_SIZE = 30;
 const initialTracks = initialPlaylist.tracks.slice(0, PAGE_SIZE);
 const initialTotalPages = Math.max(1, Math.ceil(initialPlaylist.tracks.length / PAGE_SIZE));
-const audioTrackCount = initialPlaylist.tracks.length;
 
 function firstTrackOfAlbum(albumSlug: string) {
   return tracks.find((track) => track.albumSlug === albumSlug && track.kugou);
@@ -270,7 +268,6 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
                       type="button"
                       class="material-symbols-outlined text-sm text-on-surface-variant transition-colors hover:text-primary"
                       data-play
-                      data-album-play
                       data-hash={firstTrack.kugou?.hash}
                       data-title={firstTrack.title}
                       data-artist={firstTrack.artist}
@@ -359,7 +356,6 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
                 </button>
               </div>
             </div>
-            <Player audioCount={audioTrackCount} />
           </div>
           <div class="lg:col-span-5 flex flex-col gap-6">
             <div class="bg-surface-container-low rounded-xl p-6 shadow-sm relative overflow-hidden border border-surface-container-high/40">
@@ -608,16 +604,5 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
     playlistSelect?.addEventListener('change', () => void loadPlaylist(playlistSelect.value, 1));
     pagePrev?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.max(1, activePage - 1)));
     pageNext?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.min(totalPages, activePage + 1)));
-  </script>
-
-  <script>
-    // 专辑归档在歌单播放器上方：点播放后把播放器滚进视野，给出可见反馈。
-    for (const button of document.querySelectorAll<HTMLElement>('[data-album-play]')) {
-      button.addEventListener('click', () => {
-        window.setTimeout(() => {
-          document.getElementById('site-player')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 150);
-      });
-    }
   </script>
 </BaseLayout>

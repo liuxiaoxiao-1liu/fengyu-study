@@ -1,80 +1,101 @@
 ---
-// 站内播放器：由页面里的 [data-play] 按钮驱动（首页卡片、读听歌单、专辑归档共用）。
+// 全站固定迷你播放器：由页面里的 [data-play] 按钮驱动，固定在视口底部。
 // 浏览器 <audio> 负责解码；音源地址只通过站内 /api/kugou/url 获取。
-interface Props {
-  audioCount?: number;
-}
-
-const { audioCount = 0 } = Astro.props;
-const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有可播放的站内音源，可点曲目右侧外链去酷狗收听。';
 ---
 
 <section
-  class="mt-4 pt-3 bg-surface-container/50 p-3 rounded-lg flex flex-col gap-2"
+  class="fixed inset-x-0 bottom-0 z-[60] px-gutter pb-3 pointer-events-none"
   data-player
-  id="site-player"
+  hidden
   aria-label="站内播放器"
 >
-  <div class="flex flex-wrap items-center justify-between gap-space-sm">
-    <div class="flex flex-col min-w-0">
-      <span class="font-label-sm text-xs flex items-center gap-1.5 text-on-surface-variant">
-        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container" data-player-dot aria-hidden="true"></span>
-        站内播放器
-        <span data-player-state>· {audioCount > 0 ? '等待选择曲目' : '暂无站内音源'}</span>
-      </span>
-      <strong class="text-primary font-medium text-sm truncate" data-player-title>
-        还没有选择曲目
-      </strong>
-      <span class="font-label-sm text-xs text-on-surface-variant truncate" data-player-artist>
-        {emptyHint}
-      </span>
-    </div>
-    <div class="flex items-center gap-2 shrink-0">
-      <button
-        type="button"
-        class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-        data-player-toggle
-        aria-label="播放或暂停"
-        disabled
+  <div class="pointer-events-auto mx-auto flex w-full max-w-5xl flex-col gap-2 rounded-xl border border-surface-container-high bg-surface/95 p-3 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] backdrop-blur-md sm:flex-row sm:items-center sm:gap-4">
+    <div class="flex min-w-0 flex-1 items-center gap-3">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary"
+        aria-hidden="true"
       >
-        <span class="flex items-center justify-center" data-player-icon>
-          <svg class="w-5 h-5" data-player-icon-play viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M8 5v14l11-7z"></path>
-          </svg>
-          <svg class="w-5 h-5 hidden" data-player-icon-pause viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M6 5h4v14H6zM14 5h4v14h-4z"></path>
-          </svg>
+        <span class="material-symbols-outlined text-base">graphic_eq</span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-baseline gap-2">
+          <strong class="truncate text-sm font-medium text-primary" data-player-title>
+            还没有选择曲目
+          </strong>
+          <span
+            class="shrink-0 font-label-sm text-[0.625rem] text-on-surface-variant"
+            data-player-state
+            aria-live="polite"
+          >
+            · 等待选择
+          </span>
+        </div>
+        <span class="mt-0.5 block truncate text-xs text-on-surface-variant" data-player-artist>
+          选择曲目开始播放
         </span>
-      </button>
-      <a
-        class="hidden font-label-sm text-xs text-secondary hover:underline items-center gap-1"
-        data-player-external
-        href="https://www.kugou.com/"
-        target="_blank"
-        rel="noopener noreferrer external"
-      >
-        酷狗收听<span class="material-symbols-outlined text-xs">open_in_new</span>
-      </a>
+      </div>
     </div>
-  </div>
-  <div class="flex items-center gap-3 text-on-surface-variant">
-    <span class="font-label-sm text-xs tabular-nums w-10 text-right" data-player-current>
-      00:00
-    </span>
-    <input
-      class="flex-1 h-1 accent-secondary cursor-pointer disabled:cursor-not-allowed"
-      data-player-seek
-      type="range"
-      min="0"
-      max="0"
-      step="0.1"
-      value="0"
-      aria-label="播放进度"
-      disabled
-    />
-    <span class="font-label-sm text-xs tabular-nums w-10" data-player-duration>
-      --:--
-    </span>
+
+    <div class="flex items-center gap-2 sm:gap-3">
+      <span class="font-label-sm text-xs tabular-nums text-on-surface-variant" data-player-current>
+        00:00
+      </span>
+      <input
+        class="h-1 min-w-0 flex-1 cursor-pointer accent-secondary disabled:cursor-not-allowed sm:w-32 sm:flex-none"
+        data-player-seek
+        type="range"
+        min="0"
+        max="0"
+        step="0.1"
+        value="0"
+        aria-label="播放进度"
+        disabled
+      />
+      <span class="font-label-sm text-xs tabular-nums text-on-surface-variant" data-player-duration>
+        --:--
+      </span>
+      <div class="ml-1 flex shrink-0 items-center gap-1.5">
+        <button
+          type="button"
+          class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant transition-colors hover:bg-primary hover:text-on-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          data-player-toggle
+          aria-label="播放或暂停"
+          disabled
+        >
+          <span class="flex items-center justify-center" data-player-icon>
+            <svg class="h-5 w-5" data-player-icon-play viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+            <svg
+              class="hidden h-5 w-5"
+              data-player-icon-pause
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M6 5h4v14H6zM14 5h4v14h-4z"></path>
+            </svg>
+          </span>
+        </button>
+        <a
+          class="hidden font-label-sm text-xs text-secondary hover:underline sm:inline-flex items-center gap-1"
+          data-player-external
+          href="https://www.kugou.com/"
+          target="_blank"
+          rel="noopener noreferrer external"
+        >
+          酷狗<span class="material-symbols-outlined text-xs">open_in_new</span>
+        </a>
+        <button
+          type="button"
+          class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:text-primary"
+          data-player-close
+          aria-label="收起播放器"
+        >
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+    </div>
   </div>
   <audio data-player-audio preload="auto"></audio>
 </section>
@@ -84,6 +105,7 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
   if (player) {
     const audio = player.querySelector<HTMLAudioElement>('[data-player-audio]');
     const toggle = player.querySelector<HTMLButtonElement>('[data-player-toggle]');
+    const closeButton = player.querySelector<HTMLButtonElement>('[data-player-close]');
     const playIcon = player.querySelector<HTMLElement>('[data-player-icon-play]');
     const pauseIcon = player.querySelector<HTMLElement>('[data-player-icon-pause]');
     const title = player.querySelector<HTMLElement>('[data-player-title]');
@@ -110,6 +132,16 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
       if (!Number.isFinite(seconds) || seconds < 0) return '00:00';
       const total = Math.floor(seconds);
       return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+    };
+
+    const showPlayer = () => {
+      player.hidden = false;
+      document.body.classList.add('has-player');
+    };
+
+    const hidePlayer = () => {
+      player.hidden = true;
+      document.body.classList.remove('has-player');
     };
 
     const setPlaying = (playing: boolean) => {
@@ -142,7 +174,7 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
       if (external) {
         external.href = track.external;
         external.classList.remove('hidden');
-        external.classList.add('flex');
+        external.classList.add('inline-flex');
       }
       if (current) current.textContent = '00:00';
       if (seek) seek.value = '0';
@@ -151,9 +183,9 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
     };
 
     function describeError(data: { error?: string } | null, status: number) {
-      if (data?.error === 'rate_limited' || status === 429) return '· 播放请求太频繁，等几分钟再试';
-      if (data?.error === 'kugou_disabled' || status === 503) return '· 站内音源未配置，可去酷狗收听';
-      return '· 音源解析失败，可去酷狗收听';
+      if (data?.error === 'rate_limited' || status === 429) return '· 播放太频繁，稍后再试';
+      if (data?.error === 'kugou_disabled' || status === 503) return '· 音源未配置，可去酷狗收听';
+      return '· 解析失败，可去酷狗收听';
     }
 
     async function fetchPlayUrl(hash: string) {
@@ -183,7 +215,7 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
 
     async function playKugou(hash: string, resumeAt = 0) {
       if (!audio) return;
-      if (state) state.textContent = '· 正在解析酷狗音源…';
+      if (state) state.textContent = '· 正在解析音源…';
       const url = await fetchPlayUrl(hash);
       if (state) state.textContent = '· 正在加载音源…';
       pendingResume = resumeAt > 0 ? resumeAt : 0;
@@ -192,7 +224,7 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
       try {
         await audio.play();
       } catch {
-        if (state) state.textContent = '· 音源已就绪，点播放继续';
+        if (state) state.textContent = '· 已就绪，点播放继续';
       }
     }
 
@@ -201,6 +233,7 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
       const track = readCommand(button);
       currentTrack = track;
       retried = false;
+      showPlayer();
       setTrackMeta(track);
       if (state) state.textContent = '· 正在加载…';
 
@@ -211,20 +244,20 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
         try {
           await audio.play();
         } catch {
-          if (state) state.textContent = '· 音源已就绪，点播放继续';
+          if (state) state.textContent = '· 已就绪，点播放继续';
         }
         return;
       }
 
       if (!track.hash) {
-        if (state) state.textContent = '· 这首没有可播放的站内音源';
+        if (state) state.textContent = '· 这首没有可播放的音源';
         return;
       }
 
       try {
         await playKugou(track.hash);
       } catch (error) {
-        if (state) state.textContent = error instanceof Error ? error.message : '· 音源解析失败，可去酷狗收听';
+        if (state) state.textContent = error instanceof Error ? error.message : '· 解析失败，可去酷狗收听';
         if (toggle) toggle.disabled = true;
       }
     }
@@ -243,6 +276,11 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
       } else {
         audio.pause();
       }
+    });
+
+    closeButton?.addEventListener('click', () => {
+      if (audio) audio.pause();
+      hidePlayer();
     });
 
     audio?.addEventListener('play', () => setPlaying(true));
@@ -271,14 +309,14 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
       if (currentTrack?.hash && !retried) {
         retried = true;
         const resumeAt = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
-        if (state) state.textContent = '· 音源过期，正在重新解析…';
+        if (state) state.textContent = '· 音源过期，正在重试…';
         void playKugou(currentTrack.hash, resumeAt).catch((error) => {
-          if (state) state.textContent = error instanceof Error ? error.message : '· 音源加载失败，可去酷狗收听';
+          if (state) state.textContent = error instanceof Error ? error.message : '· 加载失败，可去酷狗收听';
           if (toggle) toggle.disabled = true;
         });
         return;
       }
-      if (state) state.textContent = '· 音源加载失败，可去酷狗收听';
+      if (state) state.textContent = '· 加载失败，可去酷狗收听';
       if (toggle) toggle.disabled = true;
     });
 
@@ -290,3 +328,15 @@ const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有
     });
   }
 </script>
+
+<style is:global>
+  body.has-player {
+    padding-bottom: 8.25rem;
+  }
+
+  @media (min-width: 640px) {
+    body.has-player {
+      padding-bottom: 5.75rem;
+    }
+  }
+</style>

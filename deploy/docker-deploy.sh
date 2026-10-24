@@ -47,6 +47,28 @@ rsync -az --delete --chmod=D755,F644 -e "$RSYNC_SSH" \
 rsync -az --chmod=D755,F644 -e "$RSYNC_SSH" \
   deploy/nginx.container.conf "$SERVER:$REMOTE_DIR/deploy/"
 
+echo "==> 同步运维脚本与备份目录"
+ssh "${SSH_OPTS[@]}" "$SERVER" \
+  "mkdir -p '$REMOTE_DIR/scripts' '$REMOTE_DIR/deploy/server' '$REMOTE_DIR/backups'"
+rsync -az --chmod=D755,F755 -e "$RSYNC_SSH" \
+  scripts/backup-guestbook.sh scripts/healthcheck.sh "$SERVER:$REMOTE_DIR/scripts/"
+rsync -az --chmod=D755,F644 -e "$RSYNC_SSH" \
+  deploy/server/fengyu-cron deploy/server/fengyu-logrotate "$SERVER:$REMOTE_DIR/deploy/server/"
+
+# 幂等安装：系统 crontab 与 logrotate 配置都以仓库为准
+ssh "${SSH_OPTS[@]}" "$SERVER" \
+  "install -m 644 '$REMOTE_DIR/deploy/server/fengyu-cron' /etc/cron.d/fengyu && \
+   install -m 644 '$REMOTE_DIR/deploy/server/fengyu-logrotate' /etc/logrotate.d/fengyu && \
+   chmod +x '$REMOTE_DIR/scripts/'*.sh"
+
+# 管理端令牌只从服务器 .env 读取，不自动生成，避免覆盖已有值
+ssh "${SSH_OPTS[@]}" "$SERVER" \
+  "if [ -s '$REMOTE_DIR/.env' ] && grep -q '^ADMIN_TOKEN=.' '$REMOTE_DIR/.env'; then \
+     echo 'ADMIN_TOKEN: 已配置'; \
+   else \
+     echo '!! 缺少 $REMOTE_DIR/.env 或 ADMIN_TOKEN 为空：/admin 与管理 API 会返回 503' >&2; \
+   fi"
+
 if [ "$WEB_PORT" = "80" ]; then
   echo "!! WEB_PORT=80：请确认宿主 nginx 已停止，否则端口会冲突。"
   ssh "${SSH_OPTS[@]}" "$SERVER" "systemctl is-active --quiet nginx && echo '   当前 nginx: active'" || true
@@ -67,6 +89,23 @@ fi
 ssh "${SSH_OPTS[@]}" "$SERVER" \
   "curl -fsS --max-time 10 http://127.0.0.1:$WEB_PORT/api/guestbook >/dev/null" \
   && echo "留言 API OK"
+
+stats="$(ssh "${SSH_OPTS[@]}" "$SERVER" \
+  "curl -fsS --max-time 10 http://127.0.0.1:$WEB_PORT/api/stats" || true)"
+case "$stats" in
+  *'"ok":true'*) echo "统计 API OK" ;;
+  *) echo "统计 API 异常：$stats" >&2; exit 1 ;;
+esac
+
+# 管理 API 在配置令牌后应返回 401（未带令牌），作为鉴权生效的冒烟检查
+admin_code="$(ssh "${SSH_OPTS[@]}" "$SERVER" \
+  "curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:$WEB_PORT/api/admin/letters" || true)"
+if [ "$admin_code" = "401" ]; then
+  echo "管理 API 鉴权 OK（401）"
+else
+  echo "!! 管理 API 返回 $admin_code（期望 401）：检查服务器 $REMOTE_DIR/.env 的 ADMIN_TOKEN" >&2
+fi
+
 
 if [ "$WEB_PORT" = "80" ]; then
   echo "完成：http://$HOST/"

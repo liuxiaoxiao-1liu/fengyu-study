@@ -1,0 +1,9 @@
+# 由 deploy/docker-deploy.sh 安装到 /etc/logrotate.d/fengyu
+/var/log/fengyu-backup.log /var/log/fengyu-health.log {
+    weekly
+    rotate 8
+    compress
+    missingok
+    notifempty
+    copytruncate
+}

@@ -1,0 +1,9 @@
+# 风屿书房定时任务。由 deploy/docker-deploy.sh 安装到 /etc/cron.d/fengyu。
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# 每天 04:17 备份留言 SQLite，保留 7 天
+17 4 * * * root /opt/fengyu/scripts/backup-guestbook.sh >>/var/log/fengyu-backup.log 2>&1
+
+# 每 5 分钟本地探活，失败写入 /var/log/fengyu-health.log
+*/5 * * * * root /opt/fengyu/scripts/healthcheck.sh >>/var/log/fengyu-health.log 2>&1

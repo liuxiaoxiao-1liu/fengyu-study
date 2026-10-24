@@ -22,6 +22,8 @@ services:
       HOST: 0.0.0.0
       PORT: 4321
       GUESTBOOK_DB: /data/guestbook.sqlite
+      # 管理后台令牌：写在服务器 /opt/fengyu/.env，不进仓库；未设置时 /api/admin/* 返回 503
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
     volumes:
       - guestbook-data:/data
     expose:

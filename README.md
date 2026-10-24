@@ -61,16 +61,26 @@ npm run preview      # 预览构建结果
 | `/guestbook/` | 留言：投递信笺、房主公告、友链、留言回廊、漂流瓶 |
 | `/rss.xml`、`/sitemap.xml`、`/404.html` | 订阅、站点地图、404 |
 
-内容目前是设计稿中的示例文案，直接改这些地方即可换成自己的：
+内容与页面已经数据驱动，改内容只动 `src/data/`：
 
-- 随记正文：`src/data/essays.ts`
-- 站内搜索索引：`src/data/search.ts`
-- 首页与各栏目的文案、书籍/歌单信息：直接在各页面的 `.astro` 文件里改
-- 首页/栏目图片：`public/images/`
-- 书籍封面与专辑封面：`public/images/covers/`（由 `stitch-assets/make-covers.py` 生成，可直接替换）
+- 随记正文与分类：`src/data/essays.ts`（`kind` 区分随笔/碎碎念）
+- 书架：`src/data/books.ts`；唱片与曲目：`src/data/music.ts`
+- 照片与 EXIF、系列：`src/data/photos.ts`
+- 台词摘录：`src/data/quotes.ts`
+- 站内搜索：`src/data/search.ts` 构建期自动生成，**不要手写条目**
+- 页面只负责循环渲染，改版式再动 `src/pages/*.astro` / `src/components/`
+- 首页/栏目图片：`public/images/`；书籍封面与专辑封面：`public/images/covers/`
 - 站点名、简介、页脚：`src/lib/site.ts`
 
 字体文件在 `public/fonts/`，CSS 在 `src/styles/fonts.css` 与 `src/styles/icons.css`。
+
+### 尚未完成（P2/P3）
+
+- `astro check`、Prettier、冒烟测试 / CI、图片 WebP/AVIF；
+- 真实内容（随笔、书、歌、图）替换示例、友链与社交链接换真实主页；
+- `PROJECT_RULES.md` 仍是 v0.1 待确认，尚未统一改写为 Docker 架构；
+- 站内播放器已就绪，但仓库没有音频文件，当前全部走「未上传音源 → 酷狗搜索」降级。
+
 
 ## 留言 API
 
@@ -94,6 +104,23 @@ npm run preview      # 预览构建结果
 - 数据库路径由 `GUESTBOOK_DB` 指定：本地默认 `.data/guestbook.sqlite`，容器里是 `/data/guestbook.sqlite`；
 - 旧 JSON 导入：`npm run guestbook:import -- /path/guestbook.json /path/guestbook.sqlite`；
 - 备份：`npm run guestbook:backup -- /path/guestbook.sqlite /path/backup.sqlite`。
+
+### 管理后台
+
+- `/admin/`：审核悄悄话、通过/隐藏留言、回复、导出 JSON/CSV；
+- 需要服务器 `/opt/fengyu/.env` 里的 `ADMIN_TOKEN`（`openssl rand -hex 32` 生成）。未配置时管理 API 返回 503；
+- 其它接口：`GET /api/stats`（聚合计数）、`POST /api/subscribe`（季刊订阅入库）；
+- 管理端走 HTTP 当前没有 TLS，令牌只在本机/可信网络使用，后续上 HTTPS 后再日常使用。
+
+## 运维
+
+- 每日 04:17 自动备份（`VACUUM INTO`，保留 7 天）：`/opt/fengyu/scripts/backup-guestbook.sh` → `/opt/fengyu/backups/`；
+- 每 5 分钟本地探活首页与留言 API：`/var/log/fengyu-health.log`；
+- 定时任务与日志轮转的仓库源文件在 `deploy/server/`，`npm run deploy:docker` 会幂等安装；
+- 外部探活：用 UptimeRobot 等免费服务监控 `http://example.com/api/guestbook`，匹配 `"ok":true`（整机宕机只能靠外部监控发现）；
+- 备份与本机同盘，建议每月拉一份到本地/对象存储做异地备份；
+- 8081 旧版预览已于 2026-10-24 停止；8443 的 UFW 放行已关闭，留给以后 xray 回落。
+
 
 ## 部署
 

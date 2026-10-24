@@ -72,3 +72,56 @@ rate_limits (ip_hash, last_at)
 - 把旧 JSON 一次性导入 SQLite；
 - 域名 / HTTPS（SNI 分流）后再做邮件订阅；
 - 更新 `PROJECT_RULES.md` 的架构章节与部署章节。
+
+---
+
+## ADR-002 · 管理后台用单令牌鉴权，内容改为数据驱动
+
+- **日期**：2026-10-24
+- **状态**：已接受，实施中
+- **影响范围**：`/admin/`、`/api/admin/*`、`/api/stats`、`/api/subscribe`、`src/data/*`
+
+### 背景
+
+- 悄悄话以 `pending` 存在 SQLite，只能进容器查，日常审核成本高；
+- 站点是单人维护，2C2G，暂未上 HTTPS，不适合引入完整账号体系；
+- 首页统计、搜索索引、歌单、照片、随记计数都写死在模板里，改内容要动多处；
+- 季刊订阅只有假表单。
+
+### 决定
+
+1. 管理端用 `ADMIN_TOKEN`（服务器 `.env`，64 位 hex）做 Bearer Token，`timingSafeEqual` 比较；
+   未配置时管理 API 统一 503；令牌只存 `sessionStorage`，不落 Cookie；
+2. `/admin/` 仍是静态预渲染页，所有敏感数据通过 API 取，静态 HTML 里没有留言内容；
+3. `letters` 增加 `reply`/`replied_at`；公开 GET 返回回复；新增 `subscribers` 表存季刊订阅；
+4. 内容统一进 `src/data/`，页面循环渲染：`books` / `music` / `photos` / `quotes` / `essays`；
+   搜索索引构建期生成，不再手写；
+5. 站内播放采用可选音源：`track.audio` 有值才播，没有则降级外链并标注「未上传音源」；
+   不引入第三方播放器、不绕过版权限制；
+6. 照片用原生 `<dialog>` 灯箱，EXIF 作为可选字段由数据提供，不新增构建依赖。
+
+### 影响
+
+**正面**
+
+- 审核、回复、导出不需要再进容器；
+- 内容只改一处，统计与搜索自动跟随；
+- 零新增运行时依赖，仍是一套 Astro + SQLite。
+
+**负面**
+
+- HTTP 下令牌明文传输，**上 HTTPS 前只应在可信网络使用**；
+- 单令牌无法区分操作者，适合单人站，不适合多人协作；
+- 图片 EXIF 需手工补，暂不做自动提取。
+
+### 回滚
+
+1. 管理端问题：停用 `ADMIN_TOKEN`（清空 `.env` 并重建 app），管理 API 返回 503，公开站不受影响；
+2. 数据层问题：`reply`/`replied_at`/`subscribers` 均为增量列/表，旧代码会忽略，可直接回退镜像；
+3. 内容页回退：`git revert` 对应提交后重新部署，数据库不动。
+
+### 后续
+
+- 域名 + HTTPS（SNI 分流）后启用日常审核；
+- 如有多人维护需求，再评估 Basic Auth / OAuth；
+- 音频文件托管与版权策略单独评审。

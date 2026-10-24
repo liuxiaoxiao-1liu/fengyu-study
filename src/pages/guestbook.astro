@@ -14,7 +14,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <span class="material-symbols-outlined text-secondary text-base">mail_lock</span>
 <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">COMMUNITY &amp; WHISPERS · 拾光留声亭</span>
 <span class="text-outline-variant font-label-sm">/</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">第 148 卷</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">第 <span data-stat="total">—</span> 卷</span>
 </div>
 <h1 class="font-headline-lg text-primary tracking-tight mt-space-xs text-headline-lg-mobile sm:text-headline-lg">
               来客留言 &amp; 时光信箱
@@ -28,18 +28,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
 <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
 <span class="font-label-sm text-label-sm text-on-surface-variant">累计收到
-                  <strong class="text-primary font-medium">148</strong>
+                  <strong class="text-primary font-medium" data-stat="total">—</strong>
                   封来信</span>
 </div>
 <div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
-<span class="material-symbols-outlined text-sm text-secondary">schedule</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">平均回信时长
-                  <strong class="text-primary font-medium">24h</strong></span>
+<span class="material-symbols-outlined text-sm text-secondary">mark_email_read</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">房主回复率
+                  <strong class="text-primary font-medium" data-stat="reply-rate">—</strong></span>
 </div>
 <div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
-<span class="material-symbols-outlined text-sm text-secondary">waves</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">漂流瓶已投递
-                  <strong class="text-primary font-medium">42</strong> 只</span>
+<span class="material-symbols-outlined text-sm text-secondary">forum</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">公开信笺
+                  <strong class="text-primary font-medium" data-stat="approved">—</strong> 封</span>
 </div>
 </div>
 </div>
@@ -61,7 +61,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                     <span class="font-label-md text-label-md text-on-surface-variant font-normal">/ Leave a Message</span>
 </h2>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">NO. 149 ENTRY</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">实时同步 · LIVE</span>
 </div>
 <form class="flex flex-col gap-space-md mt-space-xs" id="guestbook-form">
                 <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
@@ -247,185 +247,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
               </h2>
 </div>
 <!-- Filter Tabs -->
-<div class="flex items-center gap-space-xs bg-surface-container-low p-1 rounded-full overflow-x-auto" id="comment-filters">
-<button class="filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm bg-primary text-on-primary transition-all shadow-sm" data-filter-category="all">
-                全部留言 (48)
-              </button>
-<button class="filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all" data-filter-category="网文共鸣">
-                网文共鸣 (18)
-              </button>
-<button class="filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all" data-filter-category="酷狗推歌">
-                酷狗推歌 (16)
-              </button>
-<button class="filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all" data-filter-category="校园微语">
-                校园微语 (14)
-              </button>
+<div class="flex items-center gap-space-xs bg-surface-container-low p-1 rounded-full overflow-x-auto" id="comment-filters" role="group" aria-label="留言分类筛选">
+<button class="filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm bg-primary text-on-primary transition-all shadow-sm" data-filter-category="all" type="button" aria-pressed="true">
+                 全部留言 (<span data-filter-count="all">0</span>)
+               </button>
 </div>
 </div>
-<!-- Masonry / Responsive Grid of Letters -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg" id="letters-container">
-<!-- Letter Card 1: 诡秘之主 -->
-<div class="letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow" data-category="网文共鸣">
-<div class="flex flex-col gap-space-sm">
-<div class="flex items-start justify-between gap-space-sm">
-<div class="flex items-center gap-space-sm">
-<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-serif font-semibold text-lg shadow-inner">
-                      周
-                    </div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-body-lg text-primary font-medium leading-none">周明瑞的塔罗牌</span>
-<span class="font-label-sm text-[0.6875rem] text-on-surface-variant mt-1">贝克兰德 · 推荐《诡秘》同人配乐</span>
-</div>
-</div>
-<div class="flex items-center gap-space-xs">
-<span class="bg-surface-container px-space-sm py-0.5 rounded font-label-sm text-label-sm text-secondary">
-                      网文共鸣
-                    </span>
-<span class="font-label-sm text-[0.6875rem] text-outline-variant">2小时前</span>
-</div>
-</div>
-<!-- Content -->
-<p class="font-body-md text-body-md text-primary leading-relaxed pt-space-xs">
-                  “看到你也二刷《诡秘之主》！那句‘我们是守夜人，也是一群时刻对抗着疯狂与危险的绝望者’真的看一次哭一次。小站这套羊皮纸般的文字排版太有廷根市和鲁恩王国的质感了！等四月新番预告出来咱们一起追！”
-                </p>
-</div>
-<!-- Owner's Reply Block -->
-<div class="bg-surface-container p-space-md rounded-lg flex flex-col gap-space-xs">
-<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1 font-medium text-primary">
-<span class="material-symbols-outlined text-xs text-secondary">reply</span>
-                    房主回信 · 风屿
-                  </span>
-<span>1小时前</span>
-</div>
-<p class="font-body-sm text-body-sm text-on-surface-variant">
-                  赞美愚者先生！塔罗会的每一次翻页都让人热血沸腾。灰雾之上的红砖回廊我甚至在
-                  UE5 里面做过一个小 demo，祝今晚做个好梦，小心失控哦！
-                </p>
-</div>
-</div>
-<!-- Letter Card 2: 酷狗推歌 (周深) -->
-<div class="letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow" data-category="酷狗推歌">
-<div class="flex flex-col gap-space-sm">
-<div class="flex items-start justify-between gap-space-sm">
-<div class="flex items-center gap-space-sm">
-<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-serif font-semibold text-lg">
-                      耳
-                    </div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-body-lg text-primary font-medium leading-none">戴耳机的考研人</span>
-<span class="font-label-sm text-[0.6875rem] text-on-surface-variant mt-1">江城大学图书馆 · 酷狗极光音效</span>
-</div>
-</div>
-<div class="flex items-center gap-space-xs">
-<span class="bg-surface-container px-space-sm py-0.5 rounded font-label-sm text-label-sm text-secondary">
-                      酷狗推歌
-                    </span>
-<span class="font-label-sm text-[0.6875rem] text-outline-variant">昨天 21:40</span>
-</div>
-</div>
-<!-- Content -->
-<p class="font-body-md text-body-md text-primary leading-relaxed pt-space-xs">
-                  “强烈推荐你去酷狗搜一下周深的现场版《大鱼》配上蝰蛇全景声，戴上降噪耳机后那种空灵感直接拉满。晚上图书馆十点闭馆后，骑着小黄车在梧桐大道上吹着夜风听，治愈一整天的做题疲惫。”
-                </p>
-</div>
-<!-- Owner's Reply Block -->
-<div class="bg-surface-container p-space-md rounded-lg flex flex-col gap-space-xs">
-<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1 font-medium text-primary">
-<span class="material-symbols-outlined text-xs text-secondary">reply</span>
-                    房主回信 · 风屿
-                  </span>
-<span>昨天 23:12</span>
-</div>
-<p class="font-body-sm text-body-sm text-on-surface-variant">
-                  收下这发安利！昨夜写高数笔记时已经在单曲循环了，周深的高音与海豚音确实像在海面上铺开的星光。祝考研一切顺利，岸上相见！
-                </p>
-</div>
-</div>
-<!-- Letter Card 3: 大学日常 / 个人小站 -->
-<div class="letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow" data-category="校园微语">
-<div class="flex flex-col gap-space-sm">
-<div class="flex items-start justify-between gap-space-sm">
-<div class="flex items-center gap-space-sm">
-<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-serif font-semibold text-lg shadow-inner">
-                      店
-                    </div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-body-lg text-primary font-medium leading-none">雨夜便利店长</span>
-<span class="font-label-sm text-[0.6875rem] text-on-surface-variant mt-1">南京 · 独立博客开发者</span>
-</div>
-</div>
-<div class="flex items-center gap-space-xs">
-<span class="bg-surface-container px-space-sm py-0.5 rounded font-label-sm text-label-sm text-secondary">
-                      校园微语
-                    </span>
-<span class="font-label-sm text-[0.6875rem] text-outline-variant">3天前</span>
-</div>
-</div>
-<!-- Content -->
-<p class="font-body-md text-body-md text-primary leading-relaxed pt-space-xs">
-                  “偶然搜 Astro
-                  个人小站的纸质排版逛进来的。现在到处都是千篇一律的卡片UI，很少看到把二次元番剧、网文书单和校园胶片融合得这么沉静的独立博主。同是大三生，一起在数字荒原里开辟自己的小岛！”
-                </p>
-</div>
-<!-- Owner's Reply Block -->
-<div class="bg-surface-container p-space-md rounded-lg flex flex-col gap-space-xs">
-<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1 font-medium text-primary">
-<span class="material-symbols-outlined text-xs text-secondary">reply</span>
-                    房主回信 · 风屿
-                  </span>
-<span>2天前</span>
-</div>
-<p class="font-body-sm text-body-sm text-on-surface-variant">
-                  感谢驻足！博客就像自己的书房，哪怕访客寥寥，只要能完整记录下这几年的心境变迁，就觉得无比值得。已将你的小站加入我的
-                  RSS 阅读器中！
-                </p>
-</div>
-</div>
-<!-- Letter Card 4: 虚幻引擎 / 漂流寄语 -->
-<div class="letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow" data-category="网文共鸣">
-<div class="flex flex-col gap-space-sm">
-<div class="flex items-start justify-between gap-space-sm">
-<div class="flex items-center gap-space-sm">
-<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-serif font-semibold text-lg shadow-inner">
-                      喵
-                    </div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-body-lg text-primary font-medium leading-none">迷失在虚幻5里的建模喵</span>
-<span class="font-label-sm text-[0.6875rem] text-on-surface-variant mt-1">动画学院机房 · 推荐许嵩《乌鸦》</span>
-</div>
-</div>
-<div class="flex items-center gap-space-xs">
-<span class="bg-surface-container px-space-sm py-0.5 rounded font-label-sm text-label-sm text-secondary">
-                      网文共鸣
-                    </span>
-<span class="font-label-sm text-[0.6875rem] text-outline-variant">5天前</span>
-</div>
-</div>
-<!-- Content -->
-<p class="font-body-md text-body-md text-primary leading-relaxed pt-space-xs">
-                  “在影集页面看到了那张虚幻引擎渲染的深空光影，体积雾与材质质感太绝了！是不是参考了《道诡异仙》里不可名状的苍穹意象？现在大家都在发短视频，能看到这样一字一句码字盖章的小站太珍贵了，请一直写下去。”
-                </p>
-</div>
-<!-- Owner's Reply Block -->
-<div class="bg-surface-container p-space-md rounded-lg flex flex-col gap-space-xs">
-<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1 font-medium text-primary">
-<span class="material-symbols-outlined text-xs text-secondary">reply</span>
-                    房主回信 · 风屿
-                  </span>
-<span>4天前</span>
-</div>
-<p class="font-body-sm text-body-sm text-on-surface-variant">
-                  眼睛太毒了！确实是读完火旺‘心素’篇章后的灵感迸发，用 Lumen
-                  打的光影。感谢你的鼓励，这间书房会一直为你亮着一盏微光灯。
-                </p>
-</div>
-</div>
-</div>
-<p class="hidden rounded-xl border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant" id="letters-empty">这一类信笺还在整理中，先去别的分类看看吧。</p>
+<!-- Masonry / Responsive Grid of Letters（由 /api/guestbook 实时渲染） -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg" id="letters-container"></div>
+<p class="hidden rounded-xl border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant" id="letters-empty">回廊里还没有公开的信笺，不如由你写下第一封。</p>
 <!-- Load More and Bottle Action Section -->
 <div class="w-full flex flex-col sm:flex-row items-center justify-center gap-space-md pt-space-xl">
 <button class="flex items-center gap-space-xs bg-surface-container px-space-lg py-space-sm rounded-full font-label-sm text-label-sm text-primary hover:bg-surface-container-high transition-colors shadow-sm" data-load-more="">
@@ -495,9 +325,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const form = document.getElementById('guestbook-form');
 
   const query = new URLSearchParams(window.location.search);
-  if (query.get('name')) author.value = query.get('name');
-  if (query.get('station')) station.value = query.get('station');
-  if (query.get('message')) {
+  if (author && query.get('name')) author.value = query.get('name');
+  if (station && query.get('station')) station.value = query.get('station');
+  if (content && query.get('message')) {
     content.value = query.get('message');
     if (counter) counter.textContent = `${content.value.length} / 600`;
   }
@@ -531,6 +361,237 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     author?.focus();
   });
 
+  // ---- 统计：只取聚合数字，失败时保留占位符 ----
+  async function loadStats() {
+    try {
+      const response = await fetch('/api/stats', { headers: { Accept: 'application/json' } });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!data || !data.ok || !data.letters) return;
+      const values = {
+        total: data.letters.publicTotal,
+        approved: data.letters.approved,
+        replied: data.letters.publicReplied,
+        'reply-rate': typeof data.replyRate === 'number' ? `${data.replyRate}%` : undefined,
+      };
+      for (const node of document.querySelectorAll('[data-stat]')) {
+        const value = values[node.dataset.stat];
+        if (value !== undefined && value !== null) node.textContent = String(value);
+      }
+    } catch {
+      // 静态预览没有 API，保留 — 占位即可。
+    }
+  }
+
+  // ---- 留言回廊：公开列表来自 /api/guestbook ----
+  const lettersContainer = document.getElementById('letters-container');
+  const loadMoreBtn = document.querySelector('[data-load-more]');
+  const lettersEmpty = document.getElementById('letters-empty');
+  const commentFilters = document.getElementById('comment-filters');
+  const LETTER_BATCH = 3;
+  let letterLimit = LETTER_BATCH;
+  let activeLetterFilter = 'all';
+  let publicLetters = [];
+  let lettersLoadFailed = false;
+
+  function setEmptyMessage(message) {
+    if (!lettersEmpty) return;
+    if (message) {
+      lettersEmpty.textContent = message;
+      lettersEmpty.classList.remove('hidden');
+    } else {
+      lettersEmpty.classList.add('hidden');
+    }
+  }
+
+  function formatRelative(iso) {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    const diff = Date.now() - date.getTime();
+    const minute = 60 * 1000;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+    if (diff < minute) return '刚刚';
+    if (diff < hour) return `${Math.floor(diff / minute)}分钟前`;
+    if (diff < day) return `${Math.floor(diff / hour)}小时前`;
+    if (diff < 2 * day) return '昨天';
+    if (diff < 30 * day) return `${Math.floor(diff / day)}天前`;
+    return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  }
+
+  function setActiveFilterButton(category) {
+    if (!commentFilters) return;
+    for (const btn of commentFilters.querySelectorAll('[data-filter-category]')) {
+      const on = (btn.dataset.filterCategory || 'all') === category;
+      btn.classList.toggle('bg-primary', on);
+      btn.classList.toggle('text-on-primary', on);
+      btn.classList.toggle('shadow-sm', on);
+      btn.classList.toggle('text-on-surface-variant', !on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
+
+  function renderTagFilters() {
+    if (!commentFilters) return;
+    for (const btn of commentFilters.querySelectorAll('[data-generated-filter]')) btn.remove();
+
+    const allCount = commentFilters.querySelector('[data-filter-count="all"]');
+    if (allCount) allCount.textContent = String(publicLetters.length);
+
+    const counts = new Map();
+    for (const letter of publicLetters) {
+      const tag = (letter.tag || '网文同好').trim() || '网文同好';
+      counts.set(tag, (counts.get(tag) || 0) + 1);
+    }
+
+    for (const [tag, count] of counts) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all';
+      btn.dataset.filterCategory = tag;
+      btn.dataset.generatedFilter = '1';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.textContent = `${tag} (${count})`;
+      commentFilters.append(btn);
+    }
+
+    if (activeLetterFilter !== 'all' && !counts.has(activeLetterFilter)) {
+      activeLetterFilter = 'all';
+    }
+    setActiveFilterButton(activeLetterFilter);
+  }
+
+  commentFilters?.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target.closest('[data-filter-category]') : null;
+    if (!target) return;
+    activeLetterFilter = target.dataset.filterCategory || 'all';
+    letterLimit = LETTER_BATCH;
+    setActiveFilterButton(activeLetterFilter);
+    refreshLetters();
+  });
+
+  function refreshLetters() {
+    if (!lettersContainer) return;
+    const cards = [...lettersContainer.querySelectorAll('.letter-card')];
+    const matched = cards.filter((card) => activeLetterFilter === 'all' || card.dataset.category === activeLetterFilter);
+    let shown = 0;
+    for (const card of cards) {
+      const isMatch = activeLetterFilter === 'all' || card.dataset.category === activeLetterFilter;
+      const visible = isMatch && shown < letterLimit;
+      card.style.display = visible ? 'flex' : 'none';
+      if (visible) shown += 1;
+    }
+
+    const remaining = Math.max(0, matched.length - shown);
+    if (loadMoreBtn) {
+      loadMoreBtn.style.display = remaining === 0 ? 'none' : '';
+      const label = loadMoreBtn.querySelector('[data-load-more-label]');
+      if (label) {
+        label.textContent = remaining
+          ? `展开翻阅更早的时光卷轴（还有 ${remaining} 封）`
+          : '已经翻到最早的一封了';
+      }
+    }
+
+    if (lettersLoadFailed) {
+      setEmptyMessage('留言回廊暂时没连上，稍后再来看看。');
+    } else if (publicLetters.length === 0) {
+      setEmptyMessage('回廊里还没有公开的信笺，不如由你写下第一封。');
+    } else if (matched.length === 0) {
+      setEmptyMessage('这一类信笺还在整理中，先去别的分类看看吧。');
+    } else {
+      setEmptyMessage('');
+    }
+  }
+
+  function makeLetter(message) {
+    const card = document.createElement('article');
+    card.className = 'letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow';
+    card.dataset.category = (message.tag || '网文同好').trim() || '网文同好';
+    if (message.id) card.dataset.id = message.id;
+
+    const head = document.createElement('div');
+    head.className = 'flex flex-col gap-space-sm';
+
+    const top = document.createElement('div');
+    top.className = 'flex items-start justify-between gap-space-sm';
+
+    const who = document.createElement('div');
+    who.className = 'flex items-center gap-space-sm min-w-0';
+    const badge = document.createElement('div');
+    badge.className = 'w-10 h-10 shrink-0 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-serif font-semibold text-lg shadow-inner';
+    badge.textContent = (message.name || '匿').slice(0, 1);
+    const identity = document.createElement('div');
+    identity.className = 'flex flex-col min-w-0';
+    const name = document.createElement('span');
+    name.className = 'font-body-lg text-primary font-medium leading-none break-words';
+    name.textContent = message.name || '匿名旅人';
+    const where = document.createElement('span');
+    where.className = 'font-label-sm text-[0.6875rem] text-on-surface-variant mt-1 break-words';
+    where.textContent = message.station || '来自一张匿名信笺';
+    identity.append(name, where);
+    who.append(badge, identity);
+
+    const meta = document.createElement('div');
+    meta.className = 'flex items-center gap-space-xs shrink-0';
+    const tag = document.createElement('span');
+    tag.className = 'bg-surface-container px-space-sm py-0.5 rounded font-label-sm text-label-sm text-secondary';
+    tag.textContent = message.tag || '网文同好';
+    const when = document.createElement('span');
+    when.className = 'font-label-sm text-[0.6875rem] text-outline-variant';
+    when.textContent = formatRelative(message.created_at);
+    meta.append(tag, when);
+    top.append(who, meta);
+
+    const body = document.createElement('p');
+    body.className = 'font-body-md text-body-md text-primary leading-relaxed pt-space-xs whitespace-pre-line break-words';
+    body.textContent = message.message || '';
+    head.append(top, body);
+    card.append(head);
+
+    if (typeof message.reply === 'string' && message.reply.trim() !== '') {
+      const replyBox = document.createElement('div');
+      replyBox.className = 'bg-surface-container p-space-md rounded-lg flex flex-col gap-space-xs';
+      const replyHead = document.createElement('div');
+      replyHead.className = 'flex items-center justify-between gap-space-sm text-on-surface-variant font-label-sm text-label-sm';
+      const replyLabel = document.createElement('span');
+      replyLabel.className = 'flex items-center gap-1 font-medium text-primary';
+      const icon = document.createElement('span');
+      icon.className = 'material-symbols-outlined text-xs text-secondary';
+      icon.textContent = 'reply';
+      replyLabel.append(icon, document.createTextNode('房主回信 · 风屿'));
+      const replyTime = document.createElement('span');
+      replyTime.textContent = formatRelative(message.replied_at);
+      replyHead.append(replyLabel, replyTime);
+      const replyBody = document.createElement('p');
+      replyBody.className = 'font-body-sm text-body-sm text-on-surface-variant whitespace-pre-line break-words';
+      replyBody.textContent = message.reply;
+      replyBox.append(replyHead, replyBody);
+      card.append(replyBox);
+    }
+
+    return card;
+  }
+
+  async function loadPublicLetters() {
+    if (!lettersContainer) return;
+    try {
+      const response = await fetch('/api/guestbook', { headers: { Accept: 'application/json' } });
+      if (!response.ok) throw new Error(`http_${response.status}`);
+      const data = await response.json();
+      publicLetters = Array.isArray(data.messages) ? data.messages : [];
+      lettersLoadFailed = false;
+      lettersContainer.replaceChildren(...publicLetters.map(makeLetter));
+    } catch {
+      lettersLoadFailed = true;
+      publicLetters = [];
+      lettersContainer.replaceChildren();
+    }
+    renderTagFilters();
+    refreshLetters();
+  }
+
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!author?.value.trim() || !content?.value.trim()) {
@@ -562,10 +623,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         throw new Error(friendly ? (data.message || '这封信暂时投递不了。') : 'offline');
       }
       showToast(data.message || '信笺已收妥。');
-      if (!payload.private) await loadPublicLetters();
       form.reset();
       if (counter) counter.textContent = '0 / 600';
       resetTags();
+      await loadStats();
+      if (!payload.private) await loadPublicLetters();
     } catch (error) {
       // 本地预览或网络异常时，至少把信笺留在浏览器里，不丢失。
       try {
@@ -593,122 +655,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
   }
 
-  function makeLetter(message) {
-    const card = document.createElement('article');
-    card.className = 'letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow';
-    card.dataset.category = message.tag || '网文同好';
-    if (message.id) card.dataset.id = message.id;
-
-    const head = document.createElement('div');
-    head.className = 'flex flex-col gap-space-sm';
-
-    const top = document.createElement('div');
-    top.className = 'flex items-start justify-between gap-space-sm';
-
-    const who = document.createElement('div');
-    who.className = 'flex items-center gap-space-sm';
-    const badge = document.createElement('div');
-    badge.className = 'w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-serif font-semibold text-lg';
-    badge.textContent = (message.name || '匿名').slice(0, 1);
-    const identity = document.createElement('div');
-    identity.className = 'flex flex-col';
-    const name = document.createElement('span');
-    name.className = 'font-body-lg text-primary font-medium leading-none';
-    name.textContent = message.name || '匿名旅人';
-    const where = document.createElement('span');
-    where.className = 'font-label-sm text-[0.6875rem] text-on-surface-variant mt-1';
-    where.textContent = message.station || '来自一张匿名信笺';
-    identity.append(name, where);
-    who.append(badge, identity);
-
-    const meta = document.createElement('div');
-    meta.className = 'flex items-center gap-space-xs';
-    const tag = document.createElement('span');
-    tag.className = 'bg-surface-container px-space-sm py-0.5 rounded font-label-sm text-label-sm text-secondary';
-    tag.textContent = message.tag || '网文同好';
-    const when = document.createElement('span');
-    when.className = 'font-label-sm text-[0.6875rem] text-outline-variant';
-    when.textContent = '刚刚';
-    meta.append(tag, when);
-    top.append(who, meta);
-
-    const body = document.createElement('p');
-    body.className = 'font-body-md text-body-md text-primary leading-relaxed pt-space-xs whitespace-pre-line';
-    body.textContent = message.message || '';
-    head.append(top, body);
-    card.append(head);
-    return card;
-  }
-
-  // 留言分页：先展示 3 封，点一次多展开一批
-  const lettersContainer = document.getElementById('letters-container');
-  const loadMoreBtn = document.querySelector('[data-load-more]');
-  const lettersEmpty = document.getElementById('letters-empty');
-  const LETTER_BATCH = 3;
-  let letterLimit = LETTER_BATCH;
-  let activeLetterFilter = 'all';
-
-  function refreshLetters() {
-    if (!lettersContainer) return;
-    const cards = [...lettersContainer.querySelectorAll('.letter-card')];
-    const matched = cards.filter(
-      (card) => activeLetterFilter === 'all' || card.dataset.category === activeLetterFilter
-    );
-    let shown = 0;
-    for (const card of cards) {
-      const isMatch =
-        activeLetterFilter === 'all' || card.dataset.category === activeLetterFilter;
-      const visible = isMatch && shown < letterLimit;
-      card.style.display = visible ? 'flex' : 'none';
-      if (visible) shown += 1;
-    }
-    const remaining = Math.max(0, matched.length - shown);
-    if (loadMoreBtn) {
-      loadMoreBtn.style.display = remaining === 0 ? 'none' : '';
-      const label = loadMoreBtn.querySelector('[data-load-more-label]');
-      if (label) {
-        label.textContent = remaining
-          ? `展开翻阅更早的时光卷轴（还有 ${remaining} 封）`
-          : '已经翻到最早的一封了';
-      }
-    }
-    if (lettersEmpty) lettersEmpty.classList.toggle('hidden', matched.length !== 0);
-  }
-
-  async function loadPublicLetters() {
-    if (!lettersContainer) return;
-    try {
-      const response = await fetch('/api/guestbook', { headers: { Accept: 'application/json' } });
-      if (!response.ok) return;
-      const data = await response.json();
-      for (const item of data.messages || []) {
-        if (!item.id || lettersContainer.querySelector(`[data-id="${item.id}"]`)) continue;
-        lettersContainer.prepend(makeLetter(item));
-      }
-    } catch {
-      // 本地静态预览没有 PHP 接口，忽略即可
-    } finally {
-      refreshLetters();
-    }
-  }
-
-  // 留言分类筛选
-  const letterFilters = [...document.querySelectorAll('[data-filter-category]')];
-  for (const btn of letterFilters) {
-    btn.addEventListener('click', () => {
-      for (const b of letterFilters) {
-        b.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
-        b.classList.add('text-on-surface-variant');
-      }
-      btn.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
-      btn.classList.remove('text-on-surface-variant');
-      activeLetterFilter = btn.dataset.filterCategory || 'all';
-      letterLimit = LETTER_BATCH;
-      refreshLetters();
-    });
-  }
-
-  // 打捞漂流瓶
+  // 打捞漂流瓶（站内示例心事，不含私密留言）
   const bottles = [
     { text: '“今晚在操场跑完五公里，躺在草坪上看冬夜猎户座。耳机里正好放到周深的《化身孤岛的鲸》，突然觉得大学四年哪怕有再多迷茫，这一刻的风也是真实的。”', author: '— 匿名漫游者 (投递于 2025.02.14)' },
     { text: '“看完了《诡秘之主》最后一章，合上书的时候宿舍已经熄灯了。愚者先生回到了属于他的地方，而我还得赶明天八点的早课。但今晚的黑暗好像没那么难熬了。”', author: '— 贝克兰德夜行人 (投递于 2025.03.02)' },
@@ -737,13 +684,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   for (const btn of document.querySelectorAll('[data-close-bottle]')) btn.addEventListener('click', closeBottle);
   modal?.addEventListener('click', (e) => { if (e.target === modal) closeBottle(); });
 
-  // 展开更早卷轴：按批次展示，翻到底自动收起按钮
   loadMoreBtn?.addEventListener('click', () => {
     letterLimit += LETTER_BATCH;
     refreshLetters();
   });
 
-  refreshLetters();
+  loadStats();
   loadPublicLetters();
 </script>
 

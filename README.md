@@ -117,7 +117,7 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 
 ### 管理后台
 
-- **`/admin/` 内容后台**：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`，只放服务器 `.env`）；顶部导航切换 **影集 / 随笔 / 书架 / 唱片 / 曲目 / 台词**，支持新增、编辑、删除，影集和曲目支持上传/封面字段；
+- **`/admin/` 内容后台**：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`，只放服务器 `.env`）；顶部导航切换 **影集 / 随笔 / 书架 / 唱片 / 曲目 / 台词**，支持新增、编辑、删除；影集支持上传图片，唱片/曲目封面可填图片地址；
 - 内容存在数据卷里的 `content.sqlite`；上传图片在 `/data/uploads`，通过 `/api/media/photos/...` 提供；
 - 首页 `/`、影集 `/photos/`、随记 `/essays/`、读听 `/reading/`、`/rss.xml`、`/sitemap.xml` 都改为请求时读取内容库；后台改完刷新即可生效，通常不需要构建发版；
 - 曲目若填了酷狗 `hash` / `albumId` / `albumAudioId`，会自动进入站内播放白名单；

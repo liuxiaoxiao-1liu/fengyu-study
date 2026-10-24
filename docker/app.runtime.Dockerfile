@@ -12,6 +12,8 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY dist ./dist
+# 酷狗解析运行时（MIT，见 vendor/kugou/LICENSE），由 /api/kugou/url 在服务端加载
+COPY vendor ./vendor
 
 RUN addgroup -S app && adduser -S app -G app \
  && mkdir -p /data \

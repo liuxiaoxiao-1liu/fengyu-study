@@ -22,6 +22,11 @@ export type Track = {
   duration: string;
   /** 站内音频地址，例如 '/audio/big-fish.mp3'；没有音源就省略 */
   audio?: string;
+  /**
+   * 酷狗曲目元数据：服务端用它换播放直链。
+   * hash / albumId / albumAudioId 来自酷狗搜索接口，只对本账号有权播放的曲目生效。
+   */
+  kugou?: { hash: string; albumId: string; albumAudioId: number };
   /** 官方 / 酷狗歌曲外链 */
   url?: string;
   note?: string;
@@ -77,6 +82,11 @@ export const tracks: Track[] = [
     duration: '05:13',
     note: '动画电影《大鱼海棠》印象曲',
     repeat: true,
+    kugou: {
+      hash: '913ea11b77c1cb2cd11f2164d0406e2c',
+      albumId: '1637713',
+      albumAudioId: 38641536,
+    },
   },
   {
     slug: 'hearing-hallucination',
@@ -89,6 +99,11 @@ export const tracks: Track[] = [
     duration: '04:32',
     note: '梦游计 / 酷狗热搜榜首',
     repeat: true,
+    kugou: {
+      hash: '24f5e7555646965cd7d1a924452b3300',
+      albumId: '973046',
+      albumAudioId: 32155790,
+    },
   },
   {
     slug: 'blue-and-white-porcelain',
@@ -100,6 +115,11 @@ export const tracks: Track[] = [
     tag: '国风经典',
     duration: '03:59',
     note: '我很忙 / 酷狗华语流行榜',
+    kugou: {
+      hash: '37a8f50a9ec3b267c3cc6bec633d9c4a',
+      albumId: '979856',
+      albumAudioId: 32218352,
+    },
   },
   {
     slug: 'gurenge',
@@ -111,6 +131,11 @@ export const tracks: Track[] = [
     tag: '超重低音',
     duration: '03:56',
     note: '鬼灭之刃 OP / ACG狂飙榜',
+    kugou: {
+      hash: '8e62077d4c68171fdb36075ef535ce67',
+      albumId: '40473855',
+      albumAudioId: 284861668,
+    },
   },
   {
     slug: 'toward-clouds',
@@ -122,6 +147,11 @@ export const tracks: Track[] = [
     tag: '治愈放空',
     duration: '03:45',
     note: '酷狗温暖民谣',
+    kugou: {
+      hash: '2e6d88a0ca2290ba32b614fc9c7ea43b',
+      albumId: '74029376',
+      albumAudioId: 518461178,
+    },
   },
 ];
 

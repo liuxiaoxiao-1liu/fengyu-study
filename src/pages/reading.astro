@@ -4,7 +4,7 @@ import Player from '../components/Player.astro';
 import { books } from '../data/books';
 import { albums, tracks, kugouSearchUrl } from '../data/music';
 
-const audioTrackCount = tracks.filter((track) => track.audio).length;
+const audioTrackCount = tracks.filter((track) => track.audio || track.kugou).length;
 const webnovelCount = books.filter((book) => book.category === 'webnovel').length;
 const suspenseCount = books.filter((book) => book.category === 'suspense').length;
 const repeatCount = tracks.filter((track) => track.repeat).length;
@@ -179,8 +179,8 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
 {tracks.map((track) => (
 <div class="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg hover:bg-surface-container transition-colors" data-card="track" data-category={track.repeat ? 'kugou repeat' : 'kugou'}>
 <div class="flex items-center gap-3 min-w-0">
-{track.audio ? (
-<button type="button" class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0" data-play data-audio={track.audio} data-title={track.title} data-artist={`${track.artist} · ${track.album}`} data-external={track.url ?? kugouSearchUrl(track)} aria-label={`播放 ${track.title}`}>
+{(track.audio || track.kugou) ? (
+<button type="button" class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0" data-play data-audio={track.audio} data-resolve={track.audio ? undefined : track.slug} data-title={track.title} data-artist={`${track.artist} · ${track.album}`} data-external={track.url ?? kugouSearchUrl(track)} aria-label={`播放 ${track.title}`}>
 <span class="material-symbols-outlined text-sm">play_arrow</span>
 </button>
 ) : (
@@ -193,7 +193,8 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
 </div>
 </div>
 <div class="flex items-center gap-3 flex-shrink-0 pl-11 sm:pl-0">
-{!track.audio && <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-on-surface-variant hidden sm:inline-block">未上传音源</span>}
+{!track.audio && track.kugou && <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-secondary-container text-on-secondary-container hidden sm:inline-block">站内播放</span>}
+{!track.audio && !track.kugou && <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-on-surface-variant hidden sm:inline-block">未上传音源</span>}
 <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">{track.tag}</span>
 <span class="font-label-sm text-label-sm text-on-surface-variant tabular-nums">{track.duration}</span>
 </div>

@@ -38,6 +38,10 @@ echo "==> 同步 dist（删除旧文件）"
 rsync -az --delete --chmod=D755,F644 \
   -e "$RSYNC_SSH" dist/ "$SERVER:$REMOTE_DIR/dist/"
 
+echo "==> 同步酷狗解析运行时"
+rsync -az --delete --chmod=D755,F644 \
+  -e "$RSYNC_SSH" vendor/ "$SERVER:$REMOTE_DIR/vendor/"
+
 echo "==> 同步编排文件"
 rsync -az --chmod=D755,F644 -e "$RSYNC_SSH" \
   docker-compose.yml .dockerignore package.json package-lock.json \

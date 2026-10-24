@@ -97,11 +97,9 @@ const emptyHint =
 
     // 曲目行里的所有播放按钮共用这一块面板与同一个 <audio>。
     document.querySelectorAll<HTMLButtonElement>('[data-play]').forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', async () => {
         if (!audio) return;
-        const src = button.dataset.audio;
-        if (!src) return;
-        const nextSrc = new URL(src, window.location.href).href;
+
         if (title) title.textContent = button.dataset.title || '未命名曲目';
         if (artist) artist.textContent = button.dataset.artist || '';
         if (state) state.textContent = '· 正在加载…';
@@ -114,10 +112,39 @@ const emptyHint =
           external.classList.remove('hidden');
           external.classList.add('flex');
         }
-        if (audio.src !== nextSrc) audio.src = nextSrc;
-        void audio.play().catch(() => {
-          if (state) state.textContent = '· 音源加载失败';
-        });
+
+        const localSrc = button.dataset.audio;
+        if (localSrc) {
+          const nextSrc = new URL(localSrc, window.location.href).href;
+          if (audio.src !== nextSrc) audio.src = nextSrc;
+          void audio.play().catch(() => {
+            if (state) state.textContent = '· 音源加载失败';
+          });
+          return;
+        }
+
+        // 没有本地音源时，向站点解析酷狗会员直链；只认 music.ts 白名单里的曲目。
+        const slug = button.dataset.resolve;
+        if (!slug) return;
+        if (state) state.textContent = '· 正在解析酷狗音源…';
+        try {
+          const response = await fetch(`/api/kugou/url?slug=${encodeURIComponent(slug)}`, {
+            headers: { accept: 'application/json' },
+          });
+          const data = (await response.json()) as { ok?: boolean; url?: string; error?: string };
+          if (!response.ok || !data.ok || typeof data.url !== 'string') {
+            throw new Error(data.error || `HTTP ${response.status}`);
+          }
+          if (audio.src !== data.url) audio.src = data.url;
+          try {
+            await audio.play();
+          } catch {
+            if (state) state.textContent = '· 音源已就绪，点播放继续';
+          }
+        } catch {
+          if (state) state.textContent = '· 音源解析失败，可去酷狗收听';
+          if (toggle) toggle.disabled = true;
+        }
       });
     });
 

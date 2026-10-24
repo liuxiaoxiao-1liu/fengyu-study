@@ -24,6 +24,14 @@ services:
       GUESTBOOK_DB: /data/guestbook.sqlite
       # 管理后台令牌：写在服务器 /opt/fengyu/.env，不进仓库；未设置时 /api/admin/* 返回 503
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      # 酷狗账号登录态：只用于把站内白名单曲目换成播放直链，不进仓库
+      KUGOU_TOKEN: ${KUGOU_TOKEN:-}
+      KUGOU_USERID: ${KUGOU_USERID:-}
+      KUGOU_VIP_TOKEN: ${KUGOU_VIP_TOKEN:-}
+      KUGOU_VIP_TYPE: ${KUGOU_VIP_TYPE:-}
+      KUGOU_MID: ${KUGOU_MID:-}
+      KUGOU_GUID: ${KUGOU_GUID:-}
+      KUGOU_DFID: ${KUGOU_DFID:-}
     volumes:
       - guestbook-data:/data
     expose:

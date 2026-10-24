@@ -1,5 +1,30 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { essays, formatEssayDate } from '../data/essays';
+import { quotes } from '../data/quotes';
+
+const sortedEssays = [...essays].sort((a, b) => b.date.localeCompare(a.date));
+const essayCount = sortedEssays.filter((essay) => essay.kind === 'essay').length;
+const microCount = sortedEssays.filter((essay) => essay.kind === 'micro').length;
+const microEssays = sortedEssays.filter((essay) => essay.kind === 'micro');
+
+// 正文是 HTML 字符串，统计字数前先去掉标签与空白。
+const totalChars = essays.reduce(
+  (sum, essay) => sum + essay.body.replace(/<[^>]*>/g, '').replace(/\s+/g, '').length,
+  0,
+);
+
+const tagCounts = new Map<string, number>();
+for (const essay of essays) {
+  for (const tag of essay.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+const topTags = [...tagCounts.entries()]
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  .slice(0, 8);
+
+const archiveYears = [...new Set(sortedEssays.map((essay) => essay.date.slice(0, 4)))].sort().join('–');
 ---
 
 <BaseLayout current="essays" title="随记">
@@ -30,13 +55,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex flex-wrap items-center gap-space-xs bg-surface-container-low p-1.5 rounded-full shadow-sm">
 <button class="filter-tab active px-space-md py-space-xs rounded-full font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all" data-target="all" type="button">
                   全部随笔
-                  <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">48</span></button><button class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-target="essay" type="button">
+                  <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">{sortedEssays.length}</span></button><button class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-target="essay" type="button">
                   网文与动漫
-                  <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">21</span></button><button class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-target="micro" type="button">
+                  <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">{essayCount}</span></button><button class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-target="micro" type="button">
                   碎碎念
-                  <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">19</span></button><button class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-target="excerpt" type="button">
+                  <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">{microCount}</span></button><button class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-target="excerpt" type="button">
                   台词摘录
-                  <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">8</span>
+                  <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">{quotes.length}</span>
 </button>
 </div>
 </div>
@@ -45,71 +70,59 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="w-full max-w-7xl mx-auto px-gutter">
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
 <div class="lg:col-span-8 flex flex-col gap-8" id="essays">
-<article class="group relative bg-surface-container-low/70 rounded-xl p-8 md:p-10 transition-all duration-300 hover:shadow-md hover:bg-surface-container-low" data-target="essay">
+{sortedEssays.map((essay, index) => (
+<article class="group relative bg-surface-container-low/70 rounded-xl p-8 md:p-10 transition-all duration-300 hover:shadow-md hover:bg-surface-container-low" data-target={essay.kind}>
 <div class="flex items-center justify-between gap-space-md mb-2">
 <div class="flex items-center gap-space-md text-on-surface-variant font-label-sm text-label-sm">
-<span class="text-secondary font-medium tracking-wide">网文随笔</span><span class="text-outline-variant text-xs">·</span><span class="">2024年12月20日</span><span class="text-outline-variant text-xs">·</span><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>
-                        8分钟阅读</span>
+<span class="text-secondary font-medium tracking-wide">{essay.category}</span><span class="text-outline-variant text-xs">·</span><time datetime={essay.date}>{formatEssayDate(essay.date)}</time><span class="text-outline-variant text-xs">·</span><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>
+{essay.readMinutes}分钟阅读</span>
 </div>
-<span class="font-label-sm text-xs text-on-surface-variant/60 tracking-wider font-mono">#052</span>
+<span class="font-label-sm text-xs text-on-surface-variant/60 tracking-wider font-mono">#{String(sortedEssays.length - index).padStart(3, '0')}</span>
 </div>
 <h2 class="font-headline-lg text-headline-lg text-primary tracking-tight font-normal mb-3 group-hover:text-primary-container transition-colors">
-<a class="hover:underline decoration-on-tertiary-container decoration-1 underline-offset-4" href="/essays/lord-of-mysteries/">《追完〈诡秘之主〉：当代网文的叙事宿命感》</a>
+<a class="hover:underline decoration-on-tertiary-container decoration-1 underline-offset-4" href={`/essays/${essay.slug}/`}>{essay.title}</a>
 </h2>
 <div class="mb-4 p-5 bg-surface-container/60 rounded-lg pl-6 border-l-2 border-secondary/40 flex items-start gap-space-sm">
-<p class="font-quote text-quote italic text-primary leading-relaxed">
-                      “我们是守夜人，也是一群时刻对抗着疯狂与失控的可怜虫。照亮黑夜的，往往正是甘愿燃烧自我的普通灵魂。”
-                    </p>
+<p class="font-quote text-quote italic text-primary leading-relaxed">{essay.quote}</p>
 </div>
-<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-5">
-                    熬夜读完克莱恩在灰雾之上的最终谢幕，窗外校园的天色已经微微泛白。当代优秀的网络文学早已脱离了单纯的升级爽快感，构建起如工业维多利亚与神话克苏鲁交织的庞大宇宙。那种面对不可名状世界依然坚守人性的悲悯与秩序，恰恰击中了在焦虑现实中疲惫摸索的年轻灵魂。
-                  </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-5">{essay.summary}</p>
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pt-4 border-t border-outline-variant/20">
 <div class="flex items-center gap-space-sm flex-wrap text-on-surface-variant font-label-sm text-xs">
-<span class="hover:text-primary transition-colors cursor-pointer">#诡秘之主</span><span class="hover:text-primary transition-colors cursor-pointer">#网文漫谈</span><span class="hover:text-primary transition-colors cursor-pointer">#宿命感</span>
+{essay.tags.map((tag) => (
+<span class="hover:text-primary transition-colors cursor-pointer">#{tag}</span>
+))}
 </div>
-<a class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary font-medium hover:text-on-tertiary-container transition-colors group/link" href="/essays/lord-of-mysteries/"><span class="">阅读全文</span><span class="material-symbols-outlined text-base transition-transform group-hover/link:translate-x-1">arrow_forward</span></a>
-</div>
-</article>
-<article class="group relative bg-surface-container-low/70 rounded-xl p-8 md:p-10 transition-all duration-300 hover:shadow-md hover:bg-surface-container-low" data-target="micro">
-<div class="flex items-center justify-between gap-space-md mb-2">
-<div class="flex items-center gap-space-md text-on-surface-variant font-label-sm text-label-sm">
-<span class="text-secondary font-medium tracking-wide">音乐与散步</span><span class="text-outline-variant text-xs">·</span><span class="">2024年11月15日</span><span class="text-outline-variant text-xs">·</span><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>
-                        6分钟阅读</span>
-</div>
-<span class="font-label-sm text-xs text-on-surface-variant/60 tracking-wider font-mono">#051</span>
-</div>
-<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight font-normal mb-3 group-hover:text-primary-container transition-colors">
-<a class="hover:underline decoration-on-tertiary-container decoration-1 underline-offset-4" href="/essays/campus-walk-playlist/">《戴着耳机用酷狗听老歌，在大学操场漫步》</a>
-</h2>
-<div class="mb-5 p-5 rounded-lg bg-surface-container/70 flex flex-col sm:flex-row items-center gap-5">
-<div class="relative w-16 h-16 shrink-0 bg-primary-container rounded shadow-sm overflow-hidden flex items-center justify-center">
-<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-<div class="w-4 h-4 rounded-full bg-surface-container flex items-center justify-center">
-<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
-</div>
-</div>
-</div>
-<div class="flex flex-col flex-1 min-w-0 w-full">
-<div class="flex items-center justify-between mb-1">
-<span class="font-label-sm text-xs text-secondary font-medium tracking-wider">酷狗播放中 · 单曲循环</span><span class="font-mono text-xs text-on-surface-variant/70">无损音质 · 2000s</span>
-</div>
-<h4 class="font-headline-sm text-headline-sm text-primary truncate leading-snug">
-                        周杰伦 · 晴天 (Jay Chou)
-                      </h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant truncate">
-                        “刮风这天，我试过握着你手，但偏偏雨渐渐……”
-                      </p>
-</div>
-</div>
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pt-4 border-t border-outline-variant/20">
-<div class="flex items-center gap-space-sm flex-wrap text-on-surface-variant font-label-sm text-xs">
-<span class="hover:text-primary transition-colors cursor-pointer">#周杰伦</span><span class="hover:text-primary transition-colors cursor-pointer">#操场夜走</span><span class="hover:text-primary transition-colors cursor-pointer">#老歌回声</span>
-</div>
-<a class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary font-medium hover:text-on-tertiary-container transition-colors group/link" href="/essays/campus-walk-playlist/"><span class="">阅读全文</span><span class="material-symbols-outlined text-base transition-transform group-hover/link:translate-x-1">arrow_forward</span></a>
+<a class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary font-medium hover:text-on-tertiary-container transition-colors group/link" href={`/essays/${essay.slug}/`}><span class="">阅读全文</span><span class="material-symbols-outlined text-base transition-transform group-hover/link:translate-x-1">arrow_forward</span></a>
 </div>
 </article>
-<p class="hidden rounded-xl border border-dashed border-outline-variant p-8 text-center font-body-sm text-body-sm text-on-surface-variant" id="essays-empty">这一类的文字还在整理中，先去翻翻别的吧。</p></div>
+))}
+<p class="hidden rounded-xl border border-dashed border-outline-variant p-8 text-center font-body-sm text-body-sm text-on-surface-variant" id="essays-empty">这一类的文字还在整理中，先去翻翻别的吧。</p>
+<section class="mt-2" data-excerpt-section id="excerpt">
+<div class="flex flex-wrap items-end justify-between gap-space-sm border-b border-surface-container-high pb-3 mb-5">
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest block mb-1">Excerpts · 台词摘录</span>
+<h2 class="font-headline-md text-headline-md text-primary font-normal">被划线的句子</h2>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{quotes.length} 条摘录 · 来自随记与歌单</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+{quotes.map((quote) => (
+<article class="group bg-surface-container-low/70 rounded-xl p-5 border-l-2 border-secondary/50 shadow-sm transition-colors hover:bg-surface-container-low" data-target="excerpt">
+<blockquote class="font-quote text-[1.05rem] leading-relaxed italic text-primary">{quote.text}</blockquote>
+<div class="mt-4 flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-secondary font-medium">{quote.source}</span>
+{quote.work && <span class="font-label-sm text-[0.625rem] text-on-surface-variant">{quote.work}</span>}
+</div>
+<div class="mt-3 flex flex-wrap gap-1.5">
+{quote.tags.map((tag) => (
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-[0.625rem]">#{tag}</span>
+))}
+</div>
+</article>
+))}
+</div>
+</section>
+</div>
 <aside class="lg:col-span-4 flex flex-col gap-8">
 <div class="bg-surface-container-low/70 rounded-xl p-6 shadow-sm">
 <div class="flex items-center justify-between mb-3">
@@ -119,13 +132,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                         书写脉络
                       </h3>
 </div>
-<span class="font-label-sm text-xs text-secondary font-mono font-medium tracking-wider">2024 ARCHIVE</span>
+<span class="font-label-sm text-xs text-secondary font-mono font-medium tracking-wider">{archiveYears} ARCHIVE</span>
 </div>
 <p class="font-body-sm text-body-sm text-on-surface-variant mb-5 leading-relaxed">
-                    今年已沉淀
-                    <span class="text-primary font-semibold">128,400</span> 字 ·
-                    连续漫步记录
-                    <span class="text-secondary font-semibold">46</span> 天
+                    已沉淀
+                    <span class="text-primary font-semibold">{totalChars.toLocaleString('zh-CN')}</span> 字 ·
+                    收录
+                    <span class="text-secondary font-semibold">{essays.length}</span> 篇随笔
                   </p>
 <div class="p-4 bg-surface-container/60 rounded-lg overflow-hidden flex items-center justify-center">
 <svg aria-label="Writing frequency activity map" class="w-full max-w-full h-auto text-on-surface-variant" viewbox="0 0 238 64">
@@ -212,38 +225,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <span class="flex h-2 w-2 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span>
 </div>
 <div class="flex flex-col gap-4">
-<div class="p-5 bg-surface-container/60 rounded-lg relative overflow-hidden transition-all hover:bg-surface-container">
+{microEssays.slice(0, 3).map((essay) => (
+<a class="block p-5 bg-surface-container/60 rounded-lg relative overflow-hidden transition-all hover:bg-surface-container" href={`/essays/${essay.slug}/`}>
 <div class="flex items-center justify-between mb-2 text-on-surface-variant">
 <span class="font-label-sm text-xs text-secondary font-medium flex items-center gap-1.5"><span class="material-symbols-outlined text-xs">pets</span>
-                          校园偶遇</span><span class="font-mono text-xs opacity-60">今天 14:32</span>
+{essay.category}</span><time class="font-mono text-xs opacity-60" datetime={essay.date}>{formatEssayDate(essay.date)}</time>
 </div>
 <p class="font-body-sm text-body-sm text-primary leading-relaxed">
-                        今天在食堂门口看到一只晒太阳的三花猫，肚皮朝天呼噜声极大，突然觉得期末考试也没那么可怕了。宇宙一直在以它的节奏呼吸。
+                        {essay.summary}
                       </p>
+</a>
+))}
 </div>
-<div class="p-5 bg-surface-container/60 rounded-lg relative overflow-hidden transition-all hover:bg-surface-container">
-<div class="flex items-center justify-between mb-2 text-on-surface-variant">
-<span class="font-label-sm text-xs text-on-tertiary-container font-medium flex items-center gap-1.5"><span class="material-symbols-outlined text-xs">local_fire_department</span>
-                          枕边翻书</span><span class="font-mono text-xs opacity-60">昨天 22:15</span>
-</div>
-<p class="font-body-sm text-body-sm text-primary leading-relaxed">
-                        重温《百年孤独》开头，依然为那个带去看冰块的下午战栗。马尔克斯到底是用怎样的心脏，才能把时间和宿命写得像河水里的光滑巨石一样笃定？
-                      </p>
-</div>
-<div class="p-5 bg-surface-container/60 rounded-lg relative overflow-hidden transition-all hover:bg-surface-container">
-<div class="flex items-center justify-between mb-2 text-on-surface-variant">
-<span class="font-label-sm text-xs text-secondary font-medium flex items-center gap-1.5"><span class="material-symbols-outlined text-xs">mobile_share_stack</span>
-                          磁带拾音</span><span class="font-mono text-xs opacity-60">3天前 18:04</span>
-</div>
-<p class="font-body-sm text-body-sm text-primary leading-relaxed">
-                        淘到一张 1982
-                        年的细野晴臣卡带，磁带底噪沙沙的声音太治愈了。像是把东京四十年前一个潮湿黄昏的空气样本封存在了磁粉里。
-                      </p>
-</div>
-</div>
-<button class="w-full mt-4 py-2.5 px-4 bg-surface text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg text-center font-label-sm text-xs transition-colors flex items-center justify-center gap-2 border border-outline-variant/30" type="button">
-<span class="material-symbols-outlined text-sm">add_comment</span><span class="">记录新的片刻思绪</span>
-</button>
+<a class="w-full mt-4 py-2.5 px-4 bg-surface text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg text-center font-label-sm text-xs transition-colors flex items-center justify-center gap-2 border border-outline-variant/30" href="/guestbook/">
+<span class="material-symbols-outlined text-sm">add_comment</span><span class="">去留言板写下片刻思绪</span>
+</a>
 </div>
 <div class="bg-surface-container-low/70 rounded-xl p-6 shadow-sm">
 <div class="flex items-center gap-2 mb-4">
@@ -253,7 +249,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                     </h3>
 </div>
 <div class="flex flex-wrap gap-2 text-xs font-label-sm">
-<span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#村上春树 12</span><span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#坂本龙一 9</span><span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#胶片日记 24</span><span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#秋日漫游 7</span><span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#独处时光 19</span><span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#夜间长跑 5</span><span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#书店寻踪 8</span><span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#黑塞 4</span>
+{topTags.map(([tag, count]) => (
+<span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">#{tag} {count}</span>
+))}
 </div>
 </div>
 <div class="bg-primary-container text-on-primary rounded-xl p-6 relative overflow-hidden shadow-sm">
@@ -264,12 +262,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <p class="font-body-sm text-body-sm text-inverse-primary/80 mb-5 leading-relaxed">
                     每季度末整理一份不公开的长文与私藏歌单，以信件形式投递至邮箱。
                   </p>
-<form class="flex flex-col gap-space-sm" id="newsletter-form">
-<input class="w-full px-4 py-2.5 rounded-lg bg-white/10 text-on-primary placeholder:text-white/40 font-label-md text-label-md focus:outline-none focus:bg-white/15 transition-colors" placeholder="your-email@campus.edu" type="email" id="newsletter-email" name="email" required/><button class="w-full py-2.5 px-4 rounded-lg bg-surface text-primary font-label-md text-label-md font-medium hover:bg-surface-container transition-colors flex items-center justify-center gap-2" type="submit">
+<form class="flex flex-col gap-space-sm" id="newsletter-form" novalidate>
+<input aria-hidden="true" autocomplete="off" class="hidden" name="website" tabindex="-1" type="text"/>
+<label class="sr-only" for="newsletter-email">接收季刊的邮箱</label>
+<input class="w-full px-4 py-2.5 rounded-lg bg-white/10 text-on-primary placeholder:text-white/40 font-label-md text-label-md focus:outline-none focus:bg-white/15 transition-colors" placeholder="your-email@campus.edu" type="email" id="newsletter-email" name="email" required aria-describedby="newsletter-note"/><button class="w-full py-2.5 px-4 rounded-lg bg-surface text-primary font-label-md text-label-md font-medium hover:bg-surface-container transition-colors disabled:opacity-60 disabled:cursor-wait flex items-center justify-center gap-2" type="submit">
 <span class="">订阅候信</span><span class="material-symbols-outlined text-sm">outgoing_mail</span>
 </button>
 </form>
-<p class="hidden font-label-sm text-[0.6875rem] text-white/60 leading-relaxed" id="newsletter-note">订阅入口还在布置中，先用 <a class="underline text-white/80" href="/rss.xml">RSS</a> 把书房装进口袋吧。</p>
+<p class="font-label-sm text-[0.6875rem] text-white/60 leading-relaxed" id="newsletter-note" role="status" aria-live="polite">每季度一封，随时可以退订。也可以先用 <a class="underline text-white/80" href="/rss.xml">RSS</a> 把书房装进口袋。</p>
 </div>
 </aside>
 </div>
@@ -279,29 +279,65 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </main>
 <script>
-  const tabs = [...document.querySelectorAll('.filter-tab')];
-  const cards = [...document.querySelectorAll('article[data-target]')];
+  const tabs = [...document.querySelectorAll<HTMLElement>('.filter-tab')];
+  const cards = [...document.querySelectorAll<HTMLElement>('article[data-target]')];
   const empty = document.getElementById('essays-empty');
-  function apply(target) {
+  const excerptSection = document.querySelector<HTMLElement>('[data-excerpt-section]');
+
+  function apply(target: string) {
     let shown = 0;
     for (const card of cards) {
       const match = target === 'all' || card.dataset.target === target;
       card.classList.toggle('hidden', !match);
       if (match) shown += 1;
     }
+    // 「台词摘录」是独立卡片区，切到随笔筛选时整块收起。
+    excerptSection?.classList.toggle('hidden', target !== 'all' && target !== 'excerpt');
     empty?.classList.toggle('hidden', shown !== 0);
   }
-  const newsletter = document.getElementById('newsletter-form');
-  newsletter?.addEventListener('submit', (event) => {
+
+  const newsletter = document.getElementById('newsletter-form') as HTMLFormElement | null;
+  const emailInput = document.getElementById('newsletter-email') as HTMLInputElement | null;
+  const newsletterNote = document.getElementById('newsletter-note');
+  const newsletterSubmit = newsletter?.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+  const setNote = (message: string) => {
+    if (newsletterNote) newsletterNote.textContent = message;
+  };
+
+  newsletter?.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const email = document.getElementById('newsletter-email');
-    const note = document.getElementById('newsletter-note');
-    if (!email?.value.includes('@')) {
-      email?.focus();
+    const email = emailInput?.value.trim() ?? '';
+    if (!email || !emailInput?.checkValidity()) {
+      setNote('邮箱格式好像不太对，再检查一下。');
+      emailInput?.focus();
       return;
     }
-    note?.classList.remove('hidden');
-    newsletter.reset();
+    newsletterSubmit?.setAttribute('disabled', '');
+    setNote('正在投递…');
+    try {
+      const honeypot = newsletter?.querySelector<HTMLInputElement>('[name="website"]')?.value ?? '';
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', accept: 'application/json' },
+        body: JSON.stringify({ email, website: honeypot }),
+      });
+      const data = (await response.json().catch(() => ({ ok: false }))) as { ok?: boolean };
+      if (response.ok && data.ok !== false) {
+        setNote('已加入季刊名单，寄出前会先给你写信。');
+        newsletter?.reset();
+      } else if (response.status === 429) {
+        setNote('投递太频繁了，请稍后再试。');
+      } else if (response.status === 400) {
+        setNote('邮箱格式好像不太对，再检查一下。');
+      } else {
+        setNote('订阅暂不可用，稍后再试，或先用 RSS 订阅。');
+      }
+    } catch {
+      setNote('网络好像断了，稍后再试，或先用 RSS 订阅。');
+    } finally {
+      newsletterSubmit?.removeAttribute('disabled');
+    }
   });
 
   for (const tab of tabs) {

@@ -1,5 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PhotoLightbox from '../components/PhotoLightbox.astro';
+import { photos, SERIES_FILTERS, SERIES_LABELS } from '../data/photos';
+
+const seriesCount = (series: string) => photos.filter((photo) => photo.series === series).length;
+const takenYears = [...new Set(photos.map((photo) => photo.takenAt.slice(0, 4)))].sort();
+const yearRange = takenYears.length > 1 ? `${takenYears[0]}–${takenYears[takenYears.length - 1]}` : (takenYears[0] ?? '');
 ---
 
 <BaseLayout current="photos" title="影集">
@@ -36,7 +42,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                   <span class="text-outline-variant">·</span> 3D概念与虚幻引擎
                 </p>
 <div class="flex items-center gap-space-xs mt-space-xs pt-space-xs text-on-surface-variant/80">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span class="font-label-sm text-label-sm text-on-surface-variant">48 组跨界视觉灵感收录持续更新</span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span class="font-label-sm text-label-sm text-on-surface-variant">{photos.length} 组跨界视觉灵感收录持续更新</span>
 </div>
 </div>
 </div>
@@ -47,11 +53,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex items-center flex-wrap gap-1.5" id="filter-container">
 <button class="filter-btn active px-4 py-1.5 rounded-lg font-label-md text-label-md bg-primary text-on-primary transition-all duration-300 shadow-sm" data-filter="all" type="button">
                   全部 (All Works)
-                  <span class="ml-1 opacity-70 text-xs">24</span></button><button class="filter-btn px-4 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-300" data-filter="anime" type="button">
-                  动漫插画 (Anime &amp; Manga)</button><button class="filter-btn px-4 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-300" data-filter="reality" type="button">
-                  现实纪实 (Realism &amp; Film)</button><button class="filter-btn px-4 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-300" data-filter="cg" type="button">
-                  虚拟 CG (Virtual Render)
-                </button>
+                  <span class="ml-1 opacity-70 text-xs">{photos.length}</span></button>
+{SERIES_FILTERS.map((series) => (
+<button class="filter-btn px-4 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-300" data-filter={series.value} type="button">
+                  {series.label} ({series.english})
+                  <span class="ml-1 opacity-70 text-xs">{seriesCount(series.value)}</span></button>
+))}
 </div>
 <div class="hidden sm:flex items-center gap-2 px-3 text-on-surface-variant font-label-sm text-label-sm">
 <span class="material-symbols-outlined text-sm">tune</span><span class="">按视觉编目与色调倒序</span>
@@ -61,126 +68,34 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <!-- Editorial Asymmetrical Masonry Photo Grid -->
 <div class="relative z-10 max-w-6xl mx-auto" id="gallery">
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-<!-- Card 1: Anime -->
-<article class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer" data-category="anime">
+{photos.map((photo, index) => (
+<article
+  class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+  data-series={photo.series}
+  data-photo-open={photo.slug}
+  role="button"
+  tabindex="0"
+  aria-label={`打开《${photo.title}》大图`}
+>
 <div class="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container">
-<img alt="Warm golden afternoon sunlight slanting across wooden study desks" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" decoding="async" height="279" loading="lazy" src="/images/photos/desk.jpg" width="512"/>
+<img alt={photo.alt} class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" decoding="async" height={photo.height} loading={index < 3 ? 'eager' : 'lazy'} src={photo.src} width={photo.width}/>
 <div class="absolute top-3 left-3 bg-primary/70 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[0.625rem] tracking-widest uppercase">
-                    ANIME STYLE · 原画
+                    {photo.badge}
                   </div>
 <div class="absolute inset-0 bg-primary/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-on-primary">
 <p class="font-quote text-quote italic text-surface-bright leading-relaxed">
-                      “日光在木纹桌面上慢慢爬行，时间在这里变得肉眼可见。”
+                      “{photo.note}”
                     </p>
 </div>
 </div>
-<div class="pt-4 flex items-baseline justify-between">
+<div class="pt-4 flex items-baseline justify-between gap-space-sm">
 <h2 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">
-                    三楼靠窗的午后光线
+                    {photo.title}
                   </h2>
-<span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0 ml-2">[ 动漫原画 ]</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0">{`[ ${SERIES_LABELS[photo.series]} ]`}</span>
 </div>
 </article>
-<!-- Card 2: Reality -->
-<article class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer" data-category="reality">
-<div class="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container">
-<img alt="University running track at dramatic golden hour sunset" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" decoding="async" height="279" loading="lazy" src="/images/photos/track.jpg" width="512"/>
-<div class="absolute top-3 left-3 bg-primary/70 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[0.625rem] tracking-widest uppercase">
-                    PORTRA 400 · 35MM
-                  </div>
-<div class="absolute inset-0 bg-primary/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-on-primary">
-<p class="font-quote text-quote italic text-surface-bright leading-relaxed">
-                      “影子拉得很长很长，仿佛能一路奔跑进整个青春。”
-                    </p>
-</div>
-</div>
-<div class="pt-4 flex items-baseline justify-between">
-<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">
-                    黄昏操场奔跑的影子
-                  </h2>
-<span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0 ml-2">[ 现实纪实 ]</span>
-</div>
-</article>
-<!-- Card 3: CG -->
-<article class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer" data-category="cg">
-<div class="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container">
-<img alt="Rainy night street asphalt puddle reflecting glowing neon signs" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" decoding="async" height="279" loading="lazy" src="/images/photos/store.jpg" width="512"/>
-<div class="absolute top-3 left-3 bg-primary/70 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[0.625rem] tracking-widest uppercase">
-                    OCTANE RENDER · 4K
-                  </div>
-<div class="absolute inset-0 bg-primary/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-on-primary">
-<p class="font-quote text-quote italic text-surface-bright leading-relaxed">
-                      “雨水将虚拟赛博倒置，电子霓虹永不熄灭。”
-                    </p>
-</div>
-</div>
-<div class="pt-4 flex items-baseline justify-between">
-<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">
-                    雨夜便利店的赛博霓虹
-                  </h2>
-<span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0 ml-2">[ 虚拟 CG ]</span>
-</div>
-</article>
-<!-- Card 4: Reality -->
-<article class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer" data-category="reality">
-<div class="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container">
-<img alt="Vintage paperback book with yellowed pages alongside coffee cup" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" decoding="async" height="279" loading="lazy" src="/images/photos/book-coffee.jpg" width="512"/>
-<div class="absolute top-3 left-3 bg-primary/70 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[0.625rem] tracking-widest uppercase">
-                    ILFORD HP5 · MONO
-                  </div>
-<div class="absolute inset-0 bg-primary/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-on-primary">
-<p class="font-quote text-quote italic text-surface-bright leading-relaxed">
-                      “纸张泛黄的气味与深烘豆香，是老巷子里最好的避难所。”
-                    </p>
-</div>
-</div>
-<div class="pt-4 flex items-baseline justify-between">
-<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">
-                    老街咖啡馆木桌上的半本旧书
-                  </h2>
-<span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0 ml-2">[ 现实纪实 ]</span>
-</div>
-</article>
-<!-- Card 5: CG / Anime -->
-<article class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer" data-category="anime cg">
-<div class="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container">
-<img alt="Vintage bicycle leaning against stone railing overlooking sunset river" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" decoding="async" height="279" loading="lazy" src="/images/photos/bicycle.jpg" width="512"/>
-<div class="absolute top-3 left-3 bg-primary/70 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[0.625rem] tracking-widest uppercase">
-                    BLENDER · RAYTRACED
-                  </div>
-<div class="absolute inset-0 bg-primary/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-on-primary">
-<p class="font-quote text-quote italic text-surface-bright leading-relaxed">
-                      “水面荡漾着碎金，晚风吹散了整周积压的疲惫。”
-                    </p>
-</div>
-</div>
-<div class="pt-4 flex items-baseline justify-between">
-<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">
-                    落日熔金的江边单车
-                  </h2>
-<span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0 ml-2">[ 虚拟 CG ]</span>
-</div>
-</article>
-<!-- Card 6: Anime -->
-<article class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer" data-category="anime">
-<div class="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container">
-<img alt="Macro shot of vibrant green mint on balcony in winter sunshine" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" decoding="async" height="279" loading="lazy" src="/images/photos/mint.jpg" width="512"/>
-<div class="absolute top-3 left-3 bg-primary/70 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[0.625rem] tracking-widest uppercase">
-                    PROCREATE · 300DPI
-                  </div>
-<div class="absolute inset-0 bg-primary/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-on-primary">
-<p class="font-quote text-quote italic text-surface-bright leading-relaxed">
-                      “寒意渐浓，但这捧绿意依然倔强地贪恋晨光。”
-                    </p>
-</div>
-</div>
-<div class="pt-4 flex items-baseline justify-between">
-<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">
-                    阳台养的薄荷与初冬晴天
-                  </h2>
-<span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0 ml-2">[ 动漫原画 ]</span>
-</div>
-</article>
+))}
 </div>
 </div>
 <!-- Bottom Section: 摄影手记 / Darkroom Notes -->
@@ -200,13 +115,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <span class="font-label-sm text-label-sm text-on-surface-variant">Written by 风屿 · 记录于工作室与数字暗房</span>
 <div class="mt-4 grid grid-cols-3 gap-3 bg-surface-container p-4 rounded-xl text-center">
 <div>
-<span class="font-label-lg text-label-lg text-primary block font-bold">142</span><span class="font-label-sm text-[0.6875rem] text-on-surface-variant">冲洗胶卷</span>
+<span class="font-label-lg text-label-lg text-primary block font-bold">{photos.length}</span><span class="font-label-sm text-[0.6875rem] text-on-surface-variant">影像收录</span>
 </div>
 <div>
-<span class="font-label-lg text-label-lg text-primary block font-bold">3,600+</span><span class="font-label-sm text-[0.6875rem] text-on-surface-variant">快门定格</span>
+<span class="font-label-lg text-label-lg text-primary block font-bold">{SERIES_FILTERS.length}</span><span class="font-label-sm text-[0.6875rem] text-on-surface-variant">视觉系列</span>
 </div>
 <div>
-<span class="font-label-lg text-label-lg text-primary block font-bold">4.2 yr</span><span class="font-label-sm text-[0.6875rem] text-on-surface-variant">观察年岁</span>
+<span class="font-label-lg text-label-lg text-primary block font-bold">{yearRange}</span><span class="font-label-sm text-[0.6875rem] text-on-surface-variant">记录年份</span>
 </div>
 </div>
 </div>
@@ -230,10 +145,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </div>
 
+<PhotoLightbox photos={photos} />
 </main>
 <script>
-  const buttons = [...document.querySelectorAll('.filter-btn')];
-  const cards = [...document.querySelectorAll('.photo-card')];
+  const buttons = [...document.querySelectorAll<HTMLElement>('.filter-btn')];
+  const cards = [...document.querySelectorAll<HTMLElement>('.photo-card')];
   for (const btn of buttons) {
     btn.addEventListener('click', () => {
       for (const b of buttons) {
@@ -242,10 +158,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       }
       btn.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
       btn.classList.remove('text-on-surface-variant');
-      const filter = btn.dataset.filter;
+      const filter = btn.dataset.filter ?? 'all';
       for (const card of cards) {
-        const cats = card.dataset.category || '';
-        const show = filter === 'all' || cats.includes(filter);
+        const show = filter === 'all' || card.dataset.series === filter;
         card.style.display = show ? 'flex' : 'none';
       }
     });

@@ -1,0 +1,155 @@
+---
+// 站内播放器面板：由阅读页曲目行里的 [data-play] 按钮驱动。
+// 没有音源的曲目不会进入这里，页面会把按钮降级成酷狗搜索外链。
+interface Props {
+  audioCount?: number;
+}
+
+const { audioCount = 0 } = Astro.props;
+const emptyHint =
+  audioCount > 0 ? '选择上方曲目开始播放。' : '所有曲目暂未上传音源，可点曲目右侧外链去酷狗收听。';
+---
+
+<section class="mt-4 pt-3 bg-surface-container/50 p-3 rounded-lg flex flex-col gap-2" data-player aria-label="站内播放器">
+  <div class="flex flex-wrap items-center justify-between gap-space-sm">
+    <div class="flex flex-col min-w-0">
+      <span class="font-label-sm text-xs flex items-center gap-1.5 text-on-surface-variant">
+        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container" data-player-dot aria-hidden="true"></span>
+        站内播放器
+        <span data-player-state>· {audioCount > 0 ? '等待选择曲目' : '暂无站内音源'}</span>
+      </span>
+      <strong class="text-primary font-medium text-sm truncate" data-player-title>还没有选择曲目</strong>
+      <span class="font-label-sm text-xs text-on-surface-variant truncate" data-player-artist>{emptyHint}</span>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <button
+        type="button"
+        class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+        data-player-toggle
+        aria-label="播放或暂停"
+        disabled
+      >
+        <span class="material-symbols-outlined text-base" data-player-icon>play_arrow</span>
+      </button>
+      <a
+        class="hidden font-label-sm text-xs text-secondary hover:underline items-center gap-1"
+        data-player-external
+        href="https://www.kugou.com/"
+        target="_blank"
+        rel="noopener noreferrer external"
+      >
+        酷狗收听<span class="material-symbols-outlined text-xs">open_in_new</span>
+      </a>
+    </div>
+  </div>
+  <div class="flex items-center gap-3 text-on-surface-variant">
+    <span class="font-label-sm text-xs tabular-nums w-10 text-right" data-player-current>00:00</span>
+    <input
+      class="flex-1 h-1 accent-secondary cursor-pointer disabled:cursor-not-allowed"
+      data-player-seek
+      type="range"
+      min="0"
+      max="0"
+      step="0.1"
+      value="0"
+      aria-label="播放进度"
+      disabled
+    />
+    <span class="font-label-sm text-xs tabular-nums w-10" data-player-duration>--:--</span>
+  </div>
+  <audio data-player-audio preload="none"></audio>
+</section>
+
+<script>
+  const player = document.querySelector<HTMLElement>('[data-player]');
+  if (player) {
+    const audio = player.querySelector<HTMLAudioElement>('[data-player-audio]');
+    const toggle = player.querySelector<HTMLButtonElement>('[data-player-toggle]');
+    const icon = player.querySelector<HTMLElement>('[data-player-icon]');
+    const title = player.querySelector<HTMLElement>('[data-player-title]');
+    const artist = player.querySelector<HTMLElement>('[data-player-artist]');
+    const state = player.querySelector<HTMLElement>('[data-player-state]');
+    const current = player.querySelector<HTMLElement>('[data-player-current]');
+    const duration = player.querySelector<HTMLElement>('[data-player-duration]');
+    const seek = player.querySelector<HTMLInputElement>('[data-player-seek]');
+    const external = player.querySelector<HTMLAnchorElement>('[data-player-external]');
+
+    const formatTime = (seconds: number) => {
+      if (!Number.isFinite(seconds) || seconds < 0) return '00:00';
+      const total = Math.floor(seconds);
+      return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+    };
+
+    const setPlaying = (playing: boolean) => {
+      if (icon) icon.textContent = playing ? 'pause' : 'play_arrow';
+      if (state) state.textContent = playing ? '· 正在播放' : '· 已暂停';
+    };
+
+    const updateDuration = () => {
+      if (!audio) return;
+      const known = Number.isFinite(audio.duration) && audio.duration > 0;
+      if (duration) duration.textContent = known ? formatTime(audio.duration) : '--:--';
+      if (seek) {
+        seek.max = String(known ? audio.duration : 0);
+        seek.disabled = !known;
+      }
+    };
+
+    // 曲目行里的所有播放按钮共用这一块面板与同一个 <audio>。
+    document.querySelectorAll<HTMLButtonElement>('[data-play]').forEach((button) => {
+      button.addEventListener('click', () => {
+        if (!audio) return;
+        const src = button.dataset.audio;
+        if (!src) return;
+        const nextSrc = new URL(src, window.location.href).href;
+        if (title) title.textContent = button.dataset.title || '未命名曲目';
+        if (artist) artist.textContent = button.dataset.artist || '';
+        if (state) state.textContent = '· 正在加载…';
+        if (toggle) toggle.disabled = false;
+        if (seek) seek.disabled = false;
+        if (current) current.textContent = '00:00';
+        if (seek) seek.value = '0';
+        if (external) {
+          external.href = button.dataset.external || 'https://www.kugou.com/';
+          external.classList.remove('hidden');
+          external.classList.add('flex');
+        }
+        if (audio.src !== nextSrc) audio.src = nextSrc;
+        void audio.play().catch(() => {
+          if (state) state.textContent = '· 音源加载失败';
+        });
+      });
+    });
+
+    toggle?.addEventListener('click', () => {
+      if (!audio || !audio.src) return;
+      if (audio.paused) {
+        void audio.play();
+      } else {
+        audio.pause();
+      }
+    });
+
+    audio?.addEventListener('play', () => setPlaying(true));
+    audio?.addEventListener('pause', () => setPlaying(false));
+    audio?.addEventListener('ended', () => setPlaying(false));
+    audio?.addEventListener('loadedmetadata', updateDuration);
+    audio?.addEventListener('durationchange', updateDuration);
+    audio?.addEventListener('timeupdate', () => {
+      if (!audio) return;
+      if (current) current.textContent = formatTime(audio.currentTime);
+      if (seek && Number.isFinite(audio.duration) && audio.duration > 0) {
+        seek.value = String(audio.currentTime);
+      }
+    });
+    audio?.addEventListener('error', () => {
+      if (state) state.textContent = '· 音源加载失败';
+      if (toggle) toggle.disabled = true;
+    });
+
+    seek?.addEventListener('input', () => {
+      if (!audio || !Number.isFinite(audio.duration)) return;
+      audio.currentTime = Number(seek.value);
+    });
+  }
+</script>

@@ -1,5 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Player from '../components/Player.astro';
+import { books } from '../data/books';
+import { albums, tracks, kugouSearchUrl } from '../data/music';
+
+const audioTrackCount = tracks.filter((track) => track.audio).length;
+const webnovelCount = books.filter((book) => book.category === 'webnovel').length;
+const suspenseCount = books.filter((book) => book.category === 'suspense').length;
+const repeatCount = tracks.filter((track) => track.repeat).length;
 ---
 
 <BaseLayout current="reading" title="读听">
@@ -24,21 +32,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex flex-col">
 <span class="font-label-sm text-label-sm text-on-surface-variant">追更网文</span>
 <div class="flex items-baseline gap-1">
-<span class="font-headline-md text-headline-md text-primary font-medium">12</span><span class="font-label-sm text-label-sm text-on-surface-variant">本追读</span>
+<span class="font-headline-md text-headline-md text-primary font-medium">{books.length}</span><span class="font-label-sm text-label-sm text-on-surface-variant">本在架</span>
 </div>
 </div>
 <div class="w-px h-8 bg-surface-container-highest"></div>
 <div class="flex flex-col">
 <span class="font-label-sm text-label-sm text-on-surface-variant">酷狗听歌</span>
 <div class="flex items-baseline gap-1">
-<span class="font-headline-md text-headline-md text-on-tertiary-container font-medium">218</span><span class="font-label-sm text-label-sm text-on-surface-variant">小时</span>
+<span class="font-headline-md text-headline-md text-on-tertiary-container font-medium">{tracks.length}</span><span class="font-label-sm text-label-sm text-on-surface-variant">首曲目</span>
 </div>
 </div>
 <div class="w-px h-8 bg-surface-container-highest"></div>
 <div class="flex flex-col">
 <span class="font-label-sm text-label-sm text-on-surface-variant">本章说标记</span>
 <div class="flex items-baseline gap-1">
-<span class="font-headline-md text-headline-md text-secondary font-medium">360</span><span class="font-label-sm text-label-sm text-on-surface-variant">条金评</span>
+<span class="font-headline-md text-headline-md text-secondary font-medium">{albums.length}</span><span class="font-label-sm text-label-sm text-on-surface-variant">张唱片</span>
 </div>
 </div>
 </div>
@@ -47,10 +55,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex items-center gap-space-xs overflow-x-auto py-1" id="filter-container">
 <button class="filter-btn active px-space-md py-space-xs rounded-lg font-label-md text-label-md bg-primary text-on-primary shadow-sm transition-all flex items-center gap-1.5" data-filter="all" type="button">
 <span class="">全部 (All)</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="webnovel" type="button">
-<span class="">玄幻奇幻 (Web Novel)</span><span class="font-label-sm text-xs opacity-60">4</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="suspense" type="button">
-<span class="">悬疑志怪 (Cult)</span><span class="font-label-sm text-xs opacity-60">1</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="kugou" type="button">
-<span class="">酷狗歌单 (Kugou)</span><span class="font-label-sm text-xs opacity-60">5</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="repeat" type="button">
-<span class="material-symbols-outlined text-xs text-on-tertiary-container">replay</span><span class="">酷狗单曲循回</span><span class="font-label-sm text-xs opacity-60">3</span>
+<span class="">玄幻奇幻 (Web Novel)</span><span class="font-label-sm text-xs opacity-60">{webnovelCount}</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="suspense" type="button">
+<span class="">悬疑志怪 (Cult)</span><span class="font-label-sm text-xs opacity-60">{suspenseCount}</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="kugou" type="button">
+<span class="">酷狗歌单 (Kugou)</span><span class="font-label-sm text-xs opacity-60">{tracks.length}</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="repeat" type="button">
+<span class="material-symbols-outlined text-xs text-on-tertiary-container">replay</span><span class="">酷狗单曲循回</span><span class="font-label-sm text-xs opacity-60">{repeatCount}</span>
 </button>
 </div>
 </div>
@@ -73,133 +81,53 @@ import BaseLayout from '../layouts/BaseLayout.astro';
               <span class="material-symbols-outlined text-xs">south_east</span></span>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
-<a aria-label="去起点中文网阅读《诡秘之主》" class="lg:col-span-7 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow relative group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="webnovel" href="https://www.qidian.com/book/1010868264/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《诡秘之主》">
+{books.map((book, index) => (
+<a
+  aria-label={`去起点中文网阅读${book.title}`}
+  class:list={[
+    'bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow relative group cursor-pointer border border-surface-container-high/40 group/card',
+    index === 0 ? 'lg:col-span-7' : index === 1 ? 'lg:col-span-5' : 'lg:col-span-4',
+  ]}
+  data-card="book"
+  data-category={book.category}
+  href={book.url}
+  rel="noopener noreferrer external"
+  target="_blank"
+  title={`去起点中文网阅读${book.title}`}
+>
 <div class="flex flex-col gap-4">
-<div class="flex items-center justify-between">
-<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">克苏鲁奇幻 · 蒸汽朋克</span><span class="font-label-sm text-label-sm text-on-surface-variant">446万字 · 完结二刷</span>
+<div class="flex items-center justify-between gap-space-sm">
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">{book.genre}</span><span class="font-label-sm text-label-sm text-on-surface-variant text-right">{book.words}</span>
 </div>
-<div class="grid grid-cols-1 sm:grid-cols-12 gap-5 items-start">
-<div class="sm:col-span-4 aspect-[3/4] bg-surface-container-high rounded-lg overflow-hidden shadow-sm flex-shrink-0 relative group-hover:scale-[1.02] transition-transform">
-<img alt="《诡秘之主》封面" class="w-full h-full object-cover" decoding="async" height="800" loading="lazy" src="/images/covers/book-guimi.jpg" width="600"/>
+<div class:list={[index === 0 ? 'grid grid-cols-1 sm:grid-cols-12 gap-5 items-start' : 'flex gap-5 items-start']}>
+<div class:list={[
+  'bg-surface-container-high rounded-lg overflow-hidden shadow-sm flex-shrink-0 group-hover:scale-[1.02] transition-transform aspect-[3/4]',
+  index === 0 ? 'sm:col-span-4 w-full' : index === 1 ? 'w-24' : 'w-20',
+]}>
+<img alt={`${book.title}封面`} class="w-full h-full object-cover" decoding="async" height="800" loading="lazy" src={book.cover} width="600"/>
 </div>
-<div class="sm:col-span-8 flex flex-col justify-between h-full">
-<div class="flex flex-col">
-<h3 class="font-headline-md text-headline-md text-primary tracking-tight font-normal mb-1.5">
-                        《诡秘之主》
+<div class:list={[index === 0 ? 'sm:col-span-8' : 'flex-1', 'flex flex-col min-w-0']}>
+<h3 class:list={['text-primary tracking-tight font-normal mb-1.5', index === 0 ? 'font-headline-md text-headline-md' : 'font-headline-sm text-headline-sm']}>
+                        {book.title}
                       </h3>
-<span class="font-body-sm text-body-sm text-on-surface-variant block mb-2">爱潜水的乌贼 · 著 / 起点中文网白金作</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block mb-2">{book.author} · 著</span>
+{index === 0 && book.quote && (
 <p class="font-quote text-quote italic text-primary leading-relaxed bg-surface-container/50 p-3 rounded-lg mb-2">
-                        “我们是守夜人，也是一群时刻对抗着疯狂与危险的绝望者。赞美愚者先生！”
+                          {book.quote}
+                        </p>
+)}
+<p class:list={['font-body-sm text-body-sm text-on-surface-variant leading-relaxed', index === 0 ? 'line-clamp-2' : 'line-clamp-3']}>
+                        {book.blurb}
                       </p>
-<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 leading-relaxed">
-                        塔罗会二十二条序列魔药途径的宏大架构。克莱恩从廷根值夜者一路升格，每一次扮演与锚定都令人拍案惊奇。
-                      </p>
 </div>
 </div>
 </div>
-</div>
-<div class="flex items-center justify-between pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-<span class="font-label-sm text-label-sm flex items-center gap-1.5 text-secondary font-medium"><span class="material-symbols-outlined text-xs">forum</span>
-                  在起点阅读《诡秘之主》</span><span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">open_in_new</span>
+<div class="flex items-center justify-between gap-space-sm pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant">
+<span class="font-label-sm text-label-sm flex items-center gap-1.5 text-secondary font-medium min-w-0"><span class="material-symbols-outlined text-xs shrink-0">forum</span>
+<span class="truncate">{book.footer ?? `去起点阅读${book.title}`}</span></span><span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform shrink-0">open_in_new</span>
 </div>
 </a>
-<a aria-label="去起点中文网阅读《道诡异仙》" class="lg:col-span-5 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="suspense" href="https://www.qidian.com/book/1031794030/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《道诡异仙》">
-<div class="flex flex-col gap-4">
-<div class="flex items-center justify-between">
-<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">悬疑志怪 · 克系修仙</span><span class="font-label-sm text-label-sm text-on-surface-variant">210万字 · 追读进度 100%</span>
-</div>
-<div class="flex gap-5 items-start">
-<div class="w-24 aspect-[3/4] bg-surface-container-high rounded-lg overflow-hidden shadow-sm flex-shrink-0 group-hover:scale-[1.02] transition-transform">
-<img alt="《道诡异仙》封面" class="w-full h-full object-cover" decoding="async" height="800" loading="lazy" src="/images/covers/book-daogui.jpg" width="600"/>
-</div>
-<div class="flex flex-col flex-1">
-<h3 class="font-headline-sm text-headline-sm text-primary tracking-tight font-normal mb-1">
-                      《道诡异仙》
-                    </h3>
-<span class="font-body-sm text-body-sm text-on-surface-variant mb-2">狐尾的笔 · 著</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3 leading-relaxed">
-                      “妈，我分不清，我真的分不清啊！”游走在现代精神病院与扭曲克苏鲁修真界之间，李火旺每一次挥刀斩出的红中坐忘道。
-                    </p>
-</div>
-</div>
-</div>
-<div class="flex items-center justify-between pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-<span class="font-label-sm text-label-sm text-secondary">坐忘道心素篇 · 白灵淼线评析</span><span class="font-label-sm text-label-sm text-primary group-hover:underline flex items-center gap-1 font-medium">去起点阅读
-                  <span class="material-symbols-outlined text-xs">open_in_new</span></span>
-</div>
-</a>
-<a aria-label="去起点中文网阅读《赤心巡天》" class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="webnovel" href="https://www.qidian.com/book/1016530091/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《赤心巡天》">
-<div class="flex flex-col gap-4">
-<div class="flex items-center justify-between">
-<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">仙侠传统 · 争鸣热血</span><span class="font-label-sm text-label-sm text-on-surface-variant">650万字 · 追更中</span>
-</div>
-<div class="flex gap-5 items-start">
-<div class="w-20 aspect-[3/4] bg-surface-container-high rounded-lg overflow-hidden shadow-sm flex-shrink-0 group-hover:scale-[1.02] transition-transform">
-<img alt="《赤心巡天》封面" class="w-full h-full object-cover" decoding="async" height="800" loading="lazy" src="/images/covers/book-chixin.jpg" width="600"/>
-</div>
-<div class="flex-1">
-<h3 class="font-headline-sm text-headline-sm text-primary tracking-tight font-normal mb-1">
-                      《赤心巡天》
-                    </h3>
-<span class="font-body-sm text-body-sm text-on-surface-variant mb-2 block">情何以甚 · 著</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3 leading-relaxed">
-                      “我姜望行事，自有一柄三昧真火与青云剑。”群雄并立的列国世界观，文笔洗练，黄河之会群像极具张力。
-                    </p>
-</div>
-</div>
-</div>
-<div class="pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant flex items-center justify-between">
-<span class="font-label-sm text-label-sm">太虚幻境与临淄天下演武</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">open_in_new</span>
-</div>
-</a>
-<a aria-label="去起点中文网阅读《深空彼岸》" class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="webnovel" href="https://www.qidian.com/book/1027339371/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《深空彼岸》">
-<div class="flex flex-col gap-4">
-<div class="flex items-center justify-between">
-<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">科幻修真 · 星际长河</span><span class="font-label-sm text-label-sm text-on-surface-variant">530万字 · 完结精修</span>
-</div>
-<div class="flex gap-5 items-start">
-<div class="w-20 aspect-[3/4] bg-surface-container-high rounded-lg overflow-hidden shadow-sm flex-shrink-0 group-hover:scale-[1.02] transition-transform">
-<img alt="《深空彼岸》封面" class="w-full h-full object-cover" decoding="async" height="800" loading="lazy" src="/images/covers/book-shenkong.jpg" width="600"/>
-</div>
-<div class="flex-1">
-<h3 class="font-headline-sm text-headline-sm text-primary tracking-tight font-normal mb-1">
-                      《深空彼岸》
-                    </h3>
-<span class="font-body-sm text-body-sm text-on-surface-variant mb-2 block">辰东 · 著</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3 leading-relaxed">
-                      “枯寂的旧土与浩瀚新星，当旧术与新星科技对撞，王煊一人执炉横渡超凡光海。”辰东大开大合的宇宙想象力。
-                    </p>
-</div>
-</div>
-</div>
-<div class="pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant flex items-center justify-between">
-<span class="font-label-sm text-label-sm">神明熄灭与地仙泉探索笔记</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">open_in_new</span>
-</div>
-</a>
-<a aria-label="去起点中文网阅读《放开那个女巫》" class="lg:col-span-4 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow group cursor-pointer border border-surface-container-high/40 group/card" data-card="book" data-category="webnovel" href="https://www.qidian.com/book/1003306811/" rel="noopener noreferrer external" target="_blank" title="去起点中文网阅读《放开那个女巫》">
-<div class="flex flex-col gap-4">
-<div class="flex items-center justify-between">
-<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">种田奇幻 · 工业革命</span><span class="font-label-sm text-label-sm text-on-surface-variant">336万字 · 经典馆藏</span>
-</div>
-<div class="flex gap-5 items-start">
-<div class="w-20 aspect-[3/4] bg-surface-container-high rounded-lg overflow-hidden shadow-sm flex-shrink-0 group-hover:scale-[1.02] transition-transform">
-<img alt="《放开那个女巫》封面" class="w-full h-full object-cover" decoding="async" height="800" loading="lazy" src="/images/covers/book-nvwu.jpg" width="600"/>
-</div>
-<div class="flex-1">
-<h3 class="font-headline-sm text-headline-sm text-primary tracking-tight font-normal mb-1">
-                      《放开那个女巫》
-                    </h3>
-<span class="font-body-sm text-body-sm text-on-surface-variant mb-2 block">二目 · 著</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3 leading-relaxed">
-                      工程师罗兰在边陲小镇点燃蒸汽机与火枪，与女巫们一起将魔法当作第一生产力推进文明复兴。
-                    </p>
-</div>
-</div>
-</div>
-<div class="pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant flex items-center justify-between">
-<span class="font-label-sm text-label-sm">无冬城工业蓝图与魔力解析</span><span class="material-symbols-outlined text-xs text-primary group-hover:translate-x-1 transition-transform">open_in_new</span>
-</div>
-</a>
+))}
 </div>
 </section>
 <section class="w-full max-w-7xl mx-auto px-gutter" id="music">
@@ -221,175 +149,91 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </div>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-<div class="group relative flex flex-col bg-surface-container-low p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer border border-surface-container-high/40">
+{albums.map((album) => (
+<article class="group relative flex flex-col bg-surface-container-low p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md border border-surface-container-high/40">
 <div class="relative aspect-square w-full rounded-lg overflow-hidden mb-3 bg-surface-container-high shadow-sm">
-<img alt="Zhou Shen Big Fish single art" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async" height="600" loading="lazy" src="/images/covers/album-bigfish.jpg" width="600"/><span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary/75 text-on-primary font-label-sm text-[0.625rem]">酷狗TOP1</span>
+<img alt={`${album.title} 专辑封面`} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async" height="600" loading="lazy" src={album.cover} width="600"/><span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary/75 text-on-primary font-label-sm text-[0.625rem]">{album.label}</span>
 </div>
 <h4 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate font-normal">
-                大鱼 (Big Fish)
+                {album.title}
               </h4>
-<span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">周深 · 蝰蛇纯净音效</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">{album.artist}</span>
 <div class="flex items-center justify-between mt-3 pt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-<span class="font-label-sm text-label-sm text-secondary font-medium">古风空灵</span><span class="material-symbols-outlined text-sm group-hover:text-primary">play_circle</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium">{album.tag}</span><span class="material-symbols-outlined text-sm group-hover:text-primary">play_circle</span>
 </div>
-</div>
-<div class="group relative flex flex-col bg-surface-container-low p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer border border-surface-container-high/40">
-<div class="relative aspect-square w-full rounded-lg overflow-hidden mb-3 bg-surface-container-high shadow-sm">
-<img alt="Xu Song breathing wild album art" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async" height="600" loading="lazy" src="/images/covers/album-breathing.jpg" width="600"/><span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary/75 text-on-primary font-label-sm text-[0.625rem]">华语经典</span>
-</div>
-<h4 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate font-normal">
-                呼吸之野 (Selected)
-              </h4>
-<span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">许嵩 · 酷狗热榜金曲</span>
-<div class="flex items-center justify-between mt-3 pt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-<span class="font-label-sm text-label-sm text-secondary font-medium">国风新潮</span><span class="material-symbols-outlined text-sm group-hover:text-primary">play_circle</span>
-</div>
-</div>
-<div class="group relative flex flex-col bg-surface-container-low p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer border border-surface-container-high/40">
-<div class="relative aspect-square w-full rounded-lg overflow-hidden mb-3 bg-surface-container-high shadow-sm">
-<img alt="Anime OST album art" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async" height="600" loading="lazy" src="/images/covers/album-specialz.jpg" width="600"/><span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary/75 text-on-primary font-label-sm text-[0.625rem]">ACG热歌</span>
-</div>
-<h4 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate font-normal">
-                SPECIALZ / 一途
-              </h4>
-<span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">King Gnu · 咒术回战OP</span>
-<div class="flex items-center justify-between mt-3 pt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-<span class="font-label-sm text-label-sm text-secondary font-medium">提神燃曲</span><span class="material-symbols-outlined text-sm group-hover:text-primary">play_circle</span>
-</div>
-</div>
-<div class="group relative flex flex-col bg-surface-container-low p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer border border-surface-container-high/40">
-<div class="relative aspect-square w-full rounded-lg overflow-hidden mb-3 bg-surface-container-high shadow-sm">
-<img alt="Jay Chou fantasy album art" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" decoding="async" height="600" loading="lazy" src="/images/covers/album-qilixiang.jpg" width="600"/><span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary/75 text-on-primary font-label-sm text-[0.625rem]">酷狗收藏</span>
-</div>
-<h4 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate font-normal">
-                七里香 / 晴天
-              </h4>
-<span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">周杰伦 · 蝰蛇母带重温</span>
-<div class="flex items-center justify-between mt-3 pt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-<span class="font-label-sm text-label-sm text-secondary font-medium">夏日回忆</span><span class="material-symbols-outlined text-sm group-hover:text-primary">play_circle</span>
-</div>
-</div>
+</article>
+))}
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 <div class="lg:col-span-7 bg-surface-container-low rounded-xl p-6 shadow-sm border border-surface-container-high/40">
-<div class="flex items-center justify-between pb-3 mb-3 border-b border-surface-container-high/60">
-<div class="flex items-center gap-space-xs">
-<span class="font-headline-sm text-headline-sm text-primary font-medium">酷狗音乐 · 自习追更精选</span><span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">酷狗蝰蛇音效同步</span>
+<div class="flex items-center justify-between pb-3 mb-3 border-b border-surface-container-high/60 gap-space-sm">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="font-headline-sm text-headline-sm text-primary font-medium">酷狗音乐 · 自习追更精选</span><span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hidden sm:inline-block">蝰蛇音效同步</span>
 </div>
-<button class="font-label-sm text-label-sm text-secondary hover:underline flex items-center gap-1 font-medium" type="button">
+<a class="font-label-sm text-label-sm text-secondary hover:underline flex items-center gap-1 font-medium shrink-0" href="https://www.kugou.com/" target="_blank" rel="noopener noreferrer external">
 <span class="material-symbols-outlined text-xs">queue_music</span>
-                  导入酷狗音乐歌单
-                </button>
+                  打开酷狗歌单
+                </a>
 </div>
 <div class="flex flex-col gap-1.5">
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" data-card="album" data-category="kugou repeat">
+{tracks.map((track) => (
+<div class="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg hover:bg-surface-container transition-colors" data-card="track" data-category={track.repeat ? 'kugou repeat' : 'kugou'}>
 <div class="flex items-center gap-3 min-w-0">
-<button class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0">
+{track.audio ? (
+<button type="button" class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0" data-play data-audio={track.audio} data-title={track.title} data-artist={`${track.artist} · ${track.album}`} data-external={track.url ?? kugouSearchUrl(track)} aria-label={`播放 ${track.title}`}>
 <span class="material-symbols-outlined text-sm">play_arrow</span>
 </button>
+) : (
+<a class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0" href={kugouSearchUrl(track)} target="_blank" rel="noopener noreferrer external" aria-label={`在酷狗搜索 ${track.title}（未上传音源）`} title="未上传音源，去酷狗搜索收听">
+<span class="material-symbols-outlined text-sm">open_in_new</span>
+</a>
+)}
 <div class="flex flex-col min-w-0">
-<span class="font-headline-sm text-base text-primary truncate group-hover:text-on-tertiary-container transition-colors">大鱼 (Big Fish)</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">周深 · 动画电影《大鱼海棠》印象曲</span>
+<span class="font-headline-sm text-base text-primary truncate group-hover:text-on-tertiary-container transition-colors">{track.title}</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">{track.artist} · {track.note ?? track.album}</span>
 </div>
 </div>
-<div class="flex items-center gap-4 flex-shrink-0">
-<span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">蝰蛇全景声</span><span class="font-label-sm text-label-sm text-on-surface-variant">05:13</span>
+<div class="flex items-center gap-3 flex-shrink-0 pl-11 sm:pl-0">
+{!track.audio && <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-on-surface-variant hidden sm:inline-block">未上传音源</span>}
+<span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">{track.tag}</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant tabular-nums">{track.duration}</span>
 </div>
 </div>
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer bg-surface-container/50 border border-secondary/20" data-card="album" data-category="kugou repeat">
-<div class="flex items-center gap-3 min-w-0">
-<button class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center transition-colors flex-shrink-0 shadow-sm">
-<span class="material-symbols-outlined text-sm">volume_up</span>
-</button>
-<div class="flex flex-col min-w-0">
-<span class="font-headline-sm text-base text-primary truncate font-medium">幻听 (Hearing Hallucination)</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">许嵩 · 梦游计 / 酷狗热搜榜首</span>
+))}
 </div>
-</div>
-<div class="flex items-center gap-4 flex-shrink-0">
-<span class="px-2 py-0.5 rounded font-label-sm text-xs bg-secondary-container text-on-secondary-container hidden sm:inline-block font-medium">正在播放</span><span class="font-label-sm text-label-sm text-on-surface-variant">04:32</span>
-</div>
-</div>
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" data-card="album" data-category="kugou repeat">
-<div class="flex items-center gap-3 min-w-0">
-<button class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0">
-<span class="material-symbols-outlined text-sm">play_arrow</span>
-</button>
-<div class="flex flex-col min-w-0">
-<span class="font-headline-sm text-base text-primary truncate group-hover:text-on-tertiary-container transition-colors">青花瓷</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">周杰伦 · 我很忙 / 酷狗华语流行榜</span>
-</div>
-</div>
-<div class="flex items-center gap-4 flex-shrink-0">
-<span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">国风经典</span><span class="font-label-sm text-label-sm text-on-surface-variant">03:59</span>
-</div>
-</div>
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" data-card="album" data-category="kugou">
-<div class="flex items-center gap-3 min-w-0">
-<button class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0">
-<span class="material-symbols-outlined text-sm">play_arrow</span>
-</button>
-<div class="flex flex-col min-w-0">
-<span class="font-headline-sm text-base text-primary truncate group-hover:text-on-tertiary-container transition-colors">红莲华 (Gurenge)</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">LiSA · 鬼灭之刃 OP / ACG狂飙榜</span>
-</div>
-</div>
-<div class="flex items-center gap-4 flex-shrink-0">
-<span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">超重低音</span><span class="font-label-sm text-label-sm text-on-surface-variant">03:56</span>
-</div>
-</div>
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" data-card="album" data-category="kugou">
-<div class="flex items-center gap-3 min-w-0">
-<button class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0">
-<span class="material-symbols-outlined text-sm">play_arrow</span>
-</button>
-<div class="flex flex-col min-w-0">
-<span class="font-headline-sm text-base text-primary truncate group-hover:text-on-tertiary-container transition-colors">向云端</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">小霞 / 海来阿木 · 酷狗温暖民谣</span>
-</div>
-</div>
-<div class="flex items-center gap-4 flex-shrink-0">
-<span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">治愈放空</span><span class="font-label-sm text-label-sm text-on-surface-variant">03:45</span>
-</div>
-</div>
-</div>
-<div class="mt-4 pt-3 bg-surface-container/50 p-3 rounded-lg flex flex-col gap-2">
-<div class="flex items-center justify-between text-on-surface-variant">
-<span class="font-label-sm text-xs flex items-center gap-1.5" id="now-playing-label"><span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container animate-pulse"></span>酷狗播放中:
-                    <strong class="text-primary font-medium">幻听 - 许嵩 (蝰蛇音效 · 清晰人声)</strong></span><span class="font-label-sm text-xs">02:18 / 04:32</span>
-</div>
-<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden cursor-pointer">
-<div class="bg-primary h-full rounded-full transition-all duration-300" style="width: 53%"></div>
-</div>
-</div>
+<Player audioCount={audioTrackCount} />
 </div>
 <div class="lg:col-span-5 flex flex-col gap-6">
 <div class="bg-surface-container-low rounded-xl p-6 shadow-sm relative overflow-hidden border border-surface-container-high/40">
 <div class="flex items-center justify-between mb-2">
-<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-medium">KUGOU MUSIC LOG · 2025.03</span><span class="font-label-sm text-label-sm text-on-surface-variant">酷狗音乐周报</span>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-medium">KUGOU MUSIC LOG · ARCHIVE</span><span class="font-label-sm text-label-sm text-on-surface-variant">酷狗音乐档案</span>
 </div>
 <h3 class="font-headline-sm text-headline-sm text-primary mb-2 font-normal">
-                  听歌月报：蝰蛇音效与网文长夜
+                  听歌札记：蝰蛇音效与网文长夜
                 </h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant mb-4 leading-relaxed">
                   本月开启酷狗蝰蛇「3D丽音」与「纯净人声」，追读《诡秘之主》与《赤心巡天》的深夜总少不了周深与许嵩的声线回荡。伴随歌词滚动，沉浸式体验修真大界的壮阔风云。
                 </p>
 <div class="flex flex-wrap gap-2 mb-4">
 <span class="px-space-sm py-1 rounded font-label-sm text-xs bg-surface-container text-primary flex items-center gap-1"><span class="material-symbols-outlined text-xs text-on-tertiary-container">graphic_eq</span>
-                    蝰蛇全景声 48%</span><span class="px-space-sm py-1 rounded font-label-sm text-xs bg-surface-container text-primary flex items-center gap-1"><span class="material-symbols-outlined text-xs text-secondary">headphones</span>
-                    沉浸追书 35%</span><span class="px-space-sm py-1 rounded font-label-sm text-xs bg-surface-container text-primary flex items-center gap-1"><span class="material-symbols-outlined text-xs text-on-surface-variant">bedtime</span>
-                    深夜国风 17%</span>
+                    书架 {books.length} 本</span><span class="px-space-sm py-1 rounded font-label-sm text-xs bg-surface-container text-primary flex items-center gap-1"><span class="material-symbols-outlined text-xs text-secondary">headphones</span>
+                    曲目 {tracks.length} 首</span><span class="px-space-sm py-1 rounded font-label-sm text-xs bg-surface-container text-primary flex items-center gap-1"><span class="material-symbols-outlined text-xs text-on-surface-variant">album</span>
+                    唱片 {albums.length} 张</span>
 </div>
 <div class="w-full bg-surface-container/70 p-space-sm rounded-lg flex items-center justify-between gap-1 h-12 mb-4">
-<div class="w-1 bg-secondary/80 rounded-full h-4 animate-pulse"></div>
+<div class="w-1 bg-secondary/80 rounded-full h-4"></div>
 <div class="w-1 bg-secondary/80 rounded-full h-8"></div>
-<div class="w-1 bg-secondary/80 rounded-full h-6 animate-pulse"></div>
+<div class="w-1 bg-secondary/80 rounded-full h-6"></div>
 <div class="w-1 bg-primary/70 rounded-full h-10"></div>
 <div class="w-1 bg-primary/70 rounded-full h-7"></div>
-<div class="w-1 bg-on-tertiary-container/80 rounded-full h-9 animate-pulse"></div>
+<div class="w-1 bg-on-tertiary-container/80 rounded-full h-9"></div>
 <div class="w-1 bg-on-tertiary-container/80 rounded-full h-5"></div>
 <div class="w-1 bg-secondary/80 rounded-full h-7"></div>
 <div class="w-1 bg-secondary/80 rounded-full h-3"></div>
-<div class="w-1 bg-primary/80 rounded-full h-8 animate-pulse"></div>
+<div class="w-1 bg-primary/80 rounded-full h-8"></div>
 <div class="w-1 bg-primary/80 rounded-full h-6"></div>
 <div class="w-1 bg-secondary/80 rounded-full h-4"></div>
 <div class="w-1 bg-on-tertiary-container/80 rounded-full h-9"></div>
-<div class="w-1 bg-on-tertiary-container/80 rounded-full h-5 animate-pulse"></div>
+<div class="w-1 bg-on-tertiary-container/80 rounded-full h-5"></div>
 <div class="w-1 bg-secondary/80 rounded-full h-7"></div>
 <div class="w-1 bg-secondary/80 rounded-full h-4"></div>
 <div class="w-1 bg-primary/80 rounded-full h-8"></div>
@@ -400,23 +244,23 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <p class="font-quote text-quote italic text-primary leading-snug mb-1">
                     “看海天一色，听风起雨落，执子手吹散苍茫茫烟波。”
                   </p>
-<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
-<span class="">—— 周深《大鱼》酷狗精评</span><span class="text-xs">9999+ 书友红心标记</span>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant gap-space-sm">
+<span class="">—— 周深《大鱼》酷狗精评</span><span class="text-xs shrink-0">摘自随记与歌单</span>
 </div>
 </div>
 </div>
-<div class="bg-surface-container-low rounded-xl p-5 shadow-sm flex items-center justify-between border border-surface-container-high/40">
-<div class="flex items-center gap-space-sm">
-<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary">
+<div class="bg-surface-container-low rounded-xl p-5 shadow-sm flex flex-wrap items-center justify-between gap-space-sm border border-surface-container-high/40">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary shrink-0">
 <span class="material-symbols-outlined text-lg">library_music</span>
 </div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-sm text-primary font-medium">酷狗歌单: 网文高燃与修仙BGM #02</span><span class="font-label-sm text-xs text-on-surface-variant">已收录 36 首 ACG 与华语热曲 · 酷狗同步</span>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-sm text-primary font-medium truncate">酷狗歌单: 网文高燃与修仙BGM #02</span><span class="font-label-sm text-xs text-on-surface-variant truncate">已收录 {tracks.length} 首曲目 · {albums.length} 张唱片</span>
 </div>
 </div>
-<button class="px-space-sm py-1.5 bg-surface-container hover:bg-surface-container-high rounded text-primary font-label-sm text-xs transition-colors font-medium">
+<a class="px-space-sm py-1.5 bg-surface-container hover:bg-surface-container-high rounded text-primary font-label-sm text-xs transition-colors font-medium" href="https://www.kugou.com/" target="_blank" rel="noopener noreferrer external">
                   酷狗收听
-                </button>
+                </a>
 </div>
 </div>
 </div>
@@ -428,7 +272,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const shelf = document.getElementById('shelf');
   const music = document.getElementById('music');
   const bookCards = shelf ? [...shelf.querySelectorAll('[data-card="book"]')] : [];
-  const albumCards = music ? [...music.querySelectorAll('[data-card="album"]')] : [];
+  const trackCards = music ? [...music.querySelectorAll('[data-card="track"]')] : [];
 
   function setActive(active) {
     for (const tab of tabs) {
@@ -452,7 +296,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     for (const card of bookCards) {
       card.style.display = !isMusic && matches(card) ? '' : 'none';
     }
-    for (const card of albumCards) {
+    for (const card of trackCards) {
       card.style.display = !isBook && matches(card) ? '' : 'none';
     }
   }

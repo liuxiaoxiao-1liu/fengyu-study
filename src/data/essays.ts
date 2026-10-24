@@ -1,8 +1,12 @@
+export type EssayKind = 'essay' | 'micro';
+
 export type Essay = {
   slug: string;
   title: string;
   date: string;
   category: string;
+  /** essay = 网文 / 音乐类随笔；micro = 碎碎念 */
+  kind: EssayKind;
   readMinutes: number;
   tags: string[];
   quote: string;
@@ -16,6 +20,7 @@ export const essays: Essay[] = [
     title: '为什么当代大学生依然离不开网文与老歌？',
     date: '2025-11-04',
     category: '网文与酷狗听歌杂记',
+    kind: 'essay',
     readMinutes: 3,
     tags: ['网文', '酷狗音乐', '大学生活'],
     quote: '“网文不是逃避，而是给紧绷的现实搭起的一座避风港。”',
@@ -40,6 +45,7 @@ export const essays: Essay[] = [
     title: '《追完〈诡秘之主〉：当代网文的叙事宿命感》',
     date: '2024-12-20',
     category: '网文随笔',
+    kind: 'essay',
     readMinutes: 8,
     tags: ['诡秘之主', '网文漫谈', '宿命感'],
     quote:
@@ -65,6 +71,7 @@ export const essays: Essay[] = [
     title: '《戴着耳机用酷狗听老歌，在大学操场漫步》',
     date: '2024-11-15',
     category: '音乐与散步',
+    kind: 'essay',
     readMinutes: 6,
     tags: ['周杰伦', '操场夜走', '老歌回声'],
     quote: '“刮风这天，我试过握着你手，但偏偏雨渐渐……”',
@@ -89,6 +96,7 @@ export const essays: Essay[] = [
     title: '在周末的咖啡馆听雨',
     date: '2025-11-04',
     category: '随记',
+    kind: 'micro',
     readMinutes: 4,
     tags: ['咖啡馆', '雨天', '周末'],
     quote: '“生活的答案往往藏在无关紧要的细节里。”',
@@ -112,6 +120,7 @@ export const essays: Essay[] = [
     title: '为什么我们仍然需要一份自己的数字花园',
     date: '2025-06-06',
     category: '随记',
+    kind: 'micro',
     readMinutes: 5,
     tags: ['独立博客', '数字花园', '写作'],
     quote: '“写作是把散落的东西收拢到一个地方。”',

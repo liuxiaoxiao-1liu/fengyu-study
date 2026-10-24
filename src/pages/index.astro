@@ -1,5 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { books, featuredBook } from '../data/books';
+import { featuredTrack, tracks } from '../data/music';
+import { photos } from '../data/photos';
+import { essays, formatEssayDate } from '../data/essays';
+
+const latestEssay = [...essays].sort((a, b) => b.date.localeCompare(a.date))[0]!;
 ---
 
 <BaseLayout current="home">
@@ -74,7 +80,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
 <span class="material-symbols-outlined text-base">menu_book</span><span class="uppercase tracking-widest font-semibold">网文书架 · Web Novel Shelf</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">追更中 · 第 841 章</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{featuredBook.words}</span>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-12 gap-space-lg my-space-md items-center">
 <div class="sm:col-span-4 flex justify-center">
@@ -142,25 +148,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex items-center gap-2">
 <span class="font-label-sm text-label-sm text-on-tertiary-container font-medium uppercase tracking-wider">酷狗正在播放</span><span class="text-[0.625rem] bg-secondary-container text-on-secondary-container px-1 rounded">Hi-Res无损</span>
 </div>
-<span class="font-headline-sm text-headline-sm text-primary truncate leading-tight mt-1">大鱼 (动画电影《大鱼海棠》印象曲)</span><span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">周深 · 酷狗热歌循环TOP1</span>
-<div class="flex items-center gap-space-sm mt-space-xs">
-<span class="text-xs text-on-surface-variant font-label-sm">03:12</span>
-<div class="flex-1 h-1 bg-surface-container-high rounded-full overflow-hidden">
-<div class="w-3/5 h-full bg-secondary"></div>
-</div>
-<span class="text-xs text-on-surface-variant font-label-sm">05:13</span>
+<span class="font-headline-sm text-headline-sm text-primary truncate leading-tight mt-1">{featuredTrack.title}</span><span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">{featuredTrack.artist} · {featuredTrack.note}</span>
+<div class="flex items-center justify-between gap-space-sm mt-space-xs">
+<span class="font-label-sm text-label-sm text-secondary">{featuredTrack.tag}</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{featuredTrack.duration} · 共 {tracks.length} 首</span>
 </div>
 </div>
 </div>
 <div class="flex flex-col gap-space-xs">
 <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">酷狗歌单精选循环</span>
 <div class="space-y-1">
+{tracks.slice(1, 3).map((track) => (
 <div class="flex items-center justify-between p-2 rounded hover:bg-surface-container transition-colors">
-<span class="font-body-sm text-body-sm text-primary truncate">《起风了》· 买辣椒也用券</span><span class="font-label-sm text-label-sm text-on-surface-variant shrink-0">国语流行</span>
+<span class="font-body-sm text-body-sm text-primary truncate">{track.title} · {track.artist}</span><span class="font-label-sm text-label-sm text-on-surface-variant shrink-0">{track.tag}</span>
 </div>
-<div class="flex items-center justify-between p-2 rounded hover:bg-surface-container transition-colors">
-<span class="font-body-sm text-body-sm text-primary truncate">《打上花火》· 米津玄师 &amp; DAOKO</span><span class="font-label-sm text-label-sm text-on-surface-variant shrink-0">ACG动漫</span>
-</div>
+))}
 </div>
 </div>
 </article>
@@ -192,7 +194,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                         从校园余晖到新海诚风天空
                       </p>
 </div>
-<span class="font-label-sm text-label-sm text-secondary tracking-widest font-mono">58 张收录</span>
+<span class="font-label-sm text-label-sm text-secondary tracking-widest font-mono">{photos.length} 张收录</span>
 </div>
 </div>
 <div class="flex items-center justify-between pt-space-xs">
@@ -207,21 +209,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
 <span class="material-symbols-outlined text-base">history_edu</span><span class="uppercase tracking-widest font-semibold">杂感随笔 · Reading &amp; Listening Notes</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">3 min read</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{latestEssay.readMinutes} min read</span>
 </div>
 <div class="my-space-md flex flex-col gap-space-sm">
 <div class="flex items-center gap-2">
-<span class="font-label-sm text-label-sm text-on-surface-variant">2025年11月 · 熬夜追更</span><span class="text-outline-variant">/</span><span class="font-label-sm text-label-sm text-secondary font-medium">网文与酷狗听歌杂记</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{formatEssayDate(latestEssay.date)}</span><span class="text-outline-variant">/</span><span class="font-label-sm text-label-sm text-secondary font-medium">{latestEssay.category}</span>
 </div>
 <h3 class="font-headline-md text-headline-md text-primary font-normal mt-1">
-                    为什么当代大学生依然离不开网文与老歌？
-                  </h3>
+                     <a class="hover:text-on-tertiary-container transition-colors" href={`/essays/${latestEssay.slug}/`}>{latestEssay.title}</a>
+                   </h3>
 <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed line-clamp-3 mt-1">
-                    白天在课堂和实验报告里被各种DDL推着往前跑，只有到了深夜，戴上耳机打开酷狗的蝰蛇音效，再点开最新更新的网文章节，那片波澜壮阔的世界才真正属于自己。网文不是逃避，而是给紧绷的现实搭起的一座避风港……
-                  </p>
+                     {latestEssay.summary}
+                   </p>
 </div>
 <div class="bg-surface-container p-space-md rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm mt-space-xs">
-<span class="font-label-sm text-label-sm text-on-surface-variant italic">“用想象力对抗生活的琐碎平庸。”</span><a class="font-label-md text-label-md text-primary hover:text-on-tertiary-container transition-colors inline-flex items-center gap-1 font-medium" href="/essays/"><span class="">阅读随想全文</span><span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+<span class="font-label-sm text-label-sm text-on-surface-variant italic">{latestEssay.quote}</span><a class="font-label-md text-label-md text-primary hover:text-on-tertiary-container transition-colors inline-flex items-center gap-1 font-medium" href={`/essays/${latestEssay.slug}/`}><span class="">阅读随想全文</span><span class="material-symbols-outlined text-sm">arrow_forward</span></a>
 </div>
 </article>
 </div>
@@ -241,25 +243,25 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
 <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">网文追读</span>
 <div class="flex items-baseline gap-1.5 mt-1.5">
-<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">42</span><span class="font-label-sm text-label-sm text-secondary font-medium">部神作</span>
+<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{books.length}</span><span class="font-label-sm text-label-sm text-secondary font-medium">部在架</span>
 </div>
 </div>
 <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
 <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">酷狗收藏</span>
 <div class="flex items-baseline gap-1.5 mt-1.5">
-<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">560</span><span class="font-label-sm text-label-sm text-secondary font-medium">首红心</span>
+<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{tracks.length}</span><span class="font-label-sm text-label-sm text-secondary font-medium">首循环</span>
 </div>
 </div>
 <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
 <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">视觉图集</span>
 <div class="flex items-baseline gap-1.5 mt-1.5">
-<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">128</span><span class="font-label-sm text-label-sm text-secondary font-medium">张插画照片</span>
+<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{photos.length}</span><span class="font-label-sm text-label-sm text-secondary font-medium">张收录</span>
 </div>
 </div>
 <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
 <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">随想随笔</span>
 <div class="flex items-baseline gap-1.5 mt-1.5">
-<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">36</span><span class="font-label-sm text-label-sm text-secondary font-medium">篇记录</span>
+<span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{essays.length}</span><span class="font-label-sm text-label-sm text-secondary font-medium">篇记录</span>
 </div>
 </div>
 </div>
@@ -281,26 +283,32 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
                 若你也恰巧在某个静默的夜晚途经此处，欢迎留下近况、推荐一首近期陪伴你的好歌，或仅仅是一句简单的“见字如面”。
               </p>
-<div class="flex items-center gap-space-md pt-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<div class="flex flex-wrap items-center gap-x-space-md gap-y-1 pt-space-xs font-label-sm text-label-sm text-on-surface-variant">
 <span class="flex items-center gap-1">
 <span class="material-symbols-outlined text-sm text-secondary">lock</span>
                   支持公开或仅博主可见
                 </span>
 <span class="">·</span>
-<span class="">回复率 100%</span>
+<span data-stat-reply>回复率读取中…</span>
+<span class="">·</span>
+<span data-stat-total>来信统计读取中…</span>
 </div>
 </div>
 <!-- Right Column: Interactive Mini Form & Recent Notes -->
 <div class="lg:col-span-7 flex flex-col gap-space-md bg-surface-container p-space-lg rounded-lg">
 <div class="bg-surface-container-low p-space-md rounded-lg border border-surface-container-high/40 flex items-start gap-space-sm shadow-sm">
-<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-sm font-semibold shrink-0">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-sm font-semibold shrink-0" data-preview-avatar>
                   修
                 </div>
 <div class="flex flex-col min-w-0 flex-1">
 <div class="flex items-center justify-between gap-space-xs">
-<span class="font-label-sm text-label-sm font-medium text-primary">修仙考研人 (来自广州)</span><span class="font-label-sm text-[0.625rem] text-on-surface-variant">今天 14:20</span>
+<span class="font-label-sm text-label-sm font-medium text-primary truncate" data-preview-name>修仙考研人 · 广州</span>
+<span class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-[0.625rem]" data-preview-badge>示例留言</span>
+<span class="font-label-sm text-[0.625rem] text-on-surface-variant" data-preview-time>今天 14:20</span>
+</span>
 </div>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed" data-preview-message>
                     “同在二刷《诡秘之主》！酷狗里开着蝰蛇音效听《大鱼》看网文真是一绝，强烈安利你去听听周深的现场版，氛围感拉满。”
                   </p>
 </div>
@@ -356,5 +364,99 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const params = new URLSearchParams({ name, station, message, private: isPrivate ? '1' : '0' });
     window.location.href = `/guestbook/?${params.toString()}#guestbook-form`;
   });
+
+  // 留言统计与最新来信都来自运行时 API；接口未就绪时显示占位，不写死假数。
+  const setText = (selector: string, value: string) => {
+    const node = document.querySelector<HTMLElement>(selector);
+    if (node) node.textContent = value;
+  };
+
+  type StatsPayload = {
+    ok?: boolean;
+    replyRate?: number | string;
+    letters?: { total?: number; publicTotal?: number };
+  };
+
+  type LetterPayload = {
+    ok?: boolean;
+    messages?: Array<{
+      name?: unknown;
+      station?: unknown;
+      message?: unknown;
+      created_at?: unknown;
+    }>;
+  };
+
+  function formatRate(value: number | string | undefined): string | null {
+    const rate = Number(value);
+    if (!Number.isFinite(rate)) return null;
+    // /api/stats 的 replyRate 已经是 0–100 的百分数。
+    return `${Math.max(0, Math.min(100, Math.round(rate)))}%`;
+  }
+
+  function formatLetterTime(value: unknown): string {
+    const text = typeof value === 'string' ? value.trim() : '';
+    if (!text) return '最近来信';
+    const date = new Date(text.replace(' ', 'T'));
+    if (Number.isNaN(date.getTime())) return '最近来信';
+    return date.toLocaleString('zh-CN', {
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  async function loadLetterStats() {
+    try {
+      const response = await fetch('/api/stats', { headers: { accept: 'application/json' } });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = (await response.json()) as StatsPayload;
+      if (!data.ok || !data.letters) throw new Error('bad payload');
+      const rate = formatRate(data.replyRate);
+      setText('[data-stat-reply]', rate ? `回复率 ${rate}` : '回复率暂不可用');
+      const total = data.letters.publicTotal ?? data.letters.total;
+      const label = typeof data.letters.publicTotal === 'number' ? '公开来信' : '已收来信';
+      setText(
+        '[data-stat-total]',
+        typeof total === 'number' ? `${label} ${total} 封` : '来信统计暂不可用',
+      );
+    } catch {
+      setText('[data-stat-reply]', '回复率暂不可用');
+      setText('[data-stat-total]', '来信统计暂不可用');
+    }
+  }
+
+  async function loadLatestLetter() {
+    try {
+      const response = await fetch('/api/guestbook', { headers: { accept: 'application/json' } });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = (await response.json()) as LetterPayload;
+      const letter = data.ok ? data.messages?.[0] : undefined;
+      if (!letter) {
+        setText('[data-preview-badge]', '暂无公开来信');
+        setText('[data-preview-name]', '还没有公开来信');
+        setText('[data-preview-time]', '—');
+        setText('[data-preview-message]', '欢迎投递第一封字句，等它在夜里被拆封。');
+        return;
+      }
+      const name = typeof letter.name === 'string' ? letter.name.trim() : '';
+      const station = typeof letter.station === 'string' ? letter.station.trim() : '';
+      setText('[data-preview-badge]', '最新来信');
+      setText('[data-preview-name]', [name || '匿名读者', station].filter(Boolean).join(' · '));
+      setText('[data-preview-time]', formatLetterTime(letter.created_at));
+      setText(
+        '[data-preview-message]',
+        typeof letter.message === 'string' && letter.message.trim() ? letter.message.trim() : '（这封来信没有正文）',
+      );
+    } catch {
+      // 接口失败时保留上方明确标注的「示例留言」。
+      setText('[data-preview-badge]', '示例留言');
+      setText('[data-preview-time]', '接口暂不可用');
+    }
+  }
+
+  void loadLetterStats();
+  void loadLatestLetter();
 </script>
 </BaseLayout>

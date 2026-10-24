@@ -1,0 +1,234 @@
+---
+import type { Photo } from '../data/photos';
+import { SERIES_LABELS, formatPhotoDate } from '../data/photos';
+
+interface Props {
+  photos: Photo[];
+}
+
+const { photos } = Astro.props;
+---
+
+<dialog class="photo-lightbox" data-lightbox aria-label="照片灯箱">
+  <div class="bg-surface rounded-2xl overflow-hidden shadow-2xl w-[min(72rem,92vw)] max-h-[92vh] flex flex-col">
+    <div class="flex items-center justify-between gap-space-sm px-space-lg py-space-sm border-b border-surface-container-high bg-surface-container-low">
+      <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+        Visual Archive / <span data-lightbox-counter>1 / {photos.length}</span>
+      </span>
+      <button
+        type="button"
+        class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-primary transition-colors"
+        data-lightbox-close
+        aria-label="关闭灯箱"
+      >
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <div class="overflow-y-auto">
+      {
+        photos.map((photo, index) => (
+          <div
+            class:list={['flex flex-col lg:flex-row', index !== 0 && 'hidden']}
+            data-lightbox-slide
+            data-slug={photo.slug}
+          >
+            <div class="bg-surface-container flex items-center justify-center lg:w-3/5">
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                width={photo.width}
+                height={photo.height}
+                class="w-full h-auto max-h-[52vh] lg:max-h-[70vh] object-contain"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            </div>
+            <div class="p-space-lg lg:w-2/5 flex flex-col gap-space-sm">
+              <div class="flex items-center justify-between gap-space-xs">
+                <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-medium">
+                  {SERIES_LABELS[photo.series]}
+                </span>
+                <time class="font-label-sm text-label-sm text-on-surface-variant" datetime={photo.takenAt}>
+                  {formatPhotoDate(photo.takenAt)}
+                </time>
+              </div>
+              <h2 class="font-headline-md text-headline-md text-primary tracking-tight font-normal">{photo.title}</h2>
+              <p class="font-quote text-quote italic text-primary leading-relaxed">{photo.note}</p>
+
+              {photo.exif && (
+                <div class="mt-space-xs rounded-lg bg-surface-container/70 p-space-md">
+                  <span class="font-label-sm text-[0.625rem] text-on-surface-variant uppercase tracking-widest block mb-2">
+                    EXIF · 拍摄参数
+                  </span>
+                  <dl class="grid grid-cols-2 gap-x-space-sm gap-y-1.5 font-label-sm text-label-sm">
+                    {photo.exif.camera && (
+                      <div>
+                        <dt class="text-on-surface-variant">机身</dt>
+                        <dd class="text-primary">{photo.exif.camera}</dd>
+                      </div>
+                    )}
+                    {photo.exif.lens && (
+                      <div>
+                        <dt class="text-on-surface-variant">镜头</dt>
+                        <dd class="text-primary">{photo.exif.lens}</dd>
+                      </div>
+                    )}
+                    {photo.exif.aperture && (
+                      <div>
+                        <dt class="text-on-surface-variant">光圈</dt>
+                        <dd class="text-primary">{photo.exif.aperture}</dd>
+                      </div>
+                    )}
+                    {photo.exif.shutter && (
+                      <div>
+                        <dt class="text-on-surface-variant">快门</dt>
+                        <dd class="text-primary">{photo.exif.shutter}</dd>
+                      </div>
+                    )}
+                    {photo.exif.iso && (
+                      <div>
+                        <dt class="text-on-surface-variant">感光度</dt>
+                        <dd class="text-primary">{photo.exif.iso}</dd>
+                      </div>
+                    )}
+                    {photo.exif.location && (
+                      <div class="col-span-2">
+                        <dt class="text-on-surface-variant">地点</dt>
+                        <dd class="text-primary">{photo.exif.location}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+              )}
+
+              <p class="font-label-sm text-[0.625rem] text-on-surface-variant mt-auto pt-space-xs border-t border-surface-container-high">
+                手记 · {photo.badge}
+              </p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="flex items-center justify-between gap-space-sm px-space-lg py-space-sm border-t border-surface-container-high bg-surface-container-low">
+      <button
+        type="button"
+        class="inline-flex items-center gap-1 px-space-md py-1.5 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container transition-colors"
+        data-lightbox-prev
+      >
+        <span class="material-symbols-outlined text-sm">arrow_back</span>上一张
+      </button>
+      <span class="font-label-sm text-[0.625rem] text-on-surface-variant hidden sm:inline">← → 切换 · Esc 关闭</span>
+      <button
+        type="button"
+        class="inline-flex items-center gap-1 px-space-md py-1.5 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container transition-colors"
+        data-lightbox-next
+      >
+        下一张<span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* 原生 dialog 灯箱：遮罩与纸感主题保持一致 */
+  .photo-lightbox {
+    border: 0;
+    padding: 0;
+    margin: auto;
+    background: transparent;
+    max-width: none;
+    max-height: none;
+  }
+
+  .photo-lightbox::backdrop {
+    background: rgb(20 15 13 / 0.72);
+    backdrop-filter: blur(6px);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .photo-lightbox[open] {
+      animation: lightbox-in 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+
+    @keyframes lightbox-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  if (dialog) {
+    const slides = [...dialog.querySelectorAll<HTMLElement>('[data-lightbox-slide]')];
+    const counter = dialog.querySelector<HTMLElement>('[data-lightbox-counter]');
+    const closeButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-close]');
+    const prevButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-prev]');
+    const nextButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-next]');
+    let current = 0;
+    let lastTrigger: HTMLElement | null = null;
+
+    const show = (index: number) => {
+      if (!slides.length) return;
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle('hidden', slideIndex !== current);
+      });
+      if (counter) counter.textContent = `${current + 1} / ${slides.length}`;
+    };
+
+    const open = (slug: string, trigger: HTMLElement) => {
+      const index = slides.findIndex((slide) => slide.dataset.slug === slug);
+      if (index < 0) return;
+      lastTrigger = trigger;
+      show(index);
+      if (!dialog.open) dialog.showModal();
+      closeButton?.focus();
+    };
+
+    document.querySelectorAll<HTMLElement>('[data-photo-open]').forEach((card) => {
+      const slug = card.dataset.photoOpen ?? '';
+      card.addEventListener('click', () => open(slug, card));
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          open(slug, card);
+        }
+      });
+    });
+
+    closeButton?.addEventListener('click', () => dialog.close());
+    prevButton?.addEventListener('click', () => show(current - 1));
+    nextButton?.addEventListener('click', () => show(current + 1));
+
+    // 点击遮罩关闭；内容区是 dialog 的子元素，不会误触。
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    // 原生 Esc 会触发 close；把焦点还给打开它的卡片。
+    dialog.addEventListener('close', () => {
+      lastTrigger?.focus();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (!dialog.open) return;
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        show(current - 1);
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        show(current + 1);
+      }
+    });
+  }
+</script>

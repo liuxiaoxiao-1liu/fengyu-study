@@ -31,8 +31,6 @@ public/
 # 锁文件由 npm 维护
 package-lock.json
 
-# 由 scripts/sync-kugou-playlists.mjs 生成，保持脚本输出格式
-src/data/kugou-playlists.ts
 
 # 技能说明保持原文
 .dsh/

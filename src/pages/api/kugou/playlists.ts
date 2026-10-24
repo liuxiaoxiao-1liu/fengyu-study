@@ -1,21 +1,39 @@
 import type { APIRoute } from 'astro';
-import { playlists } from '../../../data/playlists';
+import { getAccountPlaylist } from '../../../lib/kugou';
 
 export const prerender = false;
 
+/** 兼容旧调用：现在只有一个账号歌单 maotouying。 */
 export const GET: APIRoute = async () => {
-  const meta = playlists.map((playlist) => ({
-    slug: playlist.slug,
-    name: playlist.name,
-    count: playlist.tracks.length,
-  }));
-
-  return new Response(JSON.stringify({ ok: true, playlists: meta }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'public, max-age=300',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
+  try {
+    const playlist = await getAccountPlaylist();
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        playlists: [{ slug: playlist.slug, name: playlist.name, count: playlist.total }],
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'public, max-age=30',
+          'X-Content-Type-Options': 'nosniff',
+        },
+      },
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'playlist_sync_failed';
+    const status = message === 'kugou_disabled' ? 503 : 502;
+    return new Response(
+      JSON.stringify({ ok: false, error: status === 503 ? 'kugou_disabled' : 'playlist_sync_failed' }),
+      {
+        status,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+        },
+      },
+    );
+  }
 };

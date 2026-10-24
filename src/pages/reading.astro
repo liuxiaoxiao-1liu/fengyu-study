@@ -1,21 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TrackRow from '../components/TrackRow.astro';
 import { books } from '../data/books';
 import { albums, tracks, kugouSearchUrl } from '../data/music';
-import { playlists } from '../data/playlists';
 
-const initialPlaylist = playlists[0]!;
-const PAGE_SIZE = 30;
-const initialTracks = initialPlaylist.tracks.slice(0, PAGE_SIZE);
-const initialTotalPages = Math.max(1, Math.ceil(initialPlaylist.tracks.length / PAGE_SIZE));
+const PLAYLIST_SLUG = 'maotouying';
+const PLAYLIST_NAME = 'maotouying';
 
 function firstTrackOfAlbum(albumSlug: string) {
   return tracks.find((track) => track.albumSlug === albumSlug && track.kugou);
 }
-const accountTrackCount = playlists
-  .filter((playlist) => playlist.slug !== 'featured')
-  .reduce((total, playlist) => total + playlist.tracks.length, 0);
 const webnovelCount = books.filter((book) => book.category === 'webnovel').length;
 const suspenseCount = books.filter((book) => book.category === 'suspense').length;
 const repeatCount = tracks.filter((track) => track.repeat).length;
@@ -57,8 +50,11 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
             <div class="flex flex-col">
               <span class="font-label-sm text-label-sm text-on-surface-variant">酷狗听歌</span>
               <div class="flex items-baseline gap-1">
-                <span class="font-headline-md text-headline-md text-on-tertiary-container font-medium">
-                  {accountTrackCount}
+                <span
+                  class="font-headline-md text-headline-md text-on-tertiary-container font-medium"
+                  data-playlist-count
+                >
+                  —
                 </span>
                 <span class="font-label-sm text-label-sm text-on-surface-variant">首曲目</span>
               </div>
@@ -297,42 +293,28 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
           <div class="lg:col-span-7 bg-surface-container-low rounded-xl p-6 shadow-sm border border-surface-container-high/40">
             <div class="flex flex-col gap-3 pb-3 mb-3 border-b border-surface-container-high/60">
               <div class="flex flex-wrap items-center justify-between gap-space-sm">
-                <div class="flex items-center gap-space-xs min-w-0">
-                  <span class="font-headline-sm text-headline-sm text-primary font-medium">酷狗音乐 · 我的歌单</span>
-                  <span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hidden sm:inline-block">
-                    {initialPlaylist.tracks.length} 首 · 站内可播
-                  </span>
+                <div class="flex flex-wrap items-center justify-between gap-space-sm">
+                  <div class="flex items-center gap-space-xs min-w-0">
+                    <span class="font-headline-sm text-headline-sm text-primary font-medium">
+                      {PLAYLIST_NAME} · 我的歌单
+                    </span>
+                    <span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hidden sm:inline-block">
+                      <span data-playlist-count>—</span> 首 · 站内可播
+                    </span>
+                  </div>
+                  <span class="font-label-sm text-label-sm text-on-surface-variant">从酷狗账号自动同步</span>
                 </div>
-                <label class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
-                  歌单
-                  <select
-                    id="playlist-select"
-                    class="bg-surface-container text-primary rounded-lg px-2 py-1.5 font-label-sm text-label-sm focus:outline-none focus:ring-1 focus:ring-secondary"
-                  >
-                    {playlists.map((playlist) => (
-                      <option value={playlist.slug} selected={playlist.slug === initialPlaylist.slug}>
-                        {playlist.name}（{playlist.tracks.length}）
-                      </option>
-                    ))}
-                  </select>
-                </label>
               </div>
               <div
                 class="flex flex-col gap-1.5"
                 id="playlist-tracks"
-                data-slug={initialPlaylist.slug}
+                data-slug={PLAYLIST_SLUG}
                 data-page="1"
-                data-total-pages={initialTotalPages}
+                data-total-pages="1"
               >
-                {initialTracks.map((track) => (
-                  <TrackRow
-                    hash={track.hash}
-                    title={track.title}
-                    artist={track.artist}
-                    duration={track.duration}
-                    external={kugouSearchUrl(track)}
-                  />
-                ))}
+                <p class="rounded-lg border border-dashed border-outline-variant p-6 text-center font-body-sm text-body-sm text-on-surface-variant">
+                  正在从酷狗同步 {PLAYLIST_NAME} 歌单…
+                </p>
               </div>
               <div class="flex items-center justify-between gap-space-sm pt-1" id="playlist-pager">
                 <button
@@ -344,13 +326,13 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
                   上一页
                 </button>
                 <span class="font-label-sm text-xs text-on-surface-variant" data-page-info>
-                  第 1 / {initialTotalPages} 页
+                  正在同步…
                 </span>
                 <button
                   type="button"
                   class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-xs hover:bg-surface-container-high disabled:opacity-40 disabled:cursor-not-allowed"
                   data-page-next
-                  disabled={initialTotalPages <= 1}
+                  disabled
                 >
                   下一页
                 </button>
@@ -488,7 +470,6 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
   </script>
 
   <script>
-    const playlistSelect = document.getElementById('playlist-select') as HTMLSelectElement | null;
     const playlistList = document.getElementById('playlist-tracks');
     const pager = document.getElementById('playlist-pager');
     const pagePrev = pager?.querySelector<HTMLButtonElement>('[data-page-prev]') ?? null;
@@ -496,9 +477,9 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
     const pageInfo = pager?.querySelector<HTMLElement>('[data-page-info]') ?? null;
     const PAGE_SIZE = 30;
 
-    let activeSlug = playlistList?.dataset.slug ?? 'featured';
+    let activeSlug = 'maotouying';
     let activePage = 1;
-    let totalPages = Number(playlistList?.dataset.totalPages ?? 1);
+    let totalPages = 1;
 
     const make = <K extends keyof HTMLElementTagNameMap>(
       tag: K,
@@ -563,15 +544,27 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
     function render(data: {
       page: number;
       totalPages: number;
-      playlist: { slug: string };
+      playlist: { slug: string; name: string; total: number };
       tracks: Array<{ hash: string; title: string; artist: string; duration: string }>;
     }) {
       if (!playlistList) return;
-      playlistList.replaceChildren(...data.tracks.map(buildRow));
+      if (data.tracks.length === 0) {
+        playlistList.replaceChildren(
+          make(
+            'p',
+            'rounded-lg border border-dashed border-outline-variant p-6 text-center font-body-sm text-body-sm text-on-surface-variant',
+            '这个歌单还没有歌曲。在酷狗里添加后，这里会在约 1 分钟内同步。',
+          ),
+        );
+      } else {
+        playlistList.replaceChildren(...data.tracks.map(buildRow));
+      }
+      for (const node of document.querySelectorAll<HTMLElement>('[data-playlist-count]')) {
+        node.textContent = String(data.playlist.total ?? 0);
+      }
       activeSlug = data.playlist.slug;
       activePage = data.page;
       totalPages = data.totalPages;
-      if (playlistSelect) playlistSelect.value = data.playlist.slug;
       if (pageInfo) pageInfo.textContent = `第 ${data.page} / ${data.totalPages} 页`;
       if (pagePrev) pagePrev.disabled = data.page <= 1;
       if (pageNext) pageNext.disabled = data.page >= data.totalPages;
@@ -593,16 +586,17 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
           make(
             'p',
             'rounded-lg border border-dashed border-outline-variant p-6 text-center font-body-sm text-body-sm text-on-surface-variant',
-            '歌单加载失败，稍后再试。',
+            '歌单同步失败，稍后再试。',
           ),
         );
+        if (pageInfo) pageInfo.textContent = '同步失败';
       } finally {
         playlistList.removeAttribute('aria-busy');
       }
     }
 
-    playlistSelect?.addEventListener('change', () => void loadPlaylist(playlistSelect.value, 1));
     pagePrev?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.max(1, activePage - 1)));
     pageNext?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.min(totalPages, activePage + 1)));
+    void loadPlaylist(activeSlug, 1);
   </script>
 </BaseLayout>

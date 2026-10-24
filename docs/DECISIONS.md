@@ -170,6 +170,8 @@ rate_limits (ip_hash, last_at)
 2. 删除 `vendor/kugou`、`src/pages/api/kugou`、`src/data/kugou-playlists.ts`，恢复 `reading.astro` 的静态 5 首即可；
 3. 酷狗侧随时可在网页退出登录，使 token 失效。
 
+> 后续（ADR-006）：歌单改为运行时同步，只保留账号歌单 `maotouying`；静态 `src/data/kugou-playlists.ts` 已删除。
+
 ---
 
 ## ADR-004 · 自动化校验用 astro check + Prettier + 构建冒烟
@@ -189,7 +191,7 @@ rate_limits (ip_hash, last_at)
 
 1. 开发依赖：`@astrojs/check`、`typescript`、`@types/node`、`prettier`、`prettier-plugin-astro`，运行时不新增依赖；
 2. `npm run check` 跑 `astro check`；`tsconfig.json` 排除 `vendor/`、设计稿与试验目录，保留严格模式；
-3. `npm run format` / `format:check` 跑 Prettier；生成的 `src/data/kugou-playlists.ts`、第三方 `vendor/`、二进制素材不参与格式化；
+3. `npm run format` / `format:check` 跑 Prettier；第三方 `vendor/`、二进制素材不参与格式化；
 4. `scripts/smoke-test.mjs` 拉起 `dist/server/entry.mjs`，用临时 SQLite + 测试 Token 验证页面、留言、限流、管理端、订阅、导出与酷狗歌单接口；
 5. `npm run verify` 串联四项检查，作为发布前总闸门；`.github/workflows/ci.yml` 为接通远程仓库后的 CI 模板；
 6. 页面内联脚本补齐类型（DOM 类型断言、接口响应类型、错误对象类型），行为不变。
@@ -272,3 +274,51 @@ rate_limits (ip_hash, last_at)
 - 若要跨页面连续播放，再评估 Astro View Transitions + `transition:persist`；
 - 需要队列/自动下一首/预取时，再参考知识库的 warm deck 与 URL 预取，而不是一次性照搬；
 - 下一步可补 Playwright 的播放交互回归。
+
+---
+
+## ADR-006 · 只展示账号歌单 maotouying，运行时同步
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`src/lib/kugou.ts`、`src/pages/api/kugou/{playlist,playlists,url}.ts`、`src/pages/reading.astro`、`src/data/`
+
+### 背景
+
+- 读听页原先展示 17 个歌单，还混了一个「编辑精选」；用户只想要账号里名为 `maotouying` 的那一个；
+- 旧方案把账号歌单在构建期生成到 `src/data/kugou-playlists.ts`，在酷狗上加歌后必须重新同步 + 重新构建 + 部署；
+- 用户希望「在酷狗上添加歌曲，网站歌单自动同步」。
+
+### 决定
+
+1. **只保留一个歌单**：读听页移除歌单选择器，只展示 `maotouying`（`KUGOU_PLAYLIST_NAME` 可覆盖）；
+2. **运行时拉取**：`/api/kugou/playlist` 调 vendor 的 `userPlaylist` + `playlistTracks`，服务端内存缓存 60 秒；`/api/kugou/playlists` 返回同一个歌单的元数据；
+3. **白名单同源**：`/api/kugou/url` 不再查静态 `trackByHash`，而是查运行时歌单缓存；酷狗新增歌曲在缓存过期后即可解析播放；
+4. **失败保留旧缓存**：拉取失败时优先返回上一次成功结果；没有缓存才向页面报同步失败；
+5. **删除静态快照**：移除 `src/data/kugou-playlists.ts`、`src/data/playlists.ts` 与 `scripts/sync-kugou-playlists.mjs`，不再需要「同步 → 构建 → 部署」；
+6. **页面改造**：读听页初始显示同步占位，加载后替换为真实曲目与数量；分页仍由服务端切片。
+
+### 影响
+
+**正面**
+
+- 在酷狗上增删歌曲，约 1 分钟内自动反映到站内，不需要改代码或发版；
+- 只展示一个歌单，UI 和代码都更简单；
+- 静态数据删除后仓库少约 2000 行，构建更快。
+
+**负面**
+
+- 依赖酷狗接口在运行期可用；首次请求/缓存过期时会有一次拉取延迟；
+- 没有静态快照兜底：Kugou 完全不可用时只能显示同步失败；
+- 每个 app 实例各自缓存，多实例部署会有最多 60 秒不一致；
+- 需要 `KUGOU_TOKEN` / `KUGOU_USERID` / `KUGOU_DFID` 等登录态。
+
+### 回滚
+
+1. 恢复 `src/data/kugou-playlists.ts`、`src/data/playlists.ts` 与同步脚本，把 API 改回静态查询；
+2. 或在 `.env` 设 `KUGOU_PLAYLIST_NAME` 指向别的歌单验证运行链路，不影响账号数据。
+
+### 后续
+
+- 需要更快同步可把缓存降到 15–30 秒，或在酷狗 webhook/同步任务里主动失效；
+- 后续可加服务端定时快照，作为酷狗不可用时的只读兜底。

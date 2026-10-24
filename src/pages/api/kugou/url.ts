@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createHash } from 'node:crypto';
-import { isKugouEnabled, resolveKugouUrl } from '../../../lib/kugou';
-import { trackByHash } from '../../../data/playlists';
+import { findAccountTrack, isKugouEnabled, resolveKugouUrl } from '../../../lib/kugou';
 
 export const prerender = false;
 
@@ -51,13 +50,24 @@ export const GET: APIRoute = async ({ request, url, clientAddress }) => {
   }
 
   const hash = (url.searchParams.get('hash') ?? '').toLowerCase();
-  const track = hash ? trackByHash(hash) : undefined;
-  if (!track) {
+  if (!hash) {
     return json({ ok: false, error: 'not_in_playlist' }, 404);
   }
 
   if (hitRateLimit(clientIp(request, clientAddress))) {
     return json({ ok: false, error: 'rate_limited' }, 429);
+  }
+
+  let track;
+  try {
+    track = await findAccountTrack(hash);
+  } catch (error) {
+    console.error('[kugou] playlist sync failed', error instanceof Error ? error.message : error);
+    return json({ ok: false, error: 'playlist_sync_failed' }, 502);
+  }
+
+  if (!track) {
+    return json({ ok: false, error: 'not_in_playlist' }, 404);
   }
 
   try {

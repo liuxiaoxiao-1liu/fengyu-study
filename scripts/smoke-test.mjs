@@ -325,21 +325,37 @@ try {
       check('非法导出类型 → 400', invalidKind.status === 400, `实际 ${invalidKind.status}`);
     }
 
-    console.log('\n[5/5] 酷狗歌单只读接口');
+    console.log('\n[5/5] 酷狗歌单接口');
     {
+      const kugouEnabled = Boolean(process.env.KUGOU_TOKEN && process.env.KUGOU_USERID);
       const playlists = await request(base, '/api/kugou/playlists');
-      check(
-        '歌单列表可用',
-        playlists.status === 200 && playlists.json?.ok === true && playlists.json.playlists.length > 0,
-      );
-      const firstSlug = playlists.json?.playlists?.[0]?.slug;
-      if (firstSlug) {
-        const detail = await request(base, `/api/kugou/playlist?slug=${firstSlug}&page=1`);
+
+      if (kugouEnabled) {
         check(
-          '歌单详情可用',
-          detail.status === 200 && Array.isArray(detail.json?.tracks) && detail.json.tracks.length > 0,
+          '登录态存在时只返回 maotouying 歌单',
+          playlists.status === 200 &&
+            playlists.json?.ok === true &&
+            playlists.json.playlists.length === 1 &&
+            playlists.json.playlists[0].slug === 'maotouying',
+        );
+        const detail = await request(base, '/api/kugou/playlist?slug=maotouying&page=1');
+        check(
+          '歌单详情可用（允许空歌单）',
+          detail.status === 200 &&
+            detail.json?.ok === true &&
+            detail.json.playlist.slug === 'maotouying' &&
+            Array.isArray(detail.json.tracks),
+        );
+      } else {
+        check(
+          '无登录态时歌单接口返回 503',
+          playlists.status === 503 && playlists.json?.error === 'kugou_disabled',
+          `实际 ${playlists.status} ${playlists.json?.error ?? ''}`,
         );
       }
+
+      const wrongSlug = await request(base, '/api/kugou/playlist?slug=p1');
+      check('旧歌单 slug 返回 404', wrongSlug.status === 404, `实际 ${wrongSlug.status}`);
     }
   }
 } catch (error) {

@@ -108,7 +108,7 @@
 ```text
 src/
   components/   Header、Footer、Player、TrackRow、PhotoLightbox
-  data/         books、music、photos、quotes、essays、playlists、kugou-playlists、search
+  data/         books、music、photos、quotes、essays、search
   layouts/      BaseLayout
   lib/          site、xml、guestbook-db、newsletter-db、kugou
   pages/        五个栏目、essays/[slug]、admin、404、rss.xml、sitemap.xml
@@ -260,9 +260,9 @@ npm run verify         # 上面四项的合集，发布前的总闸门
 
 ## 7. 数据规范
 
-- `src/data/` 是书籍、专辑、曲目、照片、台词、随笔、歌单的单一来源。
+- `src/data/` 是书籍、专辑、曲目、照片、台词、随笔的单一来源；账号歌单改为运行时同步，不再落静态数据。
 - `src/data/search.ts` 必须从其他数据与文章集合**自动生成**，不再手工维护重复摘要。
-- `src/data/kugou-playlists.ts` 由 `scripts/sync-kugou-playlists.mjs` 生成，只含公开元数据（歌单名、曲目、hash），**不得手改**。
+- 账号歌单：`/api/kugou/playlist` 运行时用 `KUGOU_PLAYLIST_NAME`（默认 `maotouying`）从酷狗拉取，服务端内存缓存 60 秒；`/api/kugou/url` 的白名单也来自这份缓存，新增歌曲约 1 分钟内可播放。
 - 数据字段命名统一 camelCase；日期用 ISO 字符串；URL 用完整绝对地址。
 - `id` / `slug` 必须稳定，不随展示文案变化。
 - 页面不直接内嵌数据数组；通过 `import` 使用。
@@ -470,7 +470,7 @@ security(nginx): rate-limit guestbook API
 
 ### 已完成（截至 2026-10-25）
 
-- 内容数据化：`books` / `music` / `photos` / `quotes` / `essays` / `kugou-playlists`；
+- 内容数据化：`books` / `music` / `photos` / `quotes` / `essays`；账号歌单改为运行时同步；
 - 搜索索引构建期自动生成；
 - `/admin/` 审核、回复、导出；`/api/stats`、`/api/subscribe`；
 - 酷狗歌单同步与站内播放（登录态在服务器 `.env`）；

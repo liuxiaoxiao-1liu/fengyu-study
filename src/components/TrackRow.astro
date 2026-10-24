@@ -1,0 +1,36 @@
+---
+interface Props {
+  hash: string;
+  title: string;
+  artist: string;
+  duration: string;
+  external: string;
+}
+
+const { hash, title, artist, duration, external } = Astro.props;
+---
+
+<div class="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg hover:bg-surface-container transition-colors" data-card="track" data-category="kugou">
+  <div class="flex items-center gap-3 min-w-0">
+    <button
+      type="button"
+      class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0"
+      data-play
+      data-hash={hash}
+      data-title={title}
+      data-artist={artist}
+      data-external={external}
+      aria-label={`播放 ${title}`}
+    >
+      <span class="material-symbols-outlined text-sm">play_arrow</span>
+    </button>
+    <div class="flex flex-col min-w-0">
+      <span class="font-headline-sm text-base text-primary truncate group-hover:text-on-tertiary-container transition-colors">{title}</span>
+      <span class="font-label-sm text-label-sm text-on-surface-variant truncate">{artist}</span>
+    </div>
+  </div>
+  <div class="flex items-center gap-3 flex-shrink-0 pl-11 sm:pl-0">
+    <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-secondary-container text-on-secondary-container hidden sm:inline-block">站内播放</span>
+    <span class="font-label-sm text-label-sm text-on-surface-variant tabular-nums">{duration}</span>
+  </div>
+</div>

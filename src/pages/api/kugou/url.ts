@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { createHash } from 'node:crypto';
 import { isKugouEnabled, resolveKugouUrl } from '../../../lib/kugou';
-import { tracks } from '../../../data/music';
+import { trackByHash } from '../../../data/playlists';
 
 export const prerender = false;
 
@@ -42,7 +42,7 @@ function hitRateLimit(ip: string): boolean {
 }
 
 /**
- * 只解析 music.ts 里带 kugou 元数据的曲目，不做通用酷狗代理。
+ * 只解析「编辑精选 + 账号歌单」里出现过的 hash，不做通用酷狗代理。
  * 返回的是 CDN 直链，由浏览器 <audio> 直接播放；服务端不代理音频字节。
  */
 export const GET: APIRoute = async ({ request, url, clientAddress }) => {
@@ -50,9 +50,9 @@ export const GET: APIRoute = async ({ request, url, clientAddress }) => {
     return json({ ok: false, error: 'kugou_disabled' }, 503);
   }
 
-  const slug = url.searchParams.get('slug') ?? '';
-  const track = tracks.find((item) => item.slug === slug && item.kugou);
-  if (!track || !track.kugou) {
+  const hash = (url.searchParams.get('hash') ?? '').toLowerCase();
+  const track = hash ? trackByHash(hash) : undefined;
+  if (!track) {
     return json({ ok: false, error: 'not_in_playlist' }, 404);
   }
 
@@ -61,11 +61,11 @@ export const GET: APIRoute = async ({ request, url, clientAddress }) => {
   }
 
   try {
-    const playUrl = await resolveKugouUrl(track.kugou);
+    const playUrl = await resolveKugouUrl(track);
     return json({
       ok: true,
       url: playUrl,
-      track: { slug: track.slug, title: track.title, artist: track.artist },
+      track: { hash: track.hash, title: track.title, artist: track.artist },
     });
   } catch (error) {
     console.error('[kugou] resolve failed', error instanceof Error ? error.message : error);

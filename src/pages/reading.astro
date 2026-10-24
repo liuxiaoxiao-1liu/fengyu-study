@@ -1,10 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Player from '../components/Player.astro';
+import TrackRow from '../components/TrackRow.astro';
 import { books } from '../data/books';
 import { albums, tracks, kugouSearchUrl } from '../data/music';
+import { playlists } from '../data/playlists';
 
-const audioTrackCount = tracks.filter((track) => track.audio || track.kugou).length;
+const initialPlaylist = playlists[0]!;
+const PAGE_SIZE = 30;
+const initialTracks = initialPlaylist.tracks.slice(0, PAGE_SIZE);
+const initialTotalPages = Math.max(1, Math.ceil(initialPlaylist.tracks.length / PAGE_SIZE));
+const audioTrackCount = initialPlaylist.tracks.length;
 const webnovelCount = books.filter((book) => book.category === 'webnovel').length;
 const suspenseCount = books.filter((book) => book.category === 'suspense').length;
 const repeatCount = tracks.filter((track) => track.repeat).length;
@@ -166,40 +172,33 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 <div class="lg:col-span-7 bg-surface-container-low rounded-xl p-6 shadow-sm border border-surface-container-high/40">
-<div class="flex items-center justify-between pb-3 mb-3 border-b border-surface-container-high/60 gap-space-sm">
+<div class="flex flex-col gap-3 pb-3 mb-3 border-b border-surface-container-high/60">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
 <div class="flex items-center gap-space-xs min-w-0">
-<span class="font-headline-sm text-headline-sm text-primary font-medium">酷狗音乐 · 自习追更精选</span><span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hidden sm:inline-block">蝰蛇音效同步</span>
+<span class="font-headline-sm text-headline-sm text-primary font-medium">酷狗音乐 · 我的歌单</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hidden sm:inline-block">{initialPlaylist.tracks.length} 首 · 站内可播</span>
 </div>
-<a class="font-label-sm text-label-sm text-secondary hover:underline flex items-center gap-1 font-medium shrink-0" href="https://www.kugou.com/" target="_blank" rel="noopener noreferrer external">
-<span class="material-symbols-outlined text-xs">queue_music</span>
-                  打开酷狗歌单
-                </a>
+<label class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+  歌单
+  <select id="playlist-select" class="bg-surface-container text-primary rounded-lg px-2 py-1.5 font-label-sm text-label-sm focus:outline-none focus:ring-1 focus:ring-secondary">
+    {playlists.map((playlist) => (
+      <option value={playlist.slug} selected={playlist.slug === initialPlaylist.slug}>
+        {playlist.name}（{playlist.tracks.length}）
+      </option>
+    ))}
+  </select>
+</label>
 </div>
-<div class="flex flex-col gap-1.5">
-{tracks.map((track) => (
-<div class="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg hover:bg-surface-container transition-colors" data-card="track" data-category={track.repeat ? 'kugou repeat' : 'kugou'}>
-<div class="flex items-center gap-3 min-w-0">
-{(track.audio || track.kugou) ? (
-<button type="button" class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0" data-play data-audio={track.audio} data-resolve={track.audio ? undefined : track.slug} data-title={track.title} data-artist={`${track.artist} · ${track.album}`} data-external={track.url ?? kugouSearchUrl(track)} aria-label={`播放 ${track.title}`}>
-<span class="material-symbols-outlined text-sm">play_arrow</span>
-</button>
-) : (
-<a class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0" href={kugouSearchUrl(track)} target="_blank" rel="noopener noreferrer external" aria-label={`在酷狗搜索 ${track.title}（未上传音源）`} title="未上传音源，去酷狗搜索收听">
-<span class="material-symbols-outlined text-sm">open_in_new</span>
-</a>
-)}
-<div class="flex flex-col min-w-0">
-<span class="font-headline-sm text-base text-primary truncate group-hover:text-on-tertiary-container transition-colors">{track.title}</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">{track.artist} · {track.note ?? track.album}</span>
+<div class="flex flex-col gap-1.5" id="playlist-tracks" data-slug={initialPlaylist.slug} data-page="1" data-total-pages={initialTotalPages}>
+  {initialTracks.map((track) => (
+    <TrackRow hash={track.hash} title={track.title} artist={track.artist} duration={track.duration} external={kugouSearchUrl(track)} />
+  ))}
 </div>
+<div class="flex items-center justify-between gap-space-sm pt-1" id="playlist-pager">
+  <button type="button" class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-xs hover:bg-surface-container-high disabled:opacity-40 disabled:cursor-not-allowed" data-page-prev disabled>上一页</button>
+  <span class="font-label-sm text-xs text-on-surface-variant" data-page-info>第 1 / {initialTotalPages} 页</span>
+  <button type="button" class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-xs hover:bg-surface-container-high disabled:opacity-40 disabled:cursor-not-allowed" data-page-next disabled={initialTotalPages <= 1}>下一页</button>
 </div>
-<div class="flex items-center gap-3 flex-shrink-0 pl-11 sm:pl-0">
-{!track.audio && track.kugou && <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-secondary-container text-on-secondary-container hidden sm:inline-block">站内播放</span>}
-{!track.audio && !track.kugou && <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-on-surface-variant hidden sm:inline-block">未上传音源</span>}
-<span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">{track.tag}</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant tabular-nums">{track.duration}</span>
-</div>
-</div>
-))}
 </div>
 <Player audioCount={audioTrackCount} />
 </div>
@@ -297,7 +296,7 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
     for (const card of bookCards) {
       card.style.display = !isMusic && matches(card) ? '' : 'none';
     }
-    for (const card of trackCards) {
+    for (const card of music ? [...music.querySelectorAll<HTMLElement>('[data-card="track"]')] : []) {
       card.style.display = !isBook && matches(card) ? '' : 'none';
     }
   }
@@ -308,6 +307,106 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
       applyFilter(tab.dataset.filter || 'all');
     });
   }
+</script>
+
+<script>
+  const playlistSelect = document.getElementById('playlist-select') as HTMLSelectElement | null;
+  const playlistList = document.getElementById('playlist-tracks');
+  const pager = document.getElementById('playlist-pager');
+  const pagePrev = pager?.querySelector<HTMLButtonElement>('[data-page-prev]') ?? null;
+  const pageNext = pager?.querySelector<HTMLButtonElement>('[data-page-next]') ?? null;
+  const pageInfo = pager?.querySelector<HTMLElement>('[data-page-info]') ?? null;
+  const PAGE_SIZE = 30;
+
+  let activeSlug = playlistList?.dataset.slug ?? 'featured';
+  let activePage = 1;
+  let totalPages = Number(playlistList?.dataset.totalPages ?? 1);
+
+  const make = (tag: string, className: string, text?: string) => {
+    const node = document.createElement(tag);
+    node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  const searchUrl = (title: string, artist: string) =>
+    `https://www.kugou.com/yy/html/search.html#searchType=song&searchKeyWord=${encodeURIComponent(`${title} ${artist}`.trim())}`;
+
+  function buildRow(track: {
+    hash: string;
+    title: string;
+    artist: string;
+    duration: string;
+  }): HTMLElement {
+    const row = make('div', 'group flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg hover:bg-surface-container transition-colors');
+    row.dataset.card = 'track';
+    row.dataset.category = 'kugou';
+
+    const left = make('div', 'flex items-center gap-3 min-w-0');
+    const button = make('button', 'w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0');
+    button.type = 'button';
+    button.setAttribute('data-play', '');
+    button.dataset.hash = track.hash;
+    button.dataset.title = track.title;
+    button.dataset.artist = track.artist;
+    button.dataset.external = searchUrl(track.title, track.artist);
+    button.setAttribute('aria-label', `播放 ${track.title}`);
+    button.append(make('span', 'material-symbols-outlined text-sm', 'play_arrow'));
+
+    const meta = make('div', 'flex flex-col min-w-0');
+    meta.append(
+      make('span', 'font-headline-sm text-base text-primary truncate group-hover:text-on-tertiary-container transition-colors', track.title),
+      make('span', 'font-label-sm text-label-sm text-on-surface-variant truncate', track.artist),
+    );
+    left.append(button, meta);
+
+    const right = make('div', 'flex items-center gap-3 flex-shrink-0 pl-11 sm:pl-0');
+    right.append(
+      make('span', 'px-2 py-0.5 rounded font-label-sm text-xs bg-secondary-container text-on-secondary-container hidden sm:inline-block', '站内播放'),
+      make('span', 'font-label-sm text-label-sm text-on-surface-variant tabular-nums', track.duration),
+    );
+    row.append(left, right);
+    return row;
+  }
+
+  function render(data: {
+    page: number;
+    totalPages: number;
+    playlist: { slug: string };
+    tracks: Array<{ hash: string; title: string; artist: string; duration: string }>;
+  }) {
+    if (!playlistList) return;
+    playlistList.replaceChildren(...data.tracks.map(buildRow));
+    activeSlug = data.playlist.slug;
+    activePage = data.page;
+    totalPages = data.totalPages;
+    if (playlistSelect) playlistSelect.value = data.playlist.slug;
+    if (pageInfo) pageInfo.textContent = `第 ${data.page} / ${data.totalPages} 页`;
+    if (pagePrev) pagePrev.disabled = data.page <= 1;
+    if (pageNext) pageNext.disabled = data.page >= data.totalPages;
+  }
+
+  async function loadPlaylist(slug: string, page: number) {
+    if (!playlistList) return;
+    playlistList.setAttribute('aria-busy', 'true');
+    try {
+      const response = await fetch(
+        `/api/kugou/playlist?slug=${encodeURIComponent(slug)}&page=${page}&pageSize=${PAGE_SIZE}`,
+        { headers: { accept: 'application/json' } },
+      );
+      const data = await response.json();
+      if (!response.ok || !data?.ok) throw new Error(data?.error || 'load_failed');
+      render(data);
+    } catch {
+      playlistList.replaceChildren(make('p', 'rounded-lg border border-dashed border-outline-variant p-6 text-center font-body-sm text-body-sm text-on-surface-variant', '歌单加载失败，稍后再试。'));
+    } finally {
+      playlistList.removeAttribute('aria-busy');
+    }
+  }
+
+  playlistSelect?.addEventListener('change', () => void loadPlaylist(playlistSelect.value, 1));
+  pagePrev?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.max(1, activePage - 1)));
+  pageNext?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.min(totalPages, activePage + 1)));
 </script>
 
 </BaseLayout>

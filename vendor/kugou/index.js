@@ -3,6 +3,8 @@
 // 原项目：https://github.com/MakcRe/KuGouMusicApi （MIT）
 const registerDevModule = require('./module/register_dev');
 const songUrlModule = require('./module/song_url');
+const userPlaylistModule = require('./module/user_playlist');
+const playlistTracksModule = require('./module/playlist_track_all');
 const { createRequest } = require('./util/request');
 const { cookieToJson } = require('./util');
 
@@ -14,4 +16,6 @@ function call(moduleFn, params) {
 module.exports = {
   registerDev: (params) => call(registerDevModule, params),
   songUrl: (params) => call(songUrlModule, params),
+  userPlaylist: (params) => call(userPlaylistModule, params),
+  playlistTracks: (params) => call(playlistTracksModule, params),
 };

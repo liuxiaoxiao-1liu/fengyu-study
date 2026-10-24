@@ -115,21 +115,37 @@ export async function resolveKugouUrl(track: KugouTrackRef): Promise<string> {
   if (hit && Date.now() - hit.at < URL_TTL_MS) return hit.url;
 
   const dfid = await ensureDfid(config);
-  const response = await songUrl({
+  const cookie = baseCookie(config, dfid);
+  const pickUrl = (body: KugouResponse['body']): string => {
+    if (!body) return '';
+    return Array.isArray(body.url) ? body.url[0] ?? '' : body.url ?? body.backupUrl?.[0] ?? '';
+  };
+
+  // 优先带 album_audio_id；部分曲目（尤其免费/翻唱）带它反而返回版权拦截，退回 0 再试。
+  let response = await songUrl({
     hash: track.hash,
     album_id: track.albumId,
     album_audio_id: track.albumAudioId,
     quality: 128,
-    cookie: baseCookie(config, dfid),
+    cookie,
   });
+  let url = pickUrl(response?.body);
 
-  const body = response?.body ?? {};
-  if (body.status !== 1) {
-    throw new Error(`song_url_failed:${body.error_code ?? 'unknown'}`);
+  if (!url) {
+    response = await songUrl({
+      hash: track.hash,
+      album_id: track.albumId,
+      album_audio_id: 0,
+      quality: 128,
+      cookie,
+    });
+    url = pickUrl(response?.body);
   }
 
-  const url = Array.isArray(body.url) ? body.url[0] : body.url ?? body.backupUrl?.[0] ?? '';
-  if (!url) throw new Error('song_url_failed:no_url');
+  if (!url) {
+    const body = response?.body ?? {};
+    throw new Error(`song_url_failed:${body.error_code ?? 'unknown'}`);
+  }
 
   urlCache.set(key, { url, at: Date.now() });
   // 简单清理，避免 Map 无限增长

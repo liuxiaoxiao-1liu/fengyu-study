@@ -15,7 +15,7 @@ COPY dist ./dist
 
 RUN addgroup -S app && adduser -S app -G app \
  && mkdir -p /data \
- && chown -R app:app /app /data
+ && chown -R app:app /data
 
 USER app
 VOLUME ["/data"]

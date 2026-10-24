@@ -127,13 +127,14 @@ WEB_PORT=80 npm run deploy:docker     # 确认宿主 nginx 已停，再切到 80
 2. `npm run deploy:docker` 发到 8080，逐页验证；
 3. 有旧留言时，先在本地 `npm run guestbook:import` 导入 SQLite，再放进数据卷；
 4. `systemctl stop nginx`，然后 `WEB_PORT=80 npm run deploy:docker`；
-5. 验证首页、五个栏目、详情页、RSS、sitemap、留言 API。
+5. 验证首页、五个栏目、详情页、RSS、sitemap、留言 API；
+6. 切换成功后执行 `systemctl disable nginx`，避免重启时抢占 80。
 
 回滚：
 
 ```bash
 cd /opt/fengyu && docker compose down
-systemctl start nginx
+systemctl enable --now nginx
 ```
 
 旧 PHP 站点和 `/var/www/xiaoquanzi` 不要删除，切换前先确认还能回滚。

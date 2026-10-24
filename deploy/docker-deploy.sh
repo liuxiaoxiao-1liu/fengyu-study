@@ -31,7 +31,8 @@ echo "==> 本地构建静态页面与 server bundle"
 npm run build
 
 echo "==> 准备远程目录 $SERVER:$REMOTE_DIR"
-ssh "${SSH_OPTS[@]}" "$SERVER" "mkdir -p '$REMOTE_DIR'"
+ssh "${SSH_OPTS[@]}" "$SERVER" \
+  "mkdir -p '$REMOTE_DIR/dist' '$REMOTE_DIR/docker' '$REMOTE_DIR/deploy'"
 
 echo "==> 同步 dist（删除旧文件）"
 rsync -az --delete --chmod=D755,F644 \
@@ -39,8 +40,12 @@ rsync -az --delete --chmod=D755,F644 \
 
 echo "==> 同步编排文件"
 rsync -az --chmod=D755,F644 -e "$RSYNC_SSH" \
-  docker-compose.yml docker deploy/nginx.container.conf .dockerignore package.json package-lock.json \
+  docker-compose.yml .dockerignore package.json package-lock.json \
   "$SERVER:$REMOTE_DIR/"
+rsync -az --delete --chmod=D755,F644 -e "$RSYNC_SSH" \
+  docker/ "$SERVER:$REMOTE_DIR/docker/"
+rsync -az --chmod=D755,F644 -e "$RSYNC_SSH" \
+  deploy/nginx.container.conf "$SERVER:$REMOTE_DIR/deploy/"
 
 if [ "$WEB_PORT" = "80" ]; then
   echo "!! WEB_PORT=80：请确认宿主 nginx 已停止，否则端口会冲突。"
@@ -49,7 +54,7 @@ fi
 
 echo "==> 远程构建并启动容器（WEB_PORT=$WEB_PORT）"
 ssh "${SSH_OPTS[@]}" "$SERVER" \
-  "cd '$REMOTE_DIR' && WEB_PORT='$WEB_PORT' docker compose build app && WEB_PORT='$WEB_PORT' docker compose up -d"
+  "cd '$REMOTE_DIR' && WEB_PORT='$WEB_PORT' docker compose build app && WEB_PORT='$WEB_PORT' docker compose up -d --force-recreate && WEB_PORT='$WEB_PORT' docker compose ps"
 
 echo "==> 验证"
 sleep 1
@@ -68,4 +73,4 @@ if [ "$WEB_PORT" = "80" ]; then
 else
   echo "完成：http://$HOST:$WEB_PORT/（验证通过后可用 WEB_PORT=80 切换）"
 fi
-echo "回滚：cd $REMOTE_DIR && docker compose down && systemctl start nginx"
+echo "回滚：cd $REMOTE_DIR && docker compose down && systemctl enable --now nginx"

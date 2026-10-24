@@ -11,6 +11,9 @@ const PAGE_SIZE = 30;
 const initialTracks = initialPlaylist.tracks.slice(0, PAGE_SIZE);
 const initialTotalPages = Math.max(1, Math.ceil(initialPlaylist.tracks.length / PAGE_SIZE));
 const audioTrackCount = initialPlaylist.tracks.length;
+const accountTrackCount = playlists
+  .filter((playlist) => playlist.slug !== 'featured')
+  .reduce((total, playlist) => total + playlist.tracks.length, 0);
 const webnovelCount = books.filter((book) => book.category === 'webnovel').length;
 const suspenseCount = books.filter((book) => book.category === 'suspense').length;
 const repeatCount = tracks.filter((track) => track.repeat).length;
@@ -45,7 +48,7 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
 <div class="flex flex-col">
 <span class="font-label-sm text-label-sm text-on-surface-variant">酷狗听歌</span>
 <div class="flex items-baseline gap-1">
-<span class="font-headline-md text-headline-md text-on-tertiary-container font-medium">{tracks.length}</span><span class="font-label-sm text-label-sm text-on-surface-variant">首曲目</span>
+<span class="font-headline-md text-headline-md text-on-tertiary-container font-medium">{accountTrackCount}</span><span class="font-label-sm text-label-sm text-on-surface-variant">首曲目</span>
 </div>
 </div>
 <div class="w-px h-8 bg-surface-container-highest"></div>
@@ -63,8 +66,8 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
 <span class="">全部 (All)</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="webnovel" type="button">
 <span class="">玄幻奇幻 (Web Novel)</span><span class="font-label-sm text-xs opacity-60">{webnovelCount}</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="suspense" type="button">
 <span class="">悬疑志怪 (Cult)</span><span class="font-label-sm text-xs opacity-60">{suspenseCount}</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="kugou" type="button">
-<span class="">酷狗歌单 (Kugou)</span><span class="font-label-sm text-xs opacity-60">{tracks.length}</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="repeat" type="button">
-<span class="material-symbols-outlined text-xs text-on-tertiary-container">replay</span><span class="">酷狗单曲循回</span><span class="font-label-sm text-xs opacity-60">{repeatCount}</span>
+<span class="">编辑精选 (Kugou)</span><span class="font-label-sm text-xs opacity-60">{tracks.length}</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="repeat" type="button">
+<span class="material-symbols-outlined text-xs text-on-tertiary-container">replay</span><span class="">单曲循回</span><span class="font-label-sm text-xs opacity-60">{repeatCount}</span>
 </button>
 </div>
 </div>

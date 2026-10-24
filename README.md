@@ -112,6 +112,15 @@ npm run preview      # 预览构建结果
 - 其它接口：`GET /api/stats`（聚合计数）、`POST /api/subscribe`（季刊订阅入库）；
 - 管理端走 HTTP 当前没有 TLS，令牌只在本机/可信网络使用，后续上 HTTPS 后再日常使用。
 
+## 酷狗站内播放
+
+- 登录态（`KUGOU_TOKEN` / `KUGOU_USERID` / `KUGOU_VIP_TOKEN` / `KUGOU_VIP_TYPE` / `KUGOU_MID` / `KUGOU_GUID`）只放服务器 `/opt/fengyu/.env`，不进仓库、不下发浏览器；
+- 服务端先 `/register/dev` 换 `dfid`，再 `/song/url` 换 CDN 直链，浏览器 `<audio>` 直接播放（服务端不代理音频字节）；
+- 歌单数据在 `src/data/kugou-playlists.ts`，由 `node --env-file=.env scripts/sync-kugou-playlists.mjs` 重新生成；当前包含账号全部 17 个歌单、约 1800 首；
+- `/reading/` 支持歌单切换 + 分页（每页 30 首）；`/api/kugou/url` 只解析数据里出现过的 hash，按 IP 限流（30 次 / 10 分钟）；
+- 登录态过期或酷狗改接口时，`/api/kugou/url` 返回 502，播放器自动降级为酷狗外链；重新扫码登录后更新 `.env` 即可。
+- 运行时来源是 `vendor/kugou/`（从 Folia 内置的 KuGouMusicApi 抽取，MIT），只保留 `register_dev` / `song_url` / 歌单读取。
+
 ## 运维
 
 - 每日 04:17 自动备份（`VACUUM INTO`，保留 7 天）：`/opt/fengyu/scripts/backup-guestbook.sh` → `/opt/fengyu/backups/`；

@@ -125,3 +125,47 @@ rate_limits (ip_hash, last_at)
 - 域名 + HTTPS（SNI 分流）后启用日常审核；
 - 如有多人维护需求，再评估 Basic Auth / OAuth；
 - 音频文件托管与版权策略单独评审。
+
+---
+
+## ADR-003 · 酷狗站内播放：账号登录态 + 白名单解析
+
+- **日期**：2026-10-24
+- **状态**：已接受，已上线
+- **影响范围**：`/reading/`、`/api/kugou/*`、`vendor/kugou/`、服务器 `.env`
+
+### 背景
+
+- 用户有酷狗 VIP，要求把账号里的歌单搬到站内并直接播放；
+- 酷狗对付费曲目只向有权限的登录态返回播放地址，裸接口会返回 `20018` / `The Resource Needs to be Paid`；
+- 站点的音频优势是浏览器原生 `<audio>`，不需要服务端解码或代理音频字节。
+
+### 决定
+
+1. 通过 KuGouMusicApi 的二维码登录拿 `token` / `vip_token`，只存服务器 `.env`；
+2. 把该项目中 `register_dev` / `song_url` / 歌单读取的最小运行时 vendor 到 `vendor/kugou/`（MIT，保留 LICENSE）；
+3. 先 `/register/dev` 换 `dfid`，再 `/song/url` 换 CDN 直链；`album_audio_id` 失败时退回 0 再试；
+4. 歌单同步成 `src/data/kugou-playlists.ts`，播放接口只解析其中的 hash，不做通用代理；
+5. 前端 `<audio>` 直接播直链；服务端不缓存/不转发音频字节；
+6. 登录态失效或接口变更时返回 502，播放器降级为酷狗外链。
+
+### 影响
+
+**正面**
+
+- 站内播放走用户自己的会员权限，不需要下载或破解；
+- 复用成熟 API 实现，登录/签名逻辑不重写；
+- 歌单与页面解耦，重新同步只改一个数据文件。
+
+**负面**
+
+- 强依赖酷狗非官方接口和账号登录态，可能随时失效；
+- token 等价于账号凭据，服务器被入侵即泄露（建议小号/不绑支付）；
+- 直链是 HTTP，站点上 HTTPS 后需要代理或换 https 源；
+- 页面公开可请求解析接口，靠白名单 + 限流收窄。
+
+### 回滚
+
+1. 清空服务器 `.env` 里的 `KUGOU_*` 并重建 app → `/api/kugou/url` 返回 503，播放器降级外链；
+2. 删除 `vendor/kugou`、`src/pages/api/kugou`、`src/data/kugou-playlists.ts`，恢复 `reading.astro` 的静态 5 首即可；
+3. 酷狗侧随时可在网页退出登录，使 token 失效。

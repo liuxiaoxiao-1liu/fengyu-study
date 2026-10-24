@@ -101,6 +101,16 @@ WEB_PORT=80 npm run deploy:docker  # 确认后切 80
 | 备份体积为 0 | app 容器没跑 | `docker compose ps`；脚本会报错退出 |
 | 留言 429 | 每 IP 60 秒 + nginx 60r/m | 等一分钟，别调高限流 |
 
+## 8. 酷狗站内播放
+
+- 登录态只放服务器 `/opt/fengyu/.env`：`KUGOU_TOKEN`、`KUGOU_USERID`、`KUGOU_VIP_TOKEN`、`KUGOU_VIP_TYPE`、`KUGOU_MID`、`KUGOU_GUID`、可选 `KUGOU_DFID`；**永不进仓库、不贴聊天**。
+- 解析链路：`/register/dev` 换 `dfid` → `/song/url` 换 CDN 直链 → 浏览器 `<audio>` 播放。缺 `dfid` 时酷狗会返回 `20018`。
+- 歌单同步：`node --env-file=.env scripts/sync-kugou-playlists.mjs`，生成 `src/data/kugou-playlists.ts`（只含公开元数据）。
+- 接口：`GET /api/kugou/playlists`、`GET /api/kugou/playlist?slug=p1&page=1`、`GET /api/kugou/url?hash=...`；只认数据里出现过的 hash。
+- 运行时来源 `vendor/kugou/`（MIT，从 Folia 内置 KuGouMusicApi 抽取）；不要在页面里 import 它。
+- 登录态过期：管理不了，只能重新扫码（KuGouMusicApi 的 `login_qr_key` + `login_qr_check`），更新 `.env` 后重建 app。
+- 以后上 HTTPS：直链是 `http://`，会被混合内容拦截，需要同源代理或改 https 源；当前站点 HTTP，无此问题。
+
 ## 相关文件
 
 - `docs/FEATURES.md` — 功能契约与施工边界

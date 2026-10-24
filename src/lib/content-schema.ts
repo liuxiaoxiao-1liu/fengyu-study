@@ -53,7 +53,7 @@ const schemas: Record<RecordType, AdminSchema> = {
   },
   books: {
     type: 'books',
-    label: '书架',
+    label: '书籍',
     slugField: 'slug',
     titleField: 'title',
     fields: [

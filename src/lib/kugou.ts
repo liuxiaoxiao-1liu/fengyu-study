@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
+import { tracks as curatedTracks } from '../data/music';
 
 // 从 Folia 内置的 KuGouMusicApi 里抽出的最小运行时（MIT，见 vendor/kugou/LICENSE）。
 // 只做两件事：/register/dev 换 dfid，/song/url 用账号 token 换音频直链。
@@ -211,6 +212,24 @@ export type AccountPlaylist = {
 let playlistCache: AccountPlaylist | null = null;
 let playlistInflight: Promise<AccountPlaylist> | null = null;
 
+// 首页精选卡 / 专辑归档仍使用 music.ts 里的固定曲目；它们不在账号歌单里，
+// 但既然页面提供了播放按钮，就继续允许解析这些已知 hash。
+const curatedTrackMap = new Map(
+  curatedTracks
+    .filter((track) => track.kugou)
+    .map((track) => [
+      track.kugou!.hash.toLowerCase(),
+      {
+        hash: track.kugou!.hash.toLowerCase(),
+        albumId: track.kugou!.albumId,
+        albumAudioId: track.kugou!.albumAudioId,
+        title: track.title,
+        artist: track.artist,
+        duration: track.duration,
+      } satisfies AccountPlaylistTrack,
+    ]),
+);
+
 function formatDuration(ms: unknown): string {
   const total = Math.floor((Number(ms) || 0) / 1000);
   return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
@@ -334,6 +353,9 @@ export async function getAccountPlaylist(force = false): Promise<AccountPlaylist
 /** 按 hash 在当前歌单里找曲目；找不到就强制刷新一次（有最小刷新间隔，避免被刷接口）。 */
 export async function findAccountTrack(hash: string): Promise<AccountPlaylistTrack | null> {
   const normalized = hash.toLowerCase();
+  const curated = curatedTrackMap.get(normalized);
+  if (curated) return curated;
+
   let playlist = await getAccountPlaylist();
   let track = playlist.tracks.find((item) => item.hash === normalized) ?? null;
 

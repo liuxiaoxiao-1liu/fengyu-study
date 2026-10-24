@@ -127,7 +127,7 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 - 登录态（`KUGOU_TOKEN` / `KUGOU_USERID` / `KUGOU_VIP_TOKEN` / `KUGOU_VIP_TYPE` / `KUGOU_MID` / `KUGOU_GUID`）只放服务器 `/opt/fengyu/.env`，不进仓库、不下发浏览器；
 - 服务端先 `/register/dev` 换 `dfid`，再 `/song/url` 换 CDN 直链，浏览器 `<audio>` 直接播放（服务端不代理音频字节）；
 - 站内只展示账号里的 `maotouying` 歌单（可用 `KUGOU_PLAYLIST_NAME` 改名）；`/api/kugou/playlist` 运行时从酷狗拉取并缓存 60 秒，在酷狗上增删歌曲约 1 分钟内自动同步，不需要重新构建或部署；
-- `/reading/` 只展示这一个歌单并分页（每页 30 首）；`/api/kugou/url` 只解析当前歌单里出现过的 hash，按 IP 限流（30 次 / 10 分钟）；
+- `/reading/` 只展示这一个歌单并分页（每页 30 首）；`/api/kugou/url` 只解析当前歌单或首页/专辑精选里出现过的 hash，按 IP 限流（30 次 / 10 分钟）；
 - 播放入口统一用 `data-play` 指令：读听歌单行、读听「专辑归档」卡片、首页「酷狗音乐」卡片都会驱动同一个站内播放器；
 - 播放器固定在页面底部（`BaseLayout` 单实例），首次点播出现、可收起；多页站整页刷新会停止播放，跨页连续播放留待 View Transitions；
 - 浏览器 `<audio>` 负责解码；直链过期或断流时自动重取一次地址并按原进度续播，暂停中拖动进度条会自动恢复播放；

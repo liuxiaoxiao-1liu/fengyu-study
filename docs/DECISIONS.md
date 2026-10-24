@@ -293,7 +293,7 @@ rate_limits (ip_hash, last_at)
 
 1. **只保留一个歌单**：读听页移除歌单选择器，只展示 `maotouying`（`KUGOU_PLAYLIST_NAME` 可覆盖）；
 2. **运行时拉取**：`/api/kugou/playlist` 调 vendor 的 `userPlaylist` + `playlistTracks`，服务端内存缓存 60 秒；`/api/kugou/playlists` 返回同一个歌单的元数据；
-3. **白名单同源**：`/api/kugou/url` 不再查静态 `trackByHash`，而是查运行时歌单缓存；酷狗新增歌曲在缓存过期后即可解析播放；
+3. **白名单同源**：`/api/kugou/url` 不再查静态歌单快照，而是查运行时歌单缓存；首页/专辑精选仍用 `src/data/music.ts` 的固定曲目，作为白名单的第二来源保留；酷狗新增歌曲在缓存过期后即可解析播放；
 4. **失败保留旧缓存**：拉取失败时优先返回上一次成功结果；没有缓存才向页面报同步失败；
 5. **删除静态快照**：移除 `src/data/kugou-playlists.ts`、`src/data/playlists.ts` 与 `scripts/sync-kugou-playlists.mjs`，不再需要「同步 → 构建 → 部署」；
 6. **页面改造**：读听页初始显示同步占位，加载后替换为真实曲目与数量；分页仍由服务端切片。

@@ -1,6 +1,6 @@
 # 风屿书房 / Island of Solitude
 
-一个大学生收藏网文、酷狗歌单、影像与随笔的数字秘密基地。视觉参考 `stitch_astro_personal_website/` 中的 *Warm Editorial Literary Journal* 设计稿，用 Astro 重建为可部署的独立站点。
+一个大学生收藏网文、酷狗歌单、影像与随笔的数字秘密基地。视觉参考 `stitch_astro_personal_website/` 中的 _Warm Editorial Literary Journal_ 设计稿，用 Astro 重建为可部署的独立站点。
 
 - 页面静态输出（Astro 7）+ Tailwind CSS 3
 - 自托管字体与图标（Newsreader / Space Grotesk / Material Symbols），不依赖 Google Fonts
@@ -31,35 +31,39 @@ nginx（宿主或容器 :80）
 
 ## 项目规范
 
-开发、提交和部署前请先读 [docs/PROJECT_RULES.md](docs/PROJECT_RULES.md)。当前为 **v0.1 提案，待确认**；确认后从下一项改动开始执行。
+开发、提交和部署前请先读 [docs/PROJECT_RULES.md](docs/PROJECT_RULES.md)。当前为 **v0.2 · 已生效**（2026-10-25 按 Docker + Node + SQLite 架构对齐）；功能契约见 [docs/FEATURES.md](docs/FEATURES.md)。
 
 ## 本地开发
 
 ```bash
 npm install
-npm run dev          # http://localhost:4321，含 /api/guestbook
+npm run dev          # http://localhost:4321，含 /api/*
 npm run build        # 输出 dist/client 与 dist/server
 npm run preview      # 预览构建结果
+npm run check        # astro check（TypeScript + Astro）
+npm run format       # Prettier 写入；format:check 只检查
+npm run smoke        # 拉起构建产物，跑接口冒烟（需先 build）
+npm run verify       # 发布总闸门：format:check + check + build + smoke
 ```
 
 - 需要 Node ≥ 26（Astro 7 + `node:sqlite`）；
-- 本地 SQLite 默认写到 `.data/guestbook.sqlite`，可用 `GUESTBOOK_DB` 覆盖；
+- 本地 SQLite 默认写到 `.data/guestbook.sqlite`，可用 `GUESTBOOK_DB` 覆盖；冒烟测试用临时库，不碰本地数据；
 - 旧留言 JSON 导入：`npm run guestbook:import -- <json> <sqlite>`；
 - 备份：`npm run guestbook:backup -- <sqlite> <backup>`。
 
-这台机器的 `$HOME`、`/etc/ssh` 有部分只读限制，所以脚本会把 npm / Astro 的缓存和配置写进项目内（`.npm-cache/`、`.config/`）。普通开发机不需要这些设置。
+这台机器的 `$HOME`、`/etc/ssh` 有部分只读限制，所以脚本会把 npm / Astro 的缓存和配置写进项目内（`.npm-cache/`、`.config/`）。`npm run build` / `check` 已内置 `ASTRO_TELEMETRY_DISABLED=1`；手工执行 Astro 命令时若报 `mkdir ~/.config/astro`，加上这个环境变量即可。普通开发机不需要这些设置。
 
 ## 页面与内容
 
-| 路由 | 内容 |
-| --- | --- |
-| `/` | 首页：欢迎语、状态广播、网文/酷狗/影集/随记四宫格、数据存根、留言预览 |
-| `/reading/` | 读听：追更书架、年度网文、酷狗歌单与听歌月报 |
-| `/photos/` | 影集：动漫 / 现实 / 虚拟 CG 图像档案与手记 |
-| `/essays/` | 随记：文章列表、书写脉络、即刻手记、主题检索、季刊订阅 |
-| `/essays/[slug]/` | 随记详情页 |
-| `/guestbook/` | 留言：投递信笺、房主公告、友链、留言回廊、漂流瓶 |
-| `/rss.xml`、`/sitemap.xml`、`/404.html` | 订阅、站点地图、404 |
+| 路由                                    | 内容                                                                  |
+| --------------------------------------- | --------------------------------------------------------------------- |
+| `/`                                     | 首页：欢迎语、状态广播、网文/酷狗/影集/随记四宫格、数据存根、留言预览 |
+| `/reading/`                             | 读听：追更书架、年度网文、酷狗歌单与听歌月报                          |
+| `/photos/`                              | 影集：动漫 / 现实 / 虚拟 CG 图像档案与手记                            |
+| `/essays/`                              | 随记：文章列表、书写脉络、即刻手记、主题检索、季刊订阅                |
+| `/essays/[slug]/`                       | 随记详情页                                                            |
+| `/guestbook/`                           | 留言：投递信笺、房主公告、友链、留言回廊、漂流瓶                      |
+| `/rss.xml`、`/sitemap.xml`、`/404.html` | 订阅、站点地图、404                                                   |
 
 内容与页面已经数据驱动，改内容只动 `src/data/`：
 
@@ -74,13 +78,19 @@ npm run preview      # 预览构建结果
 
 字体文件在 `public/fonts/`，CSS 在 `src/styles/fonts.css` 与 `src/styles/icons.css`。
 
+### 自动化校验
+
+- `npm run verify`：Prettier 格式检查 → `astro check` → 构建 → 冒烟测试；
+- 冒烟脚本 [scripts/smoke-test.mjs](scripts/smoke-test.mjs) 会拉起构建产物、用临时 SQLite 验证页面、留言/悄悄话、限流、管理端鉴权与审核、订阅与导出、酷狗歌单接口；
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) 是 GitHub Actions 模板，接通远程仓库后自动执行同一套检查；
+- 当前仓库还没有配置 `origin`，所以 CI 只在本地手动跑（这也是附录 A 的最高优先技术债）。
+
 ### 尚未完成（P2/P3）
 
-- `astro check`、Prettier、冒烟测试 / CI、图片 WebP/AVIF；
+- 远程仓库与 CI 接通、Playwright 视觉/交互测试、链接检查、图片 WebP/AVIF；
 - 真实内容（随笔、书、歌、图）替换示例、友链与社交链接换真实主页；
-- `PROJECT_RULES.md` 仍是 v0.1 待确认，尚未统一改写为 Docker 架构；
+- `docs/PROJECT_RULES.md` 的遗留债务见附录 A：远程仓库、素材许可证、组件拆分、Content Collections 等；
 - 站内播放器已就绪，但仓库没有音频文件，当前全部走「未上传音源 → 酷狗搜索」降级。
-
 
 ## 留言 API
 
@@ -130,7 +140,6 @@ npm run preview      # 预览构建结果
 - 备份与本机同盘，建议每月拉一份到本地/对象存储做异地备份；
 - 8081 旧版预览已于 2026-10-24 停止；8443 的 UFW 放行已关闭，留给以后 xray 回落。
 
-
 ## 部署
 
 ### Docker 方式（当前方向：Astro API + SQLite）
@@ -151,11 +160,11 @@ WEB_PORT=80 npm run deploy:docker     # 确认宿主 nginx 已停，再切到 80
 
 服务组成：
 
-| 服务 | 说明 |
-| --- | --- |
-| `web` | `nginx:1.27-alpine`，映射 `${WEB_PORT:-8080}:80`，挂载 `dist/client` 与容器版 nginx 配置 |
-| `app` | `docker/app.runtime.Dockerfile`，Node 26，只跑 `/api/` 与 server bundle |
-| 数据卷 | `fengyu_guestbook-data` → `/data/guestbook.sqlite` |
+| 服务   | 说明                                                                                     |
+| ------ | ---------------------------------------------------------------------------------------- |
+| `web`  | `nginx:1.27-alpine`，映射 `${WEB_PORT:-8080}:80`，挂载 `dist/client` 与容器版 nginx 配置 |
+| `app`  | `docker/app.runtime.Dockerfile`，Node 26，只跑 `/api/` 与 server bundle                  |
+| 数据卷 | `fengyu_guestbook-data` → `/data/guestbook.sqlite`                                       |
 
 首次切换建议：
 
@@ -190,15 +199,15 @@ SSH_KEY=~/.ssh/other_key SSH_CONFIG=~/.ssh/config ./deploy.sh
 
 ### 服务器约定
 
-| 项目 | 值 |
-| --- | --- |
-| 服务器 | `example.com`（Ubuntu 24.04 / nginx 1.24） |
-| 登录 | `root` + `~/.ssh/id_ed25519` |
-| Docker 部署目录 | `/opt/fengyu` |
-| 旧 Web 根目录 | `/var/www/xiaoquanzi`（回滚用，暂不删） |
-| 留言数据卷 | `fengyu_guestbook-data` |
+| 项目              | 值                                                                                      |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| 服务器            | `example.com`（Ubuntu 24.04 / nginx 1.24）                                              |
+| 登录              | `root` + `~/.ssh/id_ed25519`                                                            |
+| Docker 部署目录   | `/opt/fengyu`                                                                           |
+| 旧 Web 根目录     | `/var/www/xiaoquanzi`（回滚用，暂不删）                                                 |
+| 留言数据卷        | `fengyu_guestbook-data`                                                                 |
 | 旧留言 API / 数据 | `/var/www/xiaoquanzi-api/guestbook.php`、`/var/lib/xiaoquanzi/guestbook.json`（回滚用） |
-| 端口 | `80` 站点；`8080` 预验证；`443` 由 xray 占用，未改动 |
+| 端口              | `80` 站点；`8080` 预验证；`443` 由 xray 占用，未改动                                    |
 
 ### 以后绑定域名
 

@@ -2,19 +2,20 @@
 
 > 本文件是「把功能全完善」阶段的施工图。动代码前先读；契约变更要先改这里。
 > 关联：[DECISIONS.md](DECISIONS.md)（ADR）、[PROJECT_RULES.md](PROJECT_RULES.md)（规范）。
+> **状态（2026-10-25）**：第 1–5 节功能已落地并上线；第 7 节按 `npm run smoke` 与线上实测复核，未覆盖项保持未勾选。
 
-## 0. 现状与目标
+## 0. 施工前现状与已落地目标
 
-| 项 | 现状 | 目标 |
-| --- | --- | --- |
-| 留言审核 | 私密留言只能进容器查 | `/admin/` 后台：审核、回复、导出 |
-| 首页/留言统计 | 148 封、42 只、100% 写死 | `/api/stats` + 构建期真实计数 |
-| 搜索索引 | 手写 24 条 | 由数据模块构建期生成 |
-| 季刊订阅 | 假表单 | `POST /api/subscribe` 入库，后台导出 |
-| 台词摘录 | 0 张卡片 | `quotes.ts` 数据驱动 |
+| 项              | 施工前（2026-10 初）             | 已落地                                                   |
+| --------------- | -------------------------------- | -------------------------------------------------------- |
+| 留言审核        | 私密留言只能进容器查             | `/admin/` 后台：审核、回复、导出                         |
+| 首页/留言统计   | 148 封、42 只、100% 写死         | `/api/stats` + 构建期真实计数                            |
+| 搜索索引        | 手写 24 条                       | 由数据模块构建期生成                                     |
+| 季刊订阅        | 假表单                           | `POST /api/subscribe` 入库，后台导出                     |
+| 台词摘录        | 0 张卡片                         | `quotes.ts` 数据驱动                                     |
 | 歌单 / 站内播放 | 已接账号全部 17 个歌单、~1800 首 | 歌单切换 + 分页；服务端换酷狗直链，浏览器 `<audio>` 播放 |
-| 照片 | 静态卡片 | 数据驱动 + 灯箱 + 系列筛选 + EXIF |
-| 随记计数 | 48/21/19/8 | 由 `essays`/`quotes` 实际长度计算 |
+| 照片            | 静态卡片                         | 数据驱动 + 灯箱 + 系列筛选 + EXIF                        |
+| 随记计数        | 48/21/19/8                       | 由 `essays`/`quotes` 实际长度计算                        |
 
 ## 1. 数据模块（`src/data/`）
 
@@ -23,27 +24,43 @@
 ```ts
 // books.ts
 export type Book = {
-  slug: string; title: string; author: string; genre: string;
+  slug: string;
+  title: string;
+  author: string;
+  genre: string;
   status: 'reading' | 'finished' | 'paused';
-  year: number; cover: string; url: string; blurb: string;
+  year: number;
+  cover: string;
+  url: string;
+  blurb: string;
 };
 export const books: Book[];
 
 // music.ts
 export type Track = {
-  slug: string; title: string; artist: string; album: string;
-  cover: string; tag: string; duration: string;
-  audio?: string;       // 例 '/audio/big-fish.mp3'，没有音源就省略
-  url?: string;         // 酷狗/官方外链
+  slug: string;
+  title: string;
+  artist: string;
+  album: string;
+  cover: string;
+  tag: string;
+  duration: string;
+  audio?: string; // 例 '/audio/big-fish.mp3'，没有音源就省略
+  url?: string; // 酷狗/官方外链
 };
 export const tracks: Track[];
 
 // photos.ts
 export type Photo = {
-  slug: string; title: string; src: string; alt: string;
-  width: number; height: number;
+  slug: string;
+  title: string;
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
   series: 'anime' | 'reality' | 'virtual';
-  takenAt: string; note: string;
+  takenAt: string;
+  note: string;
   exif?: { camera?: string; lens?: string; aperture?: string; shutter?: string; iso?: string; location?: string };
 };
 export const photos: Photo[];
@@ -58,15 +75,15 @@ export const quotes: Quote[];
 
 ## 2. API 契约（`src/pages/api/`，全部 `prerender = false`）
 
-| 方法/路径 | 说明 |
-| --- | --- |
-| `GET /api/guestbook` | 公开留言，`status=approved AND is_private=0`；新增返回 `reply`、`replied_at` |
-| `POST /api/guestbook` | 保持不变（蜜罐、限流、长度校验） |
-| `GET /api/stats` | `{ok, letters:{total,approved,pending,hidden,replied,publicTotal,publicReplied}, replyRate}`；replyRate 只按公开可见留言计算；不泄露内容 |
-| `POST /api/subscribe` | `{email}` → 幂等入库；格式校验 + 蜜罐 + 限流；`{ok:true}` |
-| `GET /api/admin/letters?status=pending\|approved\|hidden\|all` | 管理端列表（含私密；不含 `ip_hash`） |
-| `PATCH /api/admin/letters/:id` | `{status?, reply?}`；写 `replied_at`；校验状态枚举 |
-| `GET /api/admin/export?kind=letters\|subscribers&format=json\|csv` | 附件下载，`Content-Disposition: attachment` |
+| 方法/路径                                                          | 说明                                                                                                                                     |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/guestbook`                                               | 公开留言，`status=approved AND is_private=0`；新增返回 `reply`、`replied_at`                                                             |
+| `POST /api/guestbook`                                              | 保持不变（蜜罐、限流、长度校验）                                                                                                         |
+| `GET /api/stats`                                                   | `{ok, letters:{total,approved,pending,hidden,replied,publicTotal,publicReplied}, replyRate}`；replyRate 只按公开可见留言计算；不泄露内容 |
+| `POST /api/subscribe`                                              | `{email}` → 幂等入库；格式校验 + 蜜罐 + 限流；`{ok:true}`                                                                                |
+| `GET /api/admin/letters?status=pending\|approved\|hidden\|all`     | 管理端列表（含私密；不含 `ip_hash`）                                                                                                     |
+| `PATCH /api/admin/letters/:id`                                     | `{status?, reply?}`；写 `replied_at`；校验状态枚举                                                                                       |
+| `GET /api/admin/export?kind=letters\|subscribers&format=json\|csv` | 附件下载，`Content-Disposition: attachment`                                                                                              |
 
 鉴权：所有 `/api/admin/*` 需要 `Authorization: Bearer $ADMIN_TOKEN`，用 `crypto.timingSafeEqual` 比较；
 `ADMIN_TOKEN` 未设置时返回 `503 admin_disabled`。错误响应统一 `{ok:false,error}`。
@@ -111,23 +128,36 @@ CREATE TABLE IF NOT EXISTS subscribers (
 - 只允许 `node:sqlite`，不新增数据库依赖；不引入前端框架。
 - 用户输入一律 `textContent` / Astro 转义，禁止拼 `innerHTML`。
 - 服务端只监听容器内网；浏览器请求走 nginx `/api/` 反代。
-- 新依赖必须有理由；本阶段原则上零新增依赖。
-- 构建验证：`npm run build`；多个 agent 并发时用 `flock /tmp/fengyu-build.lock npx astro build`。
+- 新依赖必须有理由；本阶段原则上零新增运行时依赖（`@astrojs/check`、`prettier`、`@types/node` 仅为开发依赖）。
+- 验证入口：`npm run verify`（格式 + `astro check` + 构建 + 接口冒烟）；多个 agent 并发构建时用 `flock /tmp/fengyu-build.lock npm run build`。
 - 部署先 `WEB_PORT=8080` 验证，再 `WEB_PORT=80` 切换；`ADMIN_TOKEN` 放服务器 `/opt/fengyu/.env`，不进仓库。
 
 ## 6. 文件所有权（本阶段）
 
-| 范围 | 负责人 |
-| --- | --- |
-| `src/lib/guestbook-db.ts`、`src/lib/newsletter-db.ts`、`src/pages/api/**`、`src/pages/admin/**`、`src/pages/guestbook.astro` | admin 线 |
-| `src/data/**`、`src/pages/index.astro`、`essays.astro`、`reading.astro`、`photos.astro`、`src/components/**` | content 线 |
-| `deploy/**`、`docker-compose.yml`、`scripts/**`、`docs/**`、`README.md` | Lead |
+| 范围                                                                                                                         | 负责人     |
+| ---------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `src/lib/guestbook-db.ts`、`src/lib/newsletter-db.ts`、`src/pages/api/**`、`src/pages/admin/**`、`src/pages/guestbook.astro` | admin 线   |
+| `src/data/**`、`src/pages/index.astro`、`essays.astro`、`reading.astro`、`photos.astro`、`src/components/**`                 | content 线 |
+| `deploy/**`、`docker-compose.yml`、`scripts/**`、`docs/**`、`README.md`                                                      | Lead       |
 
-## 7. 验收清单
+## 7. 验收清单（2026-10-25 复核）
 
-- [ ] `npm run build` 通过，无 TypeScript 报错
-- [ ] 本地 `npm run dev`：首页计数真实；搜索条目数随数据变化；歌词/照片灯箱可用
-- [ ] 未带 Token 访问 `/api/admin/letters` 返回 401；错误 Token 返回 401；未配置返回 503
-- [ ] 悄悄话入库后 `/admin/` 可见，审核通过后公开页出现
-- [ ] 订阅邮箱入库，重复提交幂等，可导出 CSV
-- [ ] 8080 预览通过后切 80，线上五页 + API + RSS + sitemap 200
+- [x] `npm run check` 0 error、`npm run build` 通过
+- [x] `npm run smoke`：页面、留言、审核、订阅、导出、酷狗歌单接口全部通过
+- [ ] 本地 `npm run dev`：搜索条目数随数据变化；歌词/照片灯箱可用（需人工）
+- [x] 未带 Token / 错误 Token 访问 `/api/admin/letters` 返回 401（冒烟覆盖）
+- [ ] `ADMIN_TOKEN` 未配置时管理接口返回 503（需单独起无 Token 实例，人工验证）
+- [x] 悄悄话入库后 `/admin/` 可见；通过审核后仍不出现在公开页（设计如此：公开页过滤 `is_private=1`）
+- [x] 订阅邮箱入库，重复提交幂等，可导出 CSV（冒烟覆盖）
+- [ ] 8080 预览通过后切 80（发布流程人工步骤）
+- [x] 线上五页 + API + RSS + sitemap 200（2026-10-25 实测）
+
+## 8. 冒烟测试覆盖（`scripts/smoke-test.mjs`）
+
+启动 `dist/server/entry.mjs`（临时 SQLite + 测试 Token），验证：
+
+1. `/`、`/reading/`、`/photos/`、`/essays/`、`/guestbook/`、`/admin/`、`/rss.xml`、`/sitemap.xml` 返回 200 且非空；未知路径 404。
+2. 公开留言立即上墙；悄悄话不公开；同 IP 60 秒内二次提交 429；缺字段 422。
+3. `/api/stats` 计数；管理端 401、列表、审核、回复、私密留言通过后仍不公开、非法状态 400、不存在 404。
+4. 订阅成功且重复提交幂等；邮箱格式错误 422；订阅 CSV 与留言 JSON 导出；非法导出类型 400。
+5. 酷狗歌单列表与详情接口可用（不依赖账号 Token）。

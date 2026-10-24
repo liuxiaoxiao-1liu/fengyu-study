@@ -17,7 +17,8 @@ description: 风屿书房站点（Astro 静态 + Node API + SQLite + Docker）�
 | 服务器 | `root@example.com`，部署目录 `/opt/fengyu` | `ssh -F /dev/null root@example.com` |
 
 - 本机 `/etc/ssh/ssh_config.d/` 权限损坏，**所有 ssh/scp/rsync 都要带 `-F /dev/null`**，否则报 `Bad owner or permissions`。
-- 本机 `$HOME` 只读，npm/Astro 缓存已重定向到项目内 `.npm-cache/`、`.config/`（不要清）。
+- 本机 `$HOME` 只读，npm/Astro 缓存已重定向到项目内 `.npm-cache/`、`.config/`（不要清）；`npm run build/check` 已内置 `ASTRO_TELEMETRY_DISABLED=1`。
+- 发布前跑 `npm run verify`（Prettier + `astro check` + 构建 + 接口冒烟），它是本地 CI 的总入口。
 
 ## 1. 架构
 
@@ -38,11 +39,16 @@ npm install
 npm run dev        # http://localhost:4321，含 API
 npm run build      # dist/client + dist/server
 npm run preview
+npm run check      # astro check
+npm run format     # Prettier 写入；format:check 只检查
+npm run smoke      # 构建产物 + 临时 SQLite 的接口冒烟
+npm run verify     # format:check + check + build + smoke
 ```
 
-- 本地库默认 `.data/guestbook.sqlite`；`GUESTBOOK_DB=/tmp/x.sqlite` 可隔离测试。
+- 本地库默认 `.data/guestbook.sqlite`；`GUESTBOOK_DB=/tmp/x.sqlite` 可隔离测试；冒烟测试用临时库，不碰本地数据。
 - 管理后台本地调试：`ADMIN_TOKEN=devtoken npm run dev`，打开 `/admin/` 填 `devtoken`。
 - 并发构建用 `flock /tmp/fengyu-build.lock npm run build`，避免两个进程抢 `.astro/`。
+- 改接口后同步更新 `scripts/smoke-test.mjs`；`astro check` 已排除 `vendor/`，不要把它加回 `tsconfig.json` 的检查范围。
 
 ## 3. 内容改动
 
@@ -63,6 +69,7 @@ npm run preview
 - 接口：`GET /api/admin/letters`、`PATCH /api/admin/letters/:id`、`GET /api/admin/export?kind=letters|subscribers&format=json|csv`。
 - 公开接口：`GET/POST /api/guestbook`、`GET /api/stats`、`POST /api/subscribe`。
 - 悄悄话入库即 `pending`，公开留言直接 `approved`；`hidden` 仅后台可见。
+- 悄悄话即使点了“通过”也不会出现在公开留言页（公开查询过滤 `is_private=1`），这是当前设计。
 
 ## 5. 部署
 
@@ -98,6 +105,9 @@ WEB_PORT=80 npm run deploy:docker  # 确认后切 80
 | 新 API 404 | nginx 只反代了 `/api/guestbook` | 确认 `deploy/nginx.container.conf` 有 `location /api/`，重建 web 容器 |
 | 改页面不生效 | 只改了服务器 dist | 本地构建后重新 `npm run deploy:docker` |
 | 构建报 `.astro` 冲突 | 多进程同时构建 | `flock /tmp/fengyu-build.lock` 串行 |
+| 构建报 `mkdir ~/.config/astro` | 本机 `$HOME` 只读、遥测写配置失败 | 命令前加 `ASTRO_TELEMETRY_DISABLED=1`（npm script 已内置） |
+| `astro check` 报一堆 vendor 错误 | `tsconfig` 没排除 `vendor/` | 保留现有 `exclude`，vendor 是第三方 CommonJS |
+| `npm run format:check` 报大量文件 | 新文件未格式化 | `npm run format` 后单独提交 `style:` |
 | 备份体积为 0 | app 容器没跑 | `docker compose ps`；脚本会报错退出 |
 | 留言 429 | 每 IP 60 秒 + nginx 60r/m | 等一分钟，别调高限流 |
 
@@ -113,7 +123,8 @@ WEB_PORT=80 npm run deploy:docker  # 确认后切 80
 
 ## 相关文件
 
-- `docs/FEATURES.md` — 功能契约与施工边界
+- `docs/FEATURES.md` — 功能契约、接口表与验收清单
 - `docs/DECISIONS.md` — ADR（架构决策）
-- `docs/PROJECT_RULES.md` — 代码/内容/部署规范
+- `docs/PROJECT_RULES.md` — 代码/内容/部署规范（v0.2）
+- `scripts/smoke-test.mjs`、`.github/workflows/ci.yml` — 自动化校验
 - `deploy/docker-deploy.sh`、`deploy/nginx.container.conf`、`docker-compose.yml`

@@ -169,3 +169,53 @@ rate_limits (ip_hash, last_at)
 1. 清空服务器 `.env` 里的 `KUGOU_*` 并重建 app → `/api/kugou/url` 返回 503，播放器降级外链；
 2. 删除 `vendor/kugou`、`src/pages/api/kugou`、`src/data/kugou-playlists.ts`，恢复 `reading.astro` 的静态 5 首即可；
 3. 酷狗侧随时可在网页退出登录，使 token 失效。
+
+---
+
+## ADR-004 · 自动化校验用 astro check + Prettier + 构建冒烟
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`package.json`、`tsconfig.json`、`.prettierrc.json`、`.github/workflows/ci.yml`、`scripts/smoke-test.mjs`、页面内联脚本
+
+### 背景
+
+- 仓库此前只有 `npm run build` 一道关，没有类型检查、格式检查和自动化接口验证；
+- 页面内联脚本是普通 JS，长期没有类型约束，`astro check` 一开就会报大量 DOM / 隐式 any 错误；
+- 还没有远程仓库，无法直接依赖 CI；本机 `$HOME` 只读，Astro 遥测会写配置失败；
+- 2026-10-25 文档对齐时决定把“能跑”升级为“可验证”。
+
+### 决定
+
+1. 开发依赖：`@astrojs/check`、`typescript`、`@types/node`、`prettier`、`prettier-plugin-astro`，运行时不新增依赖；
+2. `npm run check` 跑 `astro check`；`tsconfig.json` 排除 `vendor/`、设计稿与试验目录，保留严格模式；
+3. `npm run format` / `format:check` 跑 Prettier；生成的 `src/data/kugou-playlists.ts`、第三方 `vendor/`、二进制素材不参与格式化；
+4. `scripts/smoke-test.mjs` 拉起 `dist/server/entry.mjs`，用临时 SQLite + 测试 Token 验证页面、留言、限流、管理端、订阅、导出与酷狗歌单接口；
+5. `npm run verify` 串联四项检查，作为发布前总闸门；`.github/workflows/ci.yml` 为接通远程仓库后的 CI 模板；
+6. 页面内联脚本补齐类型（DOM 类型断言、接口响应类型、错误对象类型），行为不变。
+
+### 影响
+
+**正面**
+
+- 类型、格式、构建、接口四条线都有可重复的验证；
+- 冒烟测试覆盖了留言/审核/订阅等最容易回归的路径；
+- 新页面和接口改动可以通过 `npm run verify` 在本地拦截。
+
+**负面**
+
+- 首次引入 Prettier 产生一次性大范围格式化提交，review 成本上升；
+- 冒烟测试只覆盖 HTTP 行为，不覆盖视觉与浏览器交互；
+- `@astrojs/check` 依赖 TypeScript 语言服务，装包体积增加（仅开发环境）；
+- 没有远程仓库时，CI 模板不会自动执行。
+
+### 回滚
+
+1. 移除 `.prettierrc.json`、`.prettierignore`、`.editorconfig`、`.github/` 与 `scripts/smoke-test.mjs`，还原 `package.json` / `package-lock.json`；
+2. `git revert` 格式化提交即可恢复原排版；类型修复与行为无关，可保留。
+
+### 后续
+
+- 接通私有远程仓库后启用 Actions；
+- 补 Playwright 视觉/交互测试与链接检查；
+- 视需要再评估 ESLint 与 Lighthouse。

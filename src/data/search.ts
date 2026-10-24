@@ -7,6 +7,7 @@ import { essays } from './essays';
 import { albums, tracks } from './music';
 import { photos, SERIES_LABELS } from './photos';
 import { quotes } from './quotes';
+import { friendLinks } from './links';
 
 export type SearchEntry = {
   title: string;
@@ -66,5 +67,12 @@ export const searchIndex: SearchEntry[] = [
     href: '/essays/#excerpt',
     kind: '台词',
     summary: [quote.source, quote.work].filter(Boolean).join(' · '),
+  })),
+
+  ...friendLinks.map((link): SearchEntry => ({
+    title: link.title,
+    href: link.url || '/guestbook/#friends',
+    kind: '友链',
+    summary: [link.note, link.tag].filter(Boolean).join(' · '),
   })),
 ];

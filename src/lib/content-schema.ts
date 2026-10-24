@@ -146,6 +146,20 @@ const schemas: Record<RecordType, AdminSchema> = {
       sortField,
     ],
   },
+  links: {
+    type: 'links',
+    label: '友链',
+    slugField: 'slug',
+    titleField: 'title',
+    fields: [
+      { name: 'slug', label: 'slug', type: 'text', required: true },
+      { name: 'title', label: '站名', type: 'text', required: true },
+      { name: 'note', label: '一句话简介', type: 'text' },
+      { name: 'tag', label: '右侧标签', type: 'text' },
+      { name: 'url', label: '网址（留空则暂链回友链区）', type: 'text' },
+      sortField,
+    ],
+  },
 };
 
 export const ADMIN_SCHEMAS = Object.values(schemas);

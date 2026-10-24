@@ -171,6 +171,19 @@ try {
       check('GET /does-not-exist → 404', response.status === 404, `实际 ${response.status}`);
     }
 
+    {
+      const response = await request(base, '/api/content/search');
+      check('GET /api/content/search → 200', response.status === 200, `实际 ${response.status}`);
+      const entries = Array.isArray(response.json?.entries) ? response.json.entries : [];
+      check('搜索索引包含内容', entries.length > 10, `实际 ${entries.length}`);
+      check(
+        '搜索索引包含友链',
+        entries.some((entry) => entry.kind === '友链'),
+      );
+      const guestbook = await request(base, '/guestbook/');
+      check('留言页含友链卡片', guestbook.text.includes('赛博邻居') && guestbook.text.includes('友链自留地'));
+    }
+
     console.log('\n[2/5] 留言：公开 / 悄悄话 / 限流');
     {
       const initial = await request(base, '/api/guestbook');

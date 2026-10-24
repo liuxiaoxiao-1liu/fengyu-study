@@ -191,7 +191,7 @@ const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-
     </div>
     <div class="px-space-lg py-space-sm border-t border-surface-container-high font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between">
       <span>Esc 关闭</span>
-      <span>共 {searchIndex.length} 条索引</span>
+      <span data-search-count>共 {searchIndex.length} 条索引</span>
     </div>
   </div>
 </dialog>
@@ -213,8 +213,12 @@ const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-
 
   const dialog = document.getElementById('search-dialog') as HTMLDialogElement | null;
   const input = document.getElementById('search-input') as HTMLInputElement | null;
-  const results = [...document.querySelectorAll<HTMLElement>('[data-result]')];
+  const resultsContainer = document.querySelector<HTMLElement>('[data-search-results]');
+  let results = [...document.querySelectorAll<HTMLElement>('[data-result]')];
   const empty = document.querySelector<HTMLElement>('[data-search-empty]');
+  const countLabel = document.querySelector<HTMLElement>('[data-search-count]');
+  let searchIndexLoaded = false;
+  let searchIndexLoading = false;
 
   function filterResults(query: string) {
     const q = query.trim().toLowerCase();
@@ -228,9 +232,57 @@ const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-
     empty?.classList.toggle('hidden', shown !== 0);
   }
 
+  async function loadSearchIndex() {
+    if (searchIndexLoaded || searchIndexLoading || !resultsContainer) return;
+    searchIndexLoading = true;
+    try {
+      const response = await fetch('/api/content/search', { headers: { accept: 'application/json' } });
+      if (!response.ok) return;
+      const data = (await response.json()) as {
+        entries?: Array<{ title: string; href: string; kind: string; summary: string }>;
+      };
+      if (!Array.isArray(data.entries)) return;
+      for (const old of results) old.remove();
+      for (const entry of data.entries) {
+        const link = document.createElement('a');
+        link.href = entry.href;
+        link.dataset.result = '';
+        link.dataset.search = [entry.title, entry.summary, entry.kind].join(' ');
+        link.className = 'block px-space-md py-space-sm rounded-lg hover:bg-surface-container-low transition-colors';
+        if (/^https?:/i.test(entry.href)) {
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer external';
+        }
+        const head = document.createElement('span');
+        head.className = 'flex items-baseline gap-space-sm';
+        const kind = document.createElement('span');
+        kind.className = 'font-label-sm text-label-sm text-secondary uppercase tracking-wider shrink-0';
+        kind.textContent = entry.kind;
+        const title = document.createElement('span');
+        title.className = 'font-body-md text-body-md text-primary';
+        title.textContent = entry.title;
+        head.append(kind, title);
+        const summary = document.createElement('span');
+        summary.className = 'block font-body-sm text-body-sm text-on-surface-variant truncate';
+        summary.textContent = entry.summary;
+        link.append(head, summary);
+        resultsContainer.insertBefore(link, empty);
+      }
+      results = [...resultsContainer.querySelectorAll<HTMLElement>('[data-result]')];
+      if (countLabel) countLabel.textContent = `共 ${data.entries.length} 条索引`;
+      searchIndexLoaded = true;
+      if (input) filterResults(input.value);
+    } catch {
+      // 网络失败时保留构建期索引，不打断搜索
+    } finally {
+      searchIndexLoading = false;
+    }
+  }
+
   function openSearch() {
     if (!dialog) return;
     if (!dialog.open) dialog.showModal();
+    void loadSearchIndex();
     if (input) {
       input.value = '';
       filterResults('');

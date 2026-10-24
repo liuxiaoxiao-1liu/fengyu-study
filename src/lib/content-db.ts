@@ -7,6 +7,7 @@ import { essays as seedEssays, type Essay } from '../data/essays';
 import { books as seedBooks, type Book } from '../data/books';
 import { albums as seedAlbums, tracks as seedTracks, type Album, type Track } from '../data/music';
 import { quotes as seedQuotes, type Quote } from '../data/quotes';
+import { friendLinks as seedLinks, type FriendLink } from '../data/links';
 
 const DB_PATH = resolve(process.env.CONTENT_DB ?? './.data/content.sqlite');
 
@@ -19,7 +20,7 @@ export type PhotoRecord = Photo & {
   updatedAt: string;
 };
 
-export type RecordType = 'essays' | 'books' | 'albums' | 'tracks' | 'quotes';
+export type RecordType = 'essays' | 'books' | 'albums' | 'tracks' | 'quotes' | 'links';
 
 export type ContentRecord = {
   id: string;
@@ -301,6 +302,14 @@ function seedRecords(database: DatabaseSync): void {
         data: quote as unknown as Record<string, unknown>,
       })),
     ],
+    [
+      'links',
+      seedLinks.map((link) => ({
+        slug: link.slug,
+        title: link.title,
+        data: link as unknown as Record<string, unknown>,
+      })),
+    ],
   ];
 
   for (const [type, entries] of groups) {
@@ -424,6 +433,10 @@ export function listTracks(): Track[] {
 
 export function listQuotes(): Quote[] {
   return listContentRecords('quotes').map((record) => record.data as unknown as Quote);
+}
+
+export function listLinks(): FriendLink[] {
+  return listContentRecords('links').map((record) => record.data as unknown as FriendLink);
 }
 
 /** 首页/专辑精选曲目的白名单：来自后台的 tracks 表（含 kugou 元数据）。 */

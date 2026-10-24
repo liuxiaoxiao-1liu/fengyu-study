@@ -1,5 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { listLinks } from '../lib/content-db';
+
+export const prerender = false;
+
+const links = listLinks();
 ---
 
 <BaseLayout current="guestbook" title="留言">
@@ -281,70 +286,28 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 </a>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
-                <!-- Friend 1 -->
-                <a
-                  class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
-                  href="#friends"
-                >
-                  <div class="flex items-center justify-between">
-                    <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
-                      云中漫步
+                {links.map((link) => (
+                  <a
+                    class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
+                    href={link.url || '#friends'}
+                    target={link.url ? '_blank' : undefined}
+                    rel={link.url ? 'noopener noreferrer external' : undefined}
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
+                        {link.title}
+                      </span>
+                      <span class="font-label-sm text-[0.625rem] text-on-surface-variant">{link.tag}</span>
+                    </div>
+                    <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
+                      {link.note}
                     </span>
-                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">CS 大四</span>
-                  </div>
-                  <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
-                    Astro 与前端引擎折腾记录
-                  </span>
-                </a>
-                <!-- Friend 2 -->
-                <a
-                  class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
-                  href="#friends"
-                >
-                  <div class="flex items-center justify-between">
-                    <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
-                      晚风便利店
-                    </span>
-                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">二次元画师</span>
-                  </div>
-                  <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
-                    日常胶片记录与同人速写
-                  </span>
-                </a>
-                <!-- Friend 3 -->
-                <a
-                  class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
-                  href="#friends"
-                >
-                  <div class="flex items-center justify-between">
-                    <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
-                      落日余晖
-                    </span>
-                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">古典吉他</span>
-                  </div>
-                  <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
-                    网文书荒避难所 &amp; 乐评
-                  </span>
-                </a>
-                <!-- Friend 4 -->
-                <a
-                  class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
-                  href="#friends"
-                >
-                  <div class="flex items-center justify-between">
-                    <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
-                      心素之境
-                    </span>
-                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">《道诡》骨灰粉</span>
-                  </div>
-                  <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
-                    白灵淼同人与街头纪实摄影
-                  </span>
-                </a>
+                  </a>
+                ))}
               </div>
               <div class="flex items-center justify-between bg-surface-container px-space-md py-space-xs rounded-lg text-on-surface-variant font-label-sm text-label-sm">
                 <span>友链准则: 保持更新 · 独立博客 · 拒绝商业滥投</span>
-                <span class="text-secondary font-medium">4 / 12 席位</span>
+                <span class="text-secondary font-medium">{links.length} / 12 席位</span>
               </div>
             </div>
           </div>

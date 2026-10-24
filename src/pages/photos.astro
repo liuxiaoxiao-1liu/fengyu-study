@@ -59,7 +59,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </nav>
 <!-- Editorial Asymmetrical Masonry Photo Grid -->
-<main class="relative z-10 max-w-6xl mx-auto">
+<div class="relative z-10 max-w-6xl mx-auto" id="gallery">
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
 <!-- Card 1: Anime -->
 <article class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer" data-category="anime">
@@ -182,7 +182,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </article>
 </div>
-</main>
+</div>
 <!-- Bottom Section: 摄影手记 / Darkroom Notes -->
 <section class="relative z-10 max-w-6xl mx-auto mt-12 mb-20">
 <div class="bg-surface-container-low rounded-2xl p-8 sm:p-10 shadow-sm relative overflow-hidden">
@@ -221,7 +221,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex items-center gap-2">
 <span class="w-2 h-2 rounded-full bg-secondary"></span><span class="font-label-sm text-label-sm text-on-surface-variant">“定格不可复制的一瞬，是向时间温柔反抗的唯一方式。”</span>
 </div>
-<a class="inline-flex items-center gap-1 font-label-md text-label-md text-on-tertiary-container hover:text-primary transition-colors" href="#notes"><span class="">浏览完整图集档案与器材参数</span><span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-on-tertiary-container hover:text-primary transition-colors" href="#gallery"><span class="">浏览完整图集</span><span class="material-symbols-outlined text-sm">arrow_forward</span></a>
 </div>
 </div>
 </div>

@@ -47,10 +47,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <div class="flex items-center gap-space-xs overflow-x-auto py-1" id="filter-container">
 <button class="filter-btn active px-space-md py-space-xs rounded-lg font-label-md text-label-md bg-primary text-on-primary shadow-sm transition-all flex items-center gap-1.5" data-filter="all" type="button">
 <span class="">全部 (All)</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="webnovel" type="button">
-<span class="">玄幻奇幻 (Web Novel)</span><span class="font-label-sm text-xs opacity-60">28</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="suspense" type="button">
-<span class="">悬疑志怪 (Cult)</span><span class="font-label-sm text-xs opacity-60">14</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="kugou" type="button">
-<span class="">酷狗歌单 (Kugou)</span><span class="font-label-sm text-xs opacity-60">32</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="repeat" type="button">
-<span class="material-symbols-outlined text-xs text-on-tertiary-container">replay</span><span class="">酷狗单曲循回</span>
+<span class="">玄幻奇幻 (Web Novel)</span><span class="font-label-sm text-xs opacity-60">4</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="suspense" type="button">
+<span class="">悬疑志怪 (Cult)</span><span class="font-label-sm text-xs opacity-60">1</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="kugou" type="button">
+<span class="">酷狗歌单 (Kugou)</span><span class="font-label-sm text-xs opacity-60">5</span></button><button class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5" data-filter="repeat" type="button">
+<span class="material-symbols-outlined text-xs text-on-tertiary-container">replay</span><span class="">酷狗单曲循回</span><span class="font-label-sm text-xs opacity-60">3</span>
 </button>
 </div>
 </div>
@@ -282,7 +282,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 </button>
 </div>
 <div class="flex flex-col gap-1.5">
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer">
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" data-card="album" data-category="kugou repeat">
 <div class="flex items-center gap-3 min-w-0">
 <button class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0">
 <span class="material-symbols-outlined text-sm">play_arrow</span>
@@ -295,7 +295,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">蝰蛇全景声</span><span class="font-label-sm text-label-sm text-on-surface-variant">05:13</span>
 </div>
 </div>
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer bg-surface-container/50 border border-secondary/20">
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer bg-surface-container/50 border border-secondary/20" data-card="album" data-category="kugou repeat">
 <div class="flex items-center gap-3 min-w-0">
 <button class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center transition-colors flex-shrink-0 shadow-sm">
 <span class="material-symbols-outlined text-sm">volume_up</span>
@@ -308,7 +308,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-secondary-container text-on-secondary-container hidden sm:inline-block font-medium">正在播放</span><span class="font-label-sm text-label-sm text-on-surface-variant">04:32</span>
 </div>
 </div>
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer">
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" data-card="album" data-category="kugou repeat">
 <div class="flex items-center gap-3 min-w-0">
 <button class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0">
 <span class="material-symbols-outlined text-sm">play_arrow</span>
@@ -321,7 +321,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">国风经典</span><span class="font-label-sm text-label-sm text-on-surface-variant">03:59</span>
 </div>
 </div>
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer">
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" data-card="album" data-category="kugou">
 <div class="flex items-center gap-3 min-w-0">
 <button class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0">
 <span class="material-symbols-outlined text-sm">play_arrow</span>
@@ -334,7 +334,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-surface-container-high text-secondary hidden sm:inline-block">超重低音</span><span class="font-label-sm text-label-sm text-on-surface-variant">03:56</span>
 </div>
 </div>
-<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer">
+<div class="group flex items-center justify-between p-3 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" data-card="album" data-category="kugou">
 <div class="flex items-center gap-3 min-w-0">
 <button class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0">
 <span class="material-symbols-outlined text-sm">play_arrow</span>
@@ -421,14 +421,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </div>
 </div>
 </section>
-<div class="fixed inset-0 z-50 bg-primary/40 backdrop-blur-sm flex items-center justify-center p-gutter hidden opacity-0 transition-opacity duration-300" id="excerpt-modal">
-<div class="bg-surface rounded-xl max-w-2xl w-full p-space-lg shadow-xl relative max-h-[85vh] overflow-y-auto transform scale-95 transition-transform duration-300" id="modal-card">
-<button class="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors" onclick="closeExcerptModal()" type="button">
-<span class="material-symbols-outlined text-sm">close</span>
-</button>
-<div id="modal-content"></div>
-</div>
-</div>
 </div>
 </main>
 <script>
@@ -450,14 +442,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   function applyFilter(filter) {
     const isBook = filter === 'webnovel' || filter === 'suspense';
-    const isAlbum = filter === 'kugou' || filter === 'repeat';
-    if (shelf) shelf.classList.toggle('hidden', isAlbum);
+    const isMusic = filter === 'kugou' || filter === 'repeat';
+    const matches = (card) => {
+      if (filter === 'all') return true;
+      return (card.dataset.category || '').split(/\s+/).includes(filter);
+    };
+    if (shelf) shelf.classList.toggle('hidden', isMusic);
     if (music) music.classList.toggle('hidden', isBook);
     for (const card of bookCards) {
-      card.style.display = (isBook && card.dataset.category !== filter) ? 'none' : '';
+      card.style.display = !isMusic && matches(card) ? '' : 'none';
     }
     for (const card of albumCards) {
-      card.classList.toggle('hidden', false);
+      card.style.display = !isBook && matches(card) ? '' : 'none';
     }
   }
 

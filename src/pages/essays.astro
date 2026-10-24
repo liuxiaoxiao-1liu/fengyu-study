@@ -1,7 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { essays, formatEssayDate } from '../data/essays';
-import { quotes } from '../data/quotes';
+import { formatEssayDate } from '../data/essays';
+import { listEssays, listQuotes } from '../lib/content-db';
+
+export const prerender = false;
+
+const essays = listEssays();
+const quotes = listQuotes();
 
 const sortedEssays = [...essays].sort((a, b) => b.date.localeCompare(a.date));
 const essayCount = sortedEssays.filter((essay) => essay.kind === 'essay').length;

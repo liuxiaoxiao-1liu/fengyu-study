@@ -1,21 +1,19 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { essays, formatEssayDate } from '../../data/essays';
+import { formatEssayDate } from '../../data/essays';
+import { listEssays } from '../../lib/content-db';
 import { SITE } from '../../lib/site';
 
-export async function getStaticPaths() {
-  const sorted = [...essays].sort((a, b) => b.date.localeCompare(a.date));
-  return sorted.map((essay, index) => ({
-    params: { slug: essay.slug },
-    props: {
-      essay,
-      newer: index > 0 ? sorted[index - 1] : null,
-      older: index < sorted.length - 1 ? sorted[index + 1] : null,
-    },
-  }));
-}
+export const prerender = false;
 
-const { essay, newer, older } = Astro.props;
+const slug = Astro.params.slug ?? '';
+const sorted = listEssays();
+const index = sorted.findIndex((item) => item.slug === slug);
+if (index < 0) return Astro.redirect('/essays/');
+
+const essay = sorted[index]!;
+const newer = index > 0 ? sorted[index - 1]! : null;
+const older = index < sorted.length - 1 ? sorted[index + 1]! : null;
 ---
 
 <BaseLayout current="essays" title={essay.title} description={essay.summary}>

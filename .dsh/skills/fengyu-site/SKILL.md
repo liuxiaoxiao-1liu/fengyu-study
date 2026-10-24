@@ -65,9 +65,10 @@ npm run verify     # format:check + check + build + smoke
 
 ## 4. 后台与数据
 
-- 内容后台 `/admin/`：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 只放 `.env`），管理影集；资料写入 `CONTENT_DB`（容器 `/data/content.sqlite`），图片写入 `CONTENT_UPLOADS`（容器 `/data/uploads`）。
+- 内容后台 `/admin/`：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 只放 `.env`）；顶部导航管理影集/随笔/书架/唱片/曲目/台词。内容写入 `CONTENT_DB`（容器 `/data/content.sqlite`），图片写入 `CONTENT_UPLOADS`（容器 `/data/uploads`）。
 - 留言后台 `/admin/letters/`：仍用 `ADMIN_TOKEN`；接口 `GET /api/admin/letters`、`PATCH /api/admin/letters/:id`、`GET /api/admin/export?...`。
-- 内容接口：`GET/POST /api/admin/photos`、`PATCH/DELETE /api/admin/photos/:id`、`POST /api/admin/upload`；登录态是 HttpOnly cookie。
+- 内容接口：`GET /api/admin/schema`、`GET/POST /api/admin/content/:type`、`PATCH/DELETE /api/admin/content/:type/:id`、`GET/POST /api/admin/photos`、`PATCH/DELETE /api/admin/photos/:id`、`POST /api/admin/upload`；登录态是 HttpOnly cookie。
+- `/`、`/essays/`、`/reading/`、`/photos/`、`/rss.xml`、`/sitemap.xml` 由 app 请求时读取内容库；nginx 必须保留这些反代，删掉会让页面 404。
 - 公开接口：`GET/POST /api/guestbook`、`GET /api/stats`、`POST /api/subscribe`。
 - 悄悄话入库即 `pending`，公开留言直接 `approved`；`hidden` 仅后台可见。
 - 悄悄话即使点了“通过”也不会出现在公开留言页（公开查询过滤 `is_private=1`），这是当前设计。

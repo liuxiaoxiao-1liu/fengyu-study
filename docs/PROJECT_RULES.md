@@ -246,7 +246,7 @@ npm run verify         # 上面四项的合集，发布前的总闸门
 
 - 公开留言入库即 `approved`，直接上墙；悄悄话入库为 `pending`，只有 `/admin/letters/` 或 `/api/admin/*` 可见。
 - 房主可在 `/admin/letters/` 审核（通过 / 隐藏）、回复并导出 JSON / CSV；`hidden` 仅后台可见。
-- 内容后台 `/admin/` 用用户名 + 密码登录（HttpOnly cookie），当前管理影集；数据在 `content.sqlite`，上传文件在 `/data/uploads`。
+- 内容后台 `/admin/` 用用户名 + 密码登录（HttpOnly cookie），导航管理影集 / 随笔 / 书架 / 唱片 / 曲目 / 台词；数据在 `content.sqlite`，上传文件在 `/data/uploads`。
 - 留言禁止 HTML；前端只用 `textContent` 渲染，禁止拼 `innerHTML`。
 - 不收集邮箱、手机号、身份证等敏感信息；留言无需登录；订阅只收邮箱。
 - 在启用 HTTPS 之前，页面必须提示“请勿在留言中填写敏感信息”，管理后台只应在可信网络使用。

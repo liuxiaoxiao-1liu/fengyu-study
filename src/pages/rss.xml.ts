@@ -1,9 +1,12 @@
 import type { APIRoute } from 'astro';
-import { essays } from '../data/essays';
+import { listEssays } from '../lib/content-db';
 import { SITE } from '../lib/site';
 import { escapeXml } from '../lib/xml';
 
+export const prerender = false;
+
 export const GET: APIRoute = async ({ site }) => {
+  const essays = listEssays();
   const base = site ?? new URL(SITE.url);
   const sorted = [...essays].sort((a, b) => b.date.localeCompare(a.date));
   const lastBuild = sorted[0] ? new Date(`${sorted[0].date}T00:00:00Z`) : new Date();
@@ -45,5 +48,3 @@ ${items}
     },
   });
 };
-
-export const prerender = true;

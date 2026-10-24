@@ -1,11 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { books, featuredBook } from '../data/books';
-import { featuredTrack, tracks, kugouSearchUrl } from '../data/music';
-import { photos } from '../data/photos';
-import { essays, formatEssayDate } from '../data/essays';
+import { kugouSearchUrl } from '../data/music';
+import { formatEssayDate } from '../data/essays';
+import { listBooks, listEssays, listPhotos, listTracks } from '../lib/content-db';
 
-const latestEssay = [...essays].sort((a, b) => b.date.localeCompare(a.date))[0]!;
+export const prerender = false;
+
+const books = listBooks();
+const tracks = listTracks();
+const photos = listPhotos();
+const essays = listEssays();
+const featuredBook = books.find((book) => book.featured) ?? books[0]!;
+const featuredTrack = tracks[0]!;
+const latestEssay = essays[0]!;
 ---
 
 <BaseLayout current="home">

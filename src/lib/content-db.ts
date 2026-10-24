@@ -3,6 +3,10 @@ import { dirname, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 import { photos as seedPhotos, type Photo, type PhotoExif, type PhotoSeries } from '../data/photos';
+import { essays as seedEssays, type Essay } from '../data/essays';
+import { books as seedBooks, type Book } from '../data/books';
+import { albums as seedAlbums, tracks as seedTracks, type Album, type Track } from '../data/music';
+import { quotes as seedQuotes, type Quote } from '../data/quotes';
 
 const DB_PATH = resolve(process.env.CONTENT_DB ?? './.data/content.sqlite');
 
@@ -10,6 +14,19 @@ let instance: DatabaseSync | null = null;
 
 export type PhotoRecord = Photo & {
   id: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type RecordType = 'essays' | 'books' | 'albums' | 'tracks' | 'quotes';
+
+export type ContentRecord = {
+  id: string;
+  type: RecordType;
+  slug: string;
+  title: string;
+  data: Record<string, unknown>;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
@@ -40,6 +57,18 @@ function db(): DatabaseSync {
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS content_records (
+      id TEXT PRIMARY KEY,
+      type TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      title TEXT NOT NULL,
+      data TEXT NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      UNIQUE (type, slug)
+    );
+    CREATE INDEX IF NOT EXISTS content_records_type_idx ON content_records (type, sort_order);
     CREATE TABLE IF NOT EXISTS photos (
       id TEXT PRIMARY KEY,
       slug TEXT NOT NULL UNIQUE,
@@ -59,6 +88,7 @@ function db(): DatabaseSync {
     );
   `);
   seedOnce(instance);
+  seedRecords(instance);
   return instance;
 }
 
@@ -219,4 +249,188 @@ export function updatePhoto(id: string, input: PhotoInput): PhotoRecord | null {
 export function deletePhoto(id: string): boolean {
   const result = db().prepare('DELETE FROM photos WHERE id = ?').run(id);
   return Number(result.changes) > 0;
+}
+
+type SeedEntry = { slug: string; title: string; data: Record<string, unknown> };
+
+function seedRecords(database: DatabaseSync): void {
+  const now = new Date().toISOString();
+  const insert = database.prepare(`
+    INSERT OR IGNORE INTO content_records (id, type, slug, title, data, sort_order, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const groups: Array<[RecordType, SeedEntry[]]> = [
+    [
+      'essays',
+      seedEssays.map((essay) => ({
+        slug: essay.slug,
+        title: essay.title,
+        data: essay as unknown as Record<string, unknown>,
+      })),
+    ],
+    [
+      'books',
+      seedBooks.map((book) => ({
+        slug: book.slug,
+        title: book.title,
+        data: book as unknown as Record<string, unknown>,
+      })),
+    ],
+    [
+      'albums',
+      seedAlbums.map((album) => ({
+        slug: album.slug,
+        title: album.title,
+        data: album as unknown as Record<string, unknown>,
+      })),
+    ],
+    [
+      'tracks',
+      seedTracks.map((track) => ({
+        slug: track.slug,
+        title: track.title,
+        data: track as unknown as Record<string, unknown>,
+      })),
+    ],
+    [
+      'quotes',
+      seedQuotes.map((quote) => ({
+        slug: quote.id,
+        title: quote.text,
+        data: quote as unknown as Record<string, unknown>,
+      })),
+    ],
+  ];
+
+  for (const [type, entries] of groups) {
+    const flag = `records_seeded_${type}`;
+    const seeded = database.prepare('SELECT value FROM settings WHERE key = ?').get(flag) as
+      { value: string } | undefined;
+    if (seeded) continue;
+    entries.forEach((entry, index) => {
+      insert.run(randomUUID(), type, entry.slug, entry.title, JSON.stringify(entry.data), index, now, now);
+    });
+    database.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(flag, now);
+  }
+}
+
+function rowToRecord(row: Record<string, unknown>): ContentRecord {
+  let data: Record<string, unknown> = {};
+  try {
+    const parsed = JSON.parse(String(row.data ?? '{}')) as unknown;
+    data = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? (parsed as Record<string, unknown>) : {};
+  } catch {
+    data = {};
+  }
+  return {
+    id: String(row.id),
+    type: String(row.type) as RecordType,
+    slug: String(row.slug),
+    title: String(row.title),
+    data,
+    sortOrder: Number(row.sort_order ?? 0),
+    createdAt: String(row.created_at),
+    updatedAt: String(row.updated_at),
+  };
+}
+
+export function listContentRecords(type: RecordType): ContentRecord[] {
+  const rows = db()
+    .prepare('SELECT * FROM content_records WHERE type = ? ORDER BY sort_order ASC, created_at ASC')
+    .all(type) as unknown as Record<string, unknown>[];
+  return rows.map(rowToRecord);
+}
+
+export function getContentRecord(type: RecordType, id: string): ContentRecord | null {
+  const row = db().prepare('SELECT * FROM content_records WHERE type = ? AND id = ?').get(type, id) as unknown as
+    Record<string, unknown> | undefined;
+  return row ? rowToRecord(row) : null;
+}
+
+export function getContentRecordBySlug(type: RecordType, slug: string): ContentRecord | null {
+  const row = db().prepare('SELECT * FROM content_records WHERE type = ? AND slug = ?').get(type, slug) as unknown as
+    Record<string, unknown> | undefined;
+  return row ? rowToRecord(row) : null;
+}
+
+export function createContentRecord(
+  type: RecordType,
+  entry: { slug: string; title: string; data: Record<string, unknown>; sortOrder?: number },
+): ContentRecord {
+  const now = new Date().toISOString();
+  const id = randomUUID();
+  const sortOrder =
+    typeof entry.sortOrder === 'number'
+      ? entry.sortOrder
+      : (
+          db()
+            .prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 AS next FROM content_records WHERE type = ?')
+            .get(type) as { next: number }
+        ).next;
+  db()
+    .prepare(
+      `INSERT INTO content_records (id, type, slug, title, data, sort_order, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .run(id, type, entry.slug, entry.title, JSON.stringify(entry.data), sortOrder, now, now);
+  return getContentRecord(type, id)!;
+}
+
+export function updateContentRecord(
+  type: RecordType,
+  id: string,
+  entry: { slug: string; title: string; data: Record<string, unknown>; sortOrder?: number },
+): ContentRecord | null {
+  const existing = getContentRecord(type, id);
+  if (!existing) return null;
+  const now = new Date().toISOString();
+  db()
+    .prepare(
+      `UPDATE content_records SET slug = ?, title = ?, data = ?, sort_order = ?, updated_at = ?
+       WHERE type = ? AND id = ?`,
+    )
+    .run(entry.slug, entry.title, JSON.stringify(entry.data), entry.sortOrder ?? existing.sortOrder, now, type, id);
+  return getContentRecord(type, id);
+}
+
+export function deleteContentRecord(type: RecordType, id: string): boolean {
+  const result = db().prepare('DELETE FROM content_records WHERE type = ? AND id = ?').run(type, id);
+  return Number(result.changes) > 0;
+}
+
+export function listEssays(): Essay[] {
+  return listContentRecords('essays')
+    .map((record) => record.data as unknown as Essay)
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
+
+export function getEssayBySlug(slug: string): Essay | null {
+  const record = getContentRecordBySlug('essays', slug);
+  return record ? (record.data as unknown as Essay) : null;
+}
+
+export function listBooks(): Book[] {
+  return listContentRecords('books').map((record) => record.data as unknown as Book);
+}
+
+export function listAlbums(): Album[] {
+  return listContentRecords('albums').map((record) => record.data as unknown as Album);
+}
+
+export function listTracks(): Track[] {
+  return listContentRecords('tracks').map((record) => record.data as unknown as Track);
+}
+
+export function listQuotes(): Quote[] {
+  return listContentRecords('quotes').map((record) => record.data as unknown as Quote);
+}
+
+/** 首页/专辑精选曲目的白名单：来自后台的 tracks 表（含 kugou 元数据）。 */
+export function findCuratedTrack(hash: string): Track | null {
+  const normalized = hash.toLowerCase();
+  for (const track of listTracks()) {
+    if (track.kugou?.hash.toLowerCase() === normalized) return track;
+  }
+  return null;
 }

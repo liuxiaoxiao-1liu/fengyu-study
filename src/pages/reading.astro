@@ -11,6 +11,10 @@ const PAGE_SIZE = 30;
 const initialTracks = initialPlaylist.tracks.slice(0, PAGE_SIZE);
 const initialTotalPages = Math.max(1, Math.ceil(initialPlaylist.tracks.length / PAGE_SIZE));
 const audioTrackCount = initialPlaylist.tracks.length;
+
+function firstTrackOfAlbum(albumSlug: string) {
+  return tracks.find((track) => track.albumSlug === albumSlug && track.kugou);
+}
 const accountTrackCount = playlists
   .filter((playlist) => playlist.slug !== 'featured')
   .reduce((total, playlist) => total + playlist.tracks.length, 0);
@@ -237,32 +241,60 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
           </div>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          {albums.map((album) => (
-            <article class="group relative flex flex-col bg-surface-container-low p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md border border-surface-container-high/40">
-              <div class="relative aspect-square w-full rounded-lg overflow-hidden mb-3 bg-surface-container-high shadow-sm">
-                <img
-                  alt={`${album.title} 专辑封面`}
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  decoding="async"
-                  height="600"
-                  loading="lazy"
-                  src={album.cover}
-                  width="600"
-                />
-                <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary/75 text-on-primary font-label-sm text-[0.625rem]">
-                  {album.label}
-                </span>
-              </div>
-              <h4 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate font-normal">
-                {album.title}
-              </h4>
-              <span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">{album.artist}</span>
-              <div class="flex items-center justify-between mt-3 pt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-                <span class="font-label-sm text-label-sm text-secondary font-medium">{album.tag}</span>
-                <span class="material-symbols-outlined text-sm group-hover:text-primary">play_circle</span>
-              </div>
-            </article>
-          ))}
+          {albums.map((album) => {
+            const firstTrack = firstTrackOfAlbum(album.slug);
+            return (
+              <article class="group relative flex flex-col bg-surface-container-low p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md border border-surface-container-high/40">
+                <div class="relative aspect-square w-full rounded-lg overflow-hidden mb-3 bg-surface-container-high shadow-sm">
+                  <img
+                    alt={`${album.title} 专辑封面`}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    decoding="async"
+                    height="600"
+                    loading="lazy"
+                    src={album.cover}
+                    width="600"
+                  />
+                  <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary/75 text-on-primary font-label-sm text-[0.625rem]">
+                    {album.label}
+                  </span>
+                </div>
+                <h4 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate font-normal">
+                  {album.title}
+                </h4>
+                <span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">{album.artist}</span>
+                <div class="flex items-center justify-between mt-3 pt-2 border-t border-surface-container-high/60 text-on-surface-variant">
+                  <span class="font-label-sm text-label-sm text-secondary font-medium">{album.tag}</span>
+                  {firstTrack ? (
+                    <button
+                      type="button"
+                      class="material-symbols-outlined text-sm text-on-surface-variant transition-colors hover:text-primary"
+                      data-play
+                      data-album-play
+                      data-hash={firstTrack.kugou?.hash}
+                      data-title={firstTrack.title}
+                      data-artist={firstTrack.artist}
+                      data-external={kugouSearchUrl(firstTrack)}
+                      aria-label={`播放 ${firstTrack.title}`}
+                      title={`播放 ${firstTrack.title}`}
+                    >
+                      play_circle
+                    </button>
+                  ) : (
+                    <a
+                      class="material-symbols-outlined text-sm text-on-surface-variant transition-colors hover:text-primary"
+                      href={kugouSearchUrl({ title: album.title, artist: album.artist })}
+                      target="_blank"
+                      rel="noopener noreferrer external"
+                      aria-label={`在酷狗搜索 ${album.title}`}
+                    >
+                      open_in_new
+                    </a>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div class="lg:col-span-7 bg-surface-container-low rounded-xl p-6 shadow-sm border border-surface-container-high/40">
@@ -576,5 +608,16 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
     playlistSelect?.addEventListener('change', () => void loadPlaylist(playlistSelect.value, 1));
     pagePrev?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.max(1, activePage - 1)));
     pageNext?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.min(totalPages, activePage + 1)));
+  </script>
+
+  <script>
+    // 专辑归档在歌单播放器上方：点播放后把播放器滚进视野，给出可见反馈。
+    for (const button of document.querySelectorAll<HTMLElement>('[data-album-play]')) {
+      button.addEventListener('click', () => {
+        window.setTimeout(() => {
+          document.getElementById('site-player')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      });
+    }
   </script>
 </BaseLayout>

@@ -1,17 +1,18 @@
 ---
-// 站内播放器面板：由阅读页曲目行里的 [data-play] 按钮驱动。
-// 没有音源的曲目不会进入这里，页面会把按钮降级成酷狗搜索外链。
+// 站内播放器：由页面里的 [data-play] 按钮驱动（首页卡片、读听歌单、专辑归档共用）。
+// 浏览器 <audio> 负责解码；音源地址只通过站内 /api/kugou/url 获取。
 interface Props {
   audioCount?: number;
 }
 
 const { audioCount = 0 } = Astro.props;
-const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有曲目暂未上传音源，可点曲目右侧外链去酷狗收听。';
+const emptyHint = audioCount > 0 ? '选择曲目开始播放。' : '当前没有可播放的站内音源，可点曲目右侧外链去酷狗收听。';
 ---
 
 <section
   class="mt-4 pt-3 bg-surface-container/50 p-3 rounded-lg flex flex-col gap-2"
   data-player
+  id="site-player"
   aria-label="站内播放器"
 >
   <div class="flex flex-wrap items-center justify-between gap-space-sm">
@@ -36,8 +37,13 @@ const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有
         aria-label="播放或暂停"
         disabled
       >
-        <span class="material-symbols-outlined text-base" data-player-icon>
-          play_arrow
+        <span class="flex items-center justify-center" data-player-icon>
+          <svg class="w-5 h-5" data-player-icon-play viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+          <svg class="w-5 h-5 hidden" data-player-icon-pause viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6 5h4v14H6zM14 5h4v14h-4z"></path>
+          </svg>
         </span>
       </button>
       <a
@@ -70,7 +76,7 @@ const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有
       --:--
     </span>
   </div>
-  <audio data-player-audio preload="none"></audio>
+  <audio data-player-audio preload="auto"></audio>
 </section>
 
 <script>
@@ -78,7 +84,8 @@ const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有
   if (player) {
     const audio = player.querySelector<HTMLAudioElement>('[data-player-audio]');
     const toggle = player.querySelector<HTMLButtonElement>('[data-player-toggle]');
-    const icon = player.querySelector<HTMLElement>('[data-player-icon]');
+    const playIcon = player.querySelector<HTMLElement>('[data-player-icon-play]');
+    const pauseIcon = player.querySelector<HTMLElement>('[data-player-icon-pause]');
     const title = player.querySelector<HTMLElement>('[data-player-title]');
     const artist = player.querySelector<HTMLElement>('[data-player-artist]');
     const state = player.querySelector<HTMLElement>('[data-player-state]');
@@ -87,6 +94,18 @@ const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有
     const seek = player.querySelector<HTMLInputElement>('[data-player-seek]');
     const external = player.querySelector<HTMLAnchorElement>('[data-player-external]');
 
+    type TrackCommand = {
+      hash?: string;
+      audio?: string;
+      title: string;
+      artist: string;
+      external: string;
+    };
+
+    let currentTrack: TrackCommand | null = null;
+    let retried = false;
+    let pendingResume = 0;
+
     const formatTime = (seconds: number) => {
       if (!Number.isFinite(seconds) || seconds < 0) return '00:00';
       const total = Math.floor(seconds);
@@ -94,7 +113,8 @@ const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有
     };
 
     const setPlaying = (playing: boolean) => {
-      if (icon) icon.textContent = playing ? 'pause' : 'play_arrow';
+      playIcon?.classList.toggle('hidden', playing);
+      pauseIcon?.classList.toggle('hidden', !playing);
       if (state) state.textContent = playing ? '· 正在播放' : '· 已暂停';
     };
 
@@ -108,62 +128,113 @@ const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有
       }
     };
 
-    // 曲目行由服务端渲染或 JS 动态插入，统一用事件委托绑定播放。
-    document.addEventListener('click', (event) => {
-      const target = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-play]') : null;
-      if (!target || target.disabled) return;
-      void handlePlay(target);
+    const readCommand = (button: HTMLButtonElement): TrackCommand => ({
+      hash: button.dataset.hash || undefined,
+      audio: button.dataset.audio || undefined,
+      title: button.dataset.title || '未命名曲目',
+      artist: button.dataset.artist || '',
+      external: button.dataset.external || 'https://www.kugou.com/',
     });
 
-    async function handlePlay(button: HTMLButtonElement) {
-      if (!audio) return;
-
-      if (title) title.textContent = button.dataset.title || '未命名曲目';
-      if (artist) artist.textContent = button.dataset.artist || '';
-      if (state) state.textContent = '· 正在加载…';
-      if (toggle) toggle.disabled = false;
-      if (seek) seek.disabled = false;
-      if (current) current.textContent = '00:00';
-      if (seek) seek.value = '0';
+    const setTrackMeta = (track: TrackCommand) => {
+      if (title) title.textContent = track.title;
+      if (artist) artist.textContent = track.artist;
       if (external) {
-        external.href = button.dataset.external || 'https://www.kugou.com/';
+        external.href = track.external;
         external.classList.remove('hidden');
         external.classList.add('flex');
       }
+      if (current) current.textContent = '00:00';
+      if (seek) seek.value = '0';
+      if (toggle) toggle.disabled = false;
+      if (seek) seek.disabled = false;
+    };
 
-      const localSrc = button.dataset.audio;
-      if (localSrc) {
-        const nextSrc = new URL(localSrc, window.location.href).href;
-        if (audio.src !== nextSrc) audio.src = nextSrc;
-        void audio.play().catch(() => {
-          if (state) state.textContent = '· 音源加载失败';
-        });
-        return;
-      }
+    function describeError(data: { error?: string } | null, status: number) {
+      if (data?.error === 'rate_limited' || status === 429) return '· 播放请求太频繁，等几分钟再试';
+      if (data?.error === 'kugou_disabled' || status === 503) return '· 站内音源未配置，可去酷狗收听';
+      return '· 音源解析失败，可去酷狗收听';
+    }
 
-      // 酷狗会员曲目：向站点换一条直链，只认白名单 hash。
-      const hash = button.dataset.hash;
-      if (!hash) return;
-      if (state) state.textContent = '· 正在解析酷狗音源…';
-      try {
+    async function fetchPlayUrl(hash: string) {
+      let lastStatus = 0;
+      let lastData: { ok?: boolean; url?: string; error?: string } | null = null;
+
+      // 网络抖错误一次；限流、未配置、白名单外不重试，避免放大请求。
+      for (let attempt = 0; attempt < 2; attempt += 1) {
         const response = await fetch(`/api/kugou/url?hash=${encodeURIComponent(hash)}`, {
           headers: { accept: 'application/json' },
         });
-        const data = (await response.json()) as { ok?: boolean; url?: string; error?: string };
-        if (!response.ok || !data.ok || typeof data.url !== 'string') {
-          throw new Error(data.error || `HTTP ${response.status}`);
+        lastStatus = response.status;
+        lastData = (await response.json().catch(() => null)) as {
+          ok?: boolean;
+          url?: string;
+          error?: string;
+        } | null;
+        if (response.ok && lastData?.ok === true && typeof lastData.url === 'string') {
+          return lastData.url;
         }
-        if (audio.src !== data.url) audio.src = data.url;
+        if (response.status === 429 || response.status === 503 || response.status === 404) break;
+        if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 350));
+      }
+
+      throw new Error(describeError(lastData, lastStatus));
+    }
+
+    async function playKugou(hash: string, resumeAt = 0) {
+      if (!audio) return;
+      if (state) state.textContent = '· 正在解析酷狗音源…';
+      const url = await fetchPlayUrl(hash);
+      if (state) state.textContent = '· 正在加载音源…';
+      pendingResume = resumeAt > 0 ? resumeAt : 0;
+      audio.src = url;
+      audio.load();
+      try {
+        await audio.play();
+      } catch {
+        if (state) state.textContent = '· 音源已就绪，点播放继续';
+      }
+    }
+
+    async function handlePlay(button: HTMLButtonElement) {
+      if (!audio) return;
+      const track = readCommand(button);
+      currentTrack = track;
+      retried = false;
+      setTrackMeta(track);
+      if (state) state.textContent = '· 正在加载…';
+
+      if (track.audio) {
+        pendingResume = 0;
+        audio.src = new URL(track.audio, window.location.href).href;
+        audio.load();
         try {
           await audio.play();
         } catch {
           if (state) state.textContent = '· 音源已就绪，点播放继续';
         }
-      } catch {
-        if (state) state.textContent = '· 音源解析失败，可去酷狗收听';
+        return;
+      }
+
+      if (!track.hash) {
+        if (state) state.textContent = '· 这首没有可播放的站内音源';
+        return;
+      }
+
+      try {
+        await playKugou(track.hash);
+      } catch (error) {
+        if (state) state.textContent = error instanceof Error ? error.message : '· 音源解析失败，可去酷狗收听';
         if (toggle) toggle.disabled = true;
       }
     }
+
+    // 曲目按钮由服务端渲染或列表动态插入，统一用事件委托绑定播放。
+    document.addEventListener('click', (event) => {
+      const target = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-play]') : null;
+      if (!target || target.disabled) return;
+      void handlePlay(target);
+    });
 
     toggle?.addEventListener('click', () => {
       if (!audio || !audio.src) return;
@@ -177,7 +248,14 @@ const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有
     audio?.addEventListener('play', () => setPlaying(true));
     audio?.addEventListener('pause', () => setPlaying(false));
     audio?.addEventListener('ended', () => setPlaying(false));
-    audio?.addEventListener('loadedmetadata', updateDuration);
+    audio?.addEventListener('loadedmetadata', () => {
+      if (!audio) return;
+      updateDuration();
+      if (pendingResume > 0 && Number.isFinite(audio.duration)) {
+        audio.currentTime = Math.min(pendingResume, Math.max(0, audio.duration - 0.5));
+      }
+      pendingResume = 0;
+    });
     audio?.addEventListener('durationchange', updateDuration);
     audio?.addEventListener('timeupdate', () => {
       if (!audio) return;
@@ -186,14 +264,29 @@ const emptyHint = audioCount > 0 ? '选择上方曲目开始播放。' : '所有
         seek.value = String(audio.currentTime);
       }
     });
+
+    // 酷狗直链有 TTL：过期/断流时重新取一次地址，并尽量从原位置续播。
     audio?.addEventListener('error', () => {
-      if (state) state.textContent = '· 音源加载失败';
+      if (!audio) return;
+      if (currentTrack?.hash && !retried) {
+        retried = true;
+        const resumeAt = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+        if (state) state.textContent = '· 音源过期，正在重新解析…';
+        void playKugou(currentTrack.hash, resumeAt).catch((error) => {
+          if (state) state.textContent = error instanceof Error ? error.message : '· 音源加载失败，可去酷狗收听';
+          if (toggle) toggle.disabled = true;
+        });
+        return;
+      }
+      if (state) state.textContent = '· 音源加载失败，可去酷狗收听';
       if (toggle) toggle.disabled = true;
     });
 
     seek?.addEventListener('input', () => {
       if (!audio || !Number.isFinite(audio.duration)) return;
       audio.currentTime = Number(seek.value);
+      // 知识库的播放管线约定：暂停中拖动进度条，语义是“继续听”。
+      if (audio.paused) void audio.play().catch(() => {});
     });
   }
 </script>

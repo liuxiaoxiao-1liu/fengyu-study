@@ -90,7 +90,7 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 - 远程仓库与 CI 接通、Playwright 视觉/交互测试、链接检查、图片 WebP/AVIF；
 - 真实内容（随笔、书、歌、图）替换示例、友链与社交链接换真实主页；
 - `docs/PROJECT_RULES.md` 的遗留债务见附录 A：远程仓库、素材许可证、组件拆分、Content Collections 等；
-- 站内播放器已就绪，但仓库没有音频文件，当前全部走「未上传音源 → 酷狗搜索」降级。
+- 仓库没有本地音频文件；所有播放都走酷狗直链，解析失败时自动降级为酷狗搜索外链。
 
 ## 留言 API
 
@@ -128,6 +128,8 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 - 服务端先 `/register/dev` 换 `dfid`，再 `/song/url` 换 CDN 直链，浏览器 `<audio>` 直接播放（服务端不代理音频字节）；
 - 歌单数据在 `src/data/kugou-playlists.ts`，由 `node --env-file=.env scripts/sync-kugou-playlists.mjs` 重新生成；当前包含账号全部 17 个歌单、约 1800 首；
 - `/reading/` 支持歌单切换 + 分页（每页 30 首）；`/api/kugou/url` 只解析数据里出现过的 hash，按 IP 限流（30 次 / 10 分钟）；
+- 播放入口统一用 `data-play` 指令：读听歌单行、读听「专辑归档」卡片、首页「酷狗音乐」卡片都会驱动同一个站内播放器；
+- 浏览器 `<audio>` 负责解码；直链过期或断流时自动重取一次地址并按原进度续播，暂停中拖动进度条会自动恢复播放；
 - 登录态过期或酷狗改接口时，`/api/kugou/url` 返回 502，播放器自动降级为酷狗外链；重新扫码登录后更新 `.env` 即可。
 - 运行时来源是 `vendor/kugou/`（从 Folia 内置的 KuGouMusicApi 抽取，MIT），只保留 `register_dev` / `song_url` / 歌单读取。
 

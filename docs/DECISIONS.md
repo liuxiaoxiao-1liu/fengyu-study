@@ -219,3 +219,55 @@ rate_limits (ip_hash, last_at)
 - 接通私有远程仓库后启用 Actions；
 - 补 Playwright 视觉/交互测试与链接检查；
 - 视需要再评估 ESLint 与 Lighthouse。
+
+---
+
+## ADR-005 · 站内播放器：单 `<audio>` + `data-play` 指令 + 站内音源门面
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`src/components/Player.astro`、`src/pages/index.astro`、`src/pages/reading.astro`
+
+### 背景
+
+- 首页「酷狗音乐」卡片和读听「专辑归档」的播放图标只是装饰，点击没有声音；
+- 知识库「音频播放管线」（`audio-playback-pipeline`）的原则是：解码交给浏览器 `<audio>`，应用不写解码器；音频地址由 provider 提供；直链有 TTL，失败要重取并续播；
+- 知识库「在线音乐 Provider 架构」（`online-music-provider-architecture`）要求 UI 不直接碰平台接口，地址获取收敛到门面；
+- 知识库「前端运行时性能护栏」（`frontend-runtime-guardrails`）要求连续播放时间不进框架状态，用 DOM/ref 直接更新；
+- 本站是 Astro 多页站，没有 React，也没有 Folia 的双 deck / Web Audio / 队列能力。
+
+### 决定
+
+1. **单实例播放器**：每个播放页只放一个 `<audio>`（`Player.astro`），首页和读听共用；不引入 Web Audio、双 deck、音频字节缓存；
+2. **指令式入口**：所有播放入口只写 `data-play` + `data-hash` / `data-title` / `data-artist` / `data-external`，由播放器做事件委托，不在每个按钮里复制请求逻辑；
+3. **音源门面**：浏览器只请求站内 `/api/kugou/url`，不直接访问酷狗；服务端继续做白名单、限流和登录态；
+4. **失败与续播**：直链过期/断流时只重取一次，并按 `currentTime` 续播；5xx 网络抖动重试一次，429/503/404 不重试；最终失败显示错误并保留酷狗外链；
+5. **统一 seek**：进度条只有一个入口；暂停中拖动进度条视为继续听，自动恢复播放；
+6. **进度更新**：`timeupdate` 直接写文本和 range，不重建 DOM；
+7. **入口接线**：首页精选卡与两行循环曲目改为播放按钮；读听专辑卡点击播放该专辑第一首，并把播放器滚进视野。
+
+### 影响
+
+**正面**
+
+- 首页、专辑归档、歌单三个入口都能真正出声；
+- 播放入口、错误处理和 seek 只有一份实现；
+- 直链过期不再直接变成“坏按钮”，会尝试续播。
+
+**负面**
+
+- 仍然是多页站：切页面会停止播放，没有全站常驻播放器；
+- 没有队列/自动下一首/预取/歌词，也没有 Folia 的无缝混音；
+- 每个播放页各有一个 `<audio>`，切页后需要重新点播；
+- 专辑卡与播放器在同一页，点击后会滚动到播放器。
+
+### 回滚
+
+1. `git revert` 本提交即可恢复静态卡片和装饰图标；
+2. 播放能力本身不依赖新接口，回滚不影响服务端。
+
+### 后续
+
+- 若要跨页面连续播放，再评估 Astro View Transitions + `transition:persist`；
+- 需要队列/自动下一首/预取时，再参考知识库的 warm deck 与 URL 预取，而不是一次性照搬；
+- 下一步可补 Playwright 的播放交互回归。

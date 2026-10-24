@@ -22,7 +22,14 @@ services:
       HOST: 0.0.0.0
       PORT: 4321
       GUESTBOOK_DB: /data/guestbook.sqlite
-      # 管理后台令牌：写在服务器 /opt/fengyu/.env，不进仓库；未设置时 /api/admin/* 返回 503
+      # 内容后台的数据与上传文件；和留言库共用 /data 卷
+      CONTENT_DB: /data/content.sqlite
+      CONTENT_UPLOADS: /data/uploads
+      # 管理后台登录：用户名 + scrypt 密码哈希 + 会话签名密钥，只写在服务器 .env
+      ADMIN_USER: ${ADMIN_USER:-}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:-}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
+      # 旧管理令牌：保留给 /admin/letters/ 与 Bearer API 兼容
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
       # 酷狗账号登录态：只用于把站内白名单曲目换成播放直链，不进仓库
       KUGOU_TOKEN: ${KUGOU_TOKEN:-}

@@ -24,6 +24,8 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const ENTRY = join(ROOT, 'dist/server/entry.mjs');
 const ADMIN_TOKEN = 'smoke-test-token';
 const DB_PATH = join(tmpdir(), `fengyu-smoke-${process.pid}-${Date.now()}.sqlite`);
+const CONTENT_DB = join(tmpdir(), `fengyu-smoke-content-${process.pid}-${Date.now()}.sqlite`);
+const CONTENT_UPLOADS = join(tmpdir(), `fengyu-smoke-uploads-${process.pid}-${Date.now()}`);
 
 if (!existsSync(ENTRY)) {
   console.error(`找不到 ${ENTRY}，请先运行 npm run build`);
@@ -92,6 +94,8 @@ const child = spawn(process.execPath, [ENTRY], {
     HOST: '127.0.0.1',
     PORT: String(port),
     GUESTBOOK_DB: DB_PATH,
+    CONTENT_DB,
+    CONTENT_UPLOADS,
     ADMIN_TOKEN,
     ASTRO_TELEMETRY_DISABLED: '1',
   },
@@ -125,12 +129,19 @@ function cleanup() {
     child.kill('SIGTERM');
     setTimeout(() => child.kill('SIGKILL'), 1500).unref();
   }
-  for (const suffix of ['', '-wal', '-shm']) {
-    try {
-      rmSync(`${DB_PATH}${suffix}`, { force: true });
-    } catch {
-      // 清理失败不影响主流程
+  for (const base of [DB_PATH, CONTENT_DB]) {
+    for (const suffix of ['', '-wal', '-shm']) {
+      try {
+        rmSync(`${base}${suffix}`, { force: true });
+      } catch {
+        // 清理失败不影响主流程
+      }
     }
+  }
+  try {
+    rmSync(CONTENT_UPLOADS, { recursive: true, force: true });
+  } catch {
+    // 清理失败不影响主流程
   }
 }
 

@@ -15,14 +15,31 @@ const { photos } = Astro.props;
       <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
         Visual Archive / <span data-lightbox-counter>1 / {photos.length}</span>
       </span>
-      <button
-        type="button"
-        class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-primary transition-colors"
-        data-lightbox-close
-        aria-label="关闭灯箱"
-      >
-        <span class="material-symbols-outlined text-lg">close</span>
-      </button>
+      <div class="flex items-center gap-3">
+        <a
+          class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors"
+          data-lightbox-download
+          download
+          href="#"
+        >
+          下载
+        </a>
+        <a
+          class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors"
+          data-lightbox-edit
+          href="/admin/"
+        >
+          编辑
+        </a>
+        <button
+          type="button"
+          class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-primary transition-colors"
+          data-lightbox-close
+          aria-label="关闭灯箱"
+        >
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
     </div>
 
     <div class="overflow-y-auto">
@@ -31,6 +48,7 @@ const { photos } = Astro.props;
           class:list={['flex flex-col lg:flex-row', index !== 0 && 'hidden']}
           data-lightbox-slide
           data-slug={photo.slug}
+          data-series={photo.series}
         >
           <div class="bg-surface-container flex items-center justify-center lg:w-3/5">
             <img
@@ -171,20 +189,46 @@ const { photos } = Astro.props;
     const closeButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-close]');
     const prevButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-prev]');
     const nextButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-next]');
+    const downloadLink = dialog.querySelector<HTMLAnchorElement>('[data-lightbox-download]');
+    const editLink = dialog.querySelector<HTMLAnchorElement>('[data-lightbox-edit]');
+    let visibleSlides = slides;
     let current = 0;
     let lastTrigger: HTMLElement | null = null;
 
+    const currentSlide = () => visibleSlides[current];
+
+    const updateMetaLinks = () => {
+      const slide = currentSlide();
+      if (!slide) return;
+      const image = slide.querySelector<HTMLImageElement>('img');
+      const src = image?.getAttribute('src') ?? '#';
+      if (downloadLink) {
+        downloadLink.href = src;
+        const name = src.split('/').pop() ?? 'photo.jpg';
+        downloadLink.download = name;
+      }
+      if (editLink) {
+        editLink.href = `/admin/?photo=${encodeURIComponent(slide.dataset.slug ?? '')}`;
+      }
+    };
+
     const show = (index: number) => {
-      if (!slides.length) return;
-      current = (index + slides.length) % slides.length;
-      slides.forEach((slide, slideIndex) => {
+      if (!visibleSlides.length) return;
+      current = (index + visibleSlides.length) % visibleSlides.length;
+      slides.forEach((slide) => slide.classList.add('hidden'));
+      visibleSlides.forEach((slide, slideIndex) => {
         slide.classList.toggle('hidden', slideIndex !== current);
       });
-      if (counter) counter.textContent = `${current + 1} / ${slides.length}`;
+      if (counter) counter.textContent = `${current + 1} / ${visibleSlides.length}`;
+      updateMetaLinks();
     };
 
     const open = (slug: string, trigger: HTMLElement) => {
-      const index = slides.findIndex((slide) => slide.dataset.slug === slug);
+      const series = trigger.dataset.series;
+      // 只在当前分类里翻页；没有分类或该分类无图时退回全部。
+      const filtered = series ? slides.filter((slide) => slide.dataset.series === series) : slides;
+      visibleSlides = filtered.length ? filtered : slides;
+      const index = visibleSlides.findIndex((slide) => slide.dataset.slug === slug);
       if (index < 0) return;
       lastTrigger = trigger;
       show(index);

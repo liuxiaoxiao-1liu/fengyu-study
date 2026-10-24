@@ -117,10 +117,13 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 
 ### 管理后台
 
-- `/admin/`：审核悄悄话、通过/隐藏留言、回复、导出 JSON/CSV；
-- 需要服务器 `/opt/fengyu/.env` 里的 `ADMIN_TOKEN`（`openssl rand -hex 32` 生成）。未配置时管理 API 返回 503；
+- **`/admin/` 内容后台**：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`，只放服务器 `.env`）；当前管理影集：新增、编辑、删除、上传图片；
+- 影集页 `/photos/` 改为请求时读取 `content.sqlite`，后台上传/修改后刷新即可生效，不需要构建发版；
+- 上传的图片保存在数据卷 `/data/uploads`，通过 `/api/media/photos/...` 提供；
+- `/admin/letters/`：旧的留言后台（审核悄悄话、通过/隐藏、回复、导出 JSON/CSV），仍用 `ADMIN_TOKEN`；
+- 生成登录凭据：`node scripts/set-admin-password.mjs '<新密码>'`（只写本地 `.env`，服务器 `.env` 需同步这三项）；
 - 其它接口：`GET /api/stats`（聚合计数）、`POST /api/subscribe`（季刊订阅入库）；
-- 管理端走 HTTP 当前没有 TLS，令牌只在本机/可信网络使用，后续上 HTTPS 后再日常使用。
+- 管理端走 HTTP 当前没有 TLS，令牌/密码只在本机/可信网络使用，后续上 HTTPS 后再日常使用。
 
 ## 酷狗站内播放
 
@@ -136,7 +139,7 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 
 ## 运维
 
-- 每日 04:17 自动备份（`VACUUM INTO`，保留 7 天）：`/opt/fengyu/scripts/backup-guestbook.sh` → `/opt/fengyu/backups/`；
+- 每日 04:17 自动备份留言库、内容库和上传图片（`VACUUM INTO` / tar，保留 7 天）：`/opt/fengyu/scripts/backup-guestbook.sh` → `/opt/fengyu/backups/`；
 - 每 5 分钟本地探活首页与留言 API：`/var/log/fengyu-health.log`；
 - 定时任务与日志轮转的仓库源文件在 `deploy/server/`，`npm run deploy:docker` 会幂等安装；
 - 外部探活：用 UptimeRobot 等免费服务监控 `http://example.com/api/guestbook`，匹配 `"ok":true`（整机宕机只能靠外部监控发现）；

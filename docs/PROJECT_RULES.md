@@ -244,8 +244,9 @@ npm run verify         # 上面四项的合集，发布前的总闸门
 
 ### 6.4 留言
 
-- 公开留言入库即 `approved`，直接上墙；悄悄话入库为 `pending`，只有 `/admin/` 或 `/api/admin/*` 可见。
-- 房主可在 `/admin/` 审核（通过 / 隐藏）、回复并导出 JSON / CSV；`hidden` 仅后台可见。
+- 公开留言入库即 `approved`，直接上墙；悄悄话入库为 `pending`，只有 `/admin/letters/` 或 `/api/admin/*` 可见。
+- 房主可在 `/admin/letters/` 审核（通过 / 隐藏）、回复并导出 JSON / CSV；`hidden` 仅后台可见。
+- 内容后台 `/admin/` 用用户名 + 密码登录（HttpOnly cookie），当前管理影集；数据在 `content.sqlite`，上传文件在 `/data/uploads`。
 - 留言禁止 HTML；前端只用 `textContent` 渲染，禁止拼 `innerHTML`。
 - 不收集邮箱、手机号、身份证等敏感信息；留言无需登录；订阅只收邮箱。
 - 在启用 HTTPS 之前，页面必须提示“请勿在留言中填写敏感信息”，管理后台只应在可信网络使用。
@@ -392,8 +393,8 @@ security(nginx): rate-limit guestbook API
 ### 11.4 安全
 
 - SSH 只允许密钥；fail2ban、UFW 保持开启；不随意开放端口。
-- 接口防护：管理端 Bearer Token（`timingSafeEqual` 比较）、16 KB 请求体上限、留言每 IP 60 秒一次、订阅 5 次/10 分钟、nginx 粗粒度限流、蜜罐字段、SQL 全部参数化。
-- `ADMIN_TOKEN` 未配置时管理接口统一 503；公开接口不返回私密留言与 `ip_hash`。
+- 接口防护：管理端会话 cookie / Bearer Token（`timingSafeEqual` 比较）、普通 API 16 KB 请求体上限（`/api/admin/upload` 单独 10 MB）、留言每 IP 60 秒一次、订阅 5 次/10 分钟、nginx 粗粒度限流、蜜罐字段、SQL 全部参数化。
+- `ADMIN_TOKEN` 未配置时留言管理接口统一 503；`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 未配置时内容后台登录返回 503；公开接口不返回私密留言与 `ip_hash`。
 - 不在 HTTP 下收集敏感信息；HTTPS 未启用前，管理后台只应在可信网络使用，留言页保留提示。
 - 酷狗登录态等价于账号凭据：建议使用专用小号、不绑定支付；泄露或失效时清空服务器 `.env` 中的 `KUGOU_*` 并重建 app。
 - 服务器密钥、xray UUID、任何 token 不进入仓库、不贴聊天记录；泄露后立即轮换。

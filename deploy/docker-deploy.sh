@@ -65,13 +65,20 @@ ssh "${SSH_OPTS[@]}" "$SERVER" \
    install -m 644 '$REMOTE_DIR/deploy/server/fengyu-logrotate' /etc/logrotate.d/fengyu && \
    chmod +x '$REMOTE_DIR/scripts/'*.sh"
 
-# 管理端令牌只从服务器 .env 读取，不自动生成，避免覆盖已有值
+# 管理端凭据只从服务器 .env 读取，不自动生成，避免覆盖已有值
 ssh "${SSH_OPTS[@]}" "$SERVER" \
   "if [ -s '$REMOTE_DIR/.env' ] && grep -q '^ADMIN_TOKEN=.' '$REMOTE_DIR/.env'; then \
      echo 'ADMIN_TOKEN: 已配置'; \
    else \
-     echo '!! 缺少 $REMOTE_DIR/.env 或 ADMIN_TOKEN 为空：/admin 与管理 API 会返回 503' >&2; \
-   fi"
+     echo '!! 缺少 $REMOTE_DIR/.env 或 ADMIN_TOKEN 为空：/admin/letters/ 与管理 API 会返回 503' >&2; \
+   fi
+   for key in ADMIN_USER ADMIN_PASSWORD_HASH ADMIN_SESSION_SECRET; do \
+     if grep -q \"^\$key=.\" '$REMOTE_DIR/.env'; then \
+       echo \"\$key: 已配置\"; \
+     else \
+       echo \"!! 缺少 \$key：/admin/ 内容后台无法登录\" >&2; \
+     fi; \
+   done"
 
 if [ "$WEB_PORT" = "80" ]; then
   echo "!! WEB_PORT=80：请确认宿主 nginx 已停止，否则端口会冲突。"

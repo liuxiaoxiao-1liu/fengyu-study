@@ -100,6 +100,7 @@ const archiveYears = [...new Set(sortedEssays.map((essay) => essay.date.slice(0,
                 <article
                   class="group relative bg-surface-container-low/70 rounded-xl p-8 md:p-10 transition-all duration-300 hover:shadow-md hover:bg-surface-container-low"
                   data-target={essay.kind}
+                  data-tags={essay.tags.join('|')}
                 >
                   <div class="flex items-center justify-between gap-space-md mb-2">
                     <div class="flex items-center gap-space-md text-on-surface-variant font-label-sm text-label-sm">
@@ -131,7 +132,13 @@ const archiveYears = [...new Set(sortedEssays.map((essay) => essay.date.slice(0,
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pt-4 border-t border-outline-variant/20">
                     <div class="flex items-center gap-space-sm flex-wrap text-on-surface-variant font-label-sm text-xs">
                       {essay.tags.map((tag) => (
-                        <span class="hover:text-primary transition-colors cursor-pointer">#{tag}</span>
+                        <button
+                          type="button"
+                          class="hover:text-primary transition-colors cursor-pointer"
+                          data-tag={tag}
+                        >
+                          #{tag}
+                        </button>
                       ))}
                     </div>
                     <a
@@ -333,9 +340,13 @@ const archiveYears = [...new Set(sortedEssays.map((essay) => essay.date.slice(0,
                 </div>
                 <div class="flex flex-wrap gap-2 text-xs font-label-sm">
                   {topTags.map(([tag, count]) => (
-                    <span class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">
+                    <button
+                      type="button"
+                      class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+                      data-tag={tag}
+                    >
                       #{tag} {count}
-                    </span>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -411,6 +422,21 @@ const archiveYears = [...new Set(sortedEssays.map((essay) => essay.date.slice(0,
       // 「台词摘录」是独立卡片区，切到随笔筛选时整块收起。
       excerptSection?.classList.toggle('hidden', target !== 'all' && target !== 'excerpt');
       empty?.classList.toggle('hidden', shown !== 0);
+    }
+
+    // 标签检索：列表卡片和侧栏主题标签都可用，点击后只显示包含该标签的随笔。
+    for (const button of document.querySelectorAll<HTMLElement>('[data-tag]')) {
+      button.addEventListener('click', () => {
+        const tag = button.dataset.tag ?? '';
+        let shown = 0;
+        for (const card of cards) {
+          const match = (card.dataset.tags ?? '').split('|').includes(tag);
+          card.classList.toggle('hidden', !match);
+          if (match) shown += 1;
+        }
+        excerptSection?.classList.add('hidden');
+        empty?.classList.toggle('hidden', shown !== 0);
+      });
     }
 
     const newsletter = document.getElementById('newsletter-form') as HTMLFormElement | null;

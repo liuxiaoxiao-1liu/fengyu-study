@@ -46,7 +46,7 @@ npm run verify     # format:check + check + build + smoke
 ```
 
 - 本地库默认 `.data/guestbook.sqlite`；`GUESTBOOK_DB=/tmp/x.sqlite` 可隔离测试；冒烟测试用临时库，不碰本地数据。
-- 管理后台本地调试：`ADMIN_TOKEN=devtoken npm run dev`，打开 `/admin/` 填 `devtoken`。
+- 后台本地调试：先 `set -a; . ./.env; set +a` 再 `npm run dev`；`/admin/` 用 `ADMIN_USER` + 密码登录（内容后台），`/admin/letters/` 仍用 `ADMIN_TOKEN`。
 - 并发构建用 `flock /tmp/fengyu-build.lock npm run build`，避免两个进程抢 `.astro/`。
 - 改接口后同步更新 `scripts/smoke-test.mjs`；`astro check` 已排除 `vendor/`，不要把它加回 `tsconfig.json` 的检查范围。
 
@@ -65,8 +65,9 @@ npm run verify     # format:check + check + build + smoke
 
 ## 4. 后台与数据
 
-- 入口 `/admin/`，令牌 `ADMIN_TOKEN`（只在服务器 `/opt/fengyu/.env`，**不进仓库、不贴聊天**）。
-- 接口：`GET /api/admin/letters`、`PATCH /api/admin/letters/:id`、`GET /api/admin/export?kind=letters|subscribers&format=json|csv`。
+- 内容后台 `/admin/`：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 只放 `.env`），管理影集；资料写入 `CONTENT_DB`（容器 `/data/content.sqlite`），图片写入 `CONTENT_UPLOADS`（容器 `/data/uploads`）。
+- 留言后台 `/admin/letters/`：仍用 `ADMIN_TOKEN`；接口 `GET /api/admin/letters`、`PATCH /api/admin/letters/:id`、`GET /api/admin/export?...`。
+- 内容接口：`GET/POST /api/admin/photos`、`PATCH/DELETE /api/admin/photos/:id`、`POST /api/admin/upload`；登录态是 HttpOnly cookie。
 - 公开接口：`GET/POST /api/guestbook`、`GET /api/stats`、`POST /api/subscribe`。
 - 悄悄话入库即 `pending`，公开留言直接 `approved`；`hidden` 仅后台可见。
 - 悄悄话即使点了“通过”也不会出现在公开留言页（公开查询过滤 `is_private=1`），这是当前设计。

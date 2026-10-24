@@ -1,8 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PhotoLightbox from '../components/PhotoLightbox.astro';
-import { photos, SERIES_FILTERS, SERIES_LABELS } from '../data/photos';
+import { SERIES_FILTERS, SERIES_LABELS } from '../data/photos';
+import { listPhotos } from '../lib/content-db';
 
+export const prerender = false;
+
+const photos = listPhotos();
 const seriesCount = (series: string) => photos.filter((photo) => photo.series === series).length;
 const takenYears = [...new Set(photos.map((photo) => photo.takenAt.slice(0, 4)))].sort();
 const yearRange =

@@ -1,6 +1,5 @@
 ---
-// /admin/ 是纯静态页：构建期不读任何 env。
-// 令牌只存在浏览器 sessionStorage，每次请求带 Authorization: Bearer。
+// 内容后台：静态页；登录态走 HttpOnly cookie，数据通过 /api/admin/* 读写。
 import '../../styles/fonts.css';
 import '../../styles/icons.css';
 import '../../styles/global.css';
@@ -13,818 +12,618 @@ import '../../styles/global.css';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#fcf9f4" />
-    <title>留言管理后台 · 风屿书房</title>
+    <title>内容后台 · 风屿书房</title>
     <link rel="icon" href="/images/logo.png" type="image/png" />
   </head>
 
   <body class="bg-surface font-body-md text-body-md text-on-surface antialiased">
-    <main id="main" class="mx-auto flex w-full max-w-5xl flex-col gap-space-lg px-gutter py-space-xl">
+    <main id="main" class="mx-auto flex w-full max-w-6xl flex-col gap-space-lg px-gutter py-space-xl">
       <header class="flex flex-col gap-space-sm">
-        <div class="flex items-center gap-space-xs text-secondary">
-          <span class="font-label-sm text-label-sm uppercase tracking-wider">OWNER CONSOLE · 房主专席</span>
-        </div>
+        <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">
+          OWNER CONSOLE · 房主专席
+        </span>
         <h1 class="font-headline-lg text-headline-lg-mobile text-primary sm:text-headline-lg">
-          留言管理后台
-          <span class="font-display italic text-on-surface-variant text-headline-md font-normal">Letters Desk</span>
+          内容后台
+          <span class="font-display italic text-headline-md font-normal text-on-surface-variant">Content Desk</span>
         </h1>
-        <p class="max-w-3xl font-body-sm text-body-sm leading-relaxed text-on-surface-variant">
-          审核公开留言、回复悄悄话、导出留言与季刊订阅。管理令牌只保存在当前标签页的 sessionStorage
-          里，不会写进页面源码或服务器日志。
+        <p class="max-w-3xl font-body-sm leading-relaxed text-body-sm text-on-surface-variant">
+          登录后直接在网页上维护影集，不需要改代码或重新部署。当前开放：新增 / 编辑 / 删除 / 上传图片。
         </p>
-        <a
-          class="font-label-sm text-label-sm text-secondary underline decoration-outline-variant underline-offset-4 hover:text-primary"
-          href="/"
-        >
-          ← 返回书房
-        </a>
+        <div class="flex flex-wrap items-center gap-space-md font-label-sm text-label-sm">
+          <a class="text-secondary underline decoration-outline-variant underline-offset-4 hover:text-primary" href="/">
+            ← 返回书房
+          </a>
+          <a
+            class="text-secondary underline decoration-outline-variant underline-offset-4 hover:text-primary"
+            href="/admin/letters/"
+          >
+            留言审核
+          </a>
+        </div>
       </header>
 
-      <!-- 令牌入口 -->
       <section
-        id="token-panel"
-        class="flex flex-col gap-space-md rounded-xl bg-surface-container-low p-space-lg shadow-sm"
-        aria-labelledby="token-title"
+        id="login-panel"
+        class="rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm"
       >
-        <div class="flex flex-col gap-space-xs">
-          <h2 id="token-title" class="font-headline-sm text-headline-sm text-primary">
-            连接后台
-          </h2>
-          <p class="font-label-sm text-label-sm text-on-surface-variant">
-            服务器未配置 <code class="rounded bg-surface-container px-1 py-0.5 font-mono">ADMIN_TOKEN</code> 时接口返回
-            503；令牌错误返回 401。
-          </p>
-        </div>
-        <form id="token-form" class="flex flex-col gap-space-sm sm:flex-row sm:items-end">
-          <div class="flex flex-1 flex-col gap-space-xs">
-            <label class="font-label-sm text-label-sm text-on-surface-variant" for="admin-token">
-              管理令牌 / ADMIN_TOKEN
-            </label>
-            <input
-              id="admin-token"
-              name="token"
-              type="password"
-              required
-              autocomplete="off"
-              spellcheck="false"
-              placeholder="粘贴服务器 /opt/fengyu/.env 里的 ADMIN_TOKEN"
-              class="w-full rounded-lg bg-surface-container-lowest px-space-md py-space-sm font-mono text-body-sm text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary"
-            />
-          </div>
-          <div class="flex items-center gap-space-sm">
+        <h2 class="font-headline-sm text-headline-sm text-primary">登录</h2>
+        <p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">使用房主账号登录后管理内容。</p>
+        <form id="login-form" class="mt-space-md grid max-w-md gap-space-sm">
+          <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+            用户名
+            <input id="login-user" class="field" autocomplete="username" required />
+          </label>
+          <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+            密码
+            <input id="login-password" type="password" class="field" autocomplete="current-password" required />
+          </label>
+          <div class="flex items-center gap-space-sm pt-1">
             <button
-              id="connect-button"
               type="submit"
-              class="flex items-center justify-center gap-space-xs rounded-lg bg-primary px-space-lg py-space-sm font-label-md text-label-md text-on-primary shadow-sm transition-all hover:bg-primary/90 active:scale-95"
+              class="rounded-lg bg-primary px-space-lg py-2 font-label-md text-label-md text-on-primary hover:bg-primary-container"
             >
-              连接后台
+              登录
             </button>
+            <span
+              id="login-message"
+              class="font-label-sm text-label-sm text-error"
+              role="status"
+              aria-live="polite"
+            ></span>
           </div>
         </form>
       </section>
 
-      <div
-        id="notice"
-        class="hidden rounded-lg border border-outline-variant/60 bg-surface-container px-space-md py-space-sm font-body-sm text-body-sm text-on-surface-variant"
-        role="alert"
-        aria-live="polite"
-      ></div>
-
-      <!-- 后台主体 -->
-      <section id="dashboard" class="hidden flex-col gap-space-lg">
-        <div class="flex flex-wrap items-center justify-between gap-space-sm">
-          <div class="flex items-center gap-space-xs">
-            <span class="material-symbols-outlined text-base text-secondary" aria-hidden="true">
-              inbox
-            </span>
-            <h2 class="font-headline-sm text-headline-sm text-primary">信笺队列</h2>
+      <section id="dashboard" class="flex flex-col gap-space-lg" hidden>
+        <div class="flex flex-wrap items-center justify-between gap-space-sm rounded-xl bg-surface-container-low px-space-lg py-space-md shadow-sm">
+          <div class="font-label-sm text-label-sm text-on-surface-variant">
+            已登录：<strong class="text-primary" data-session-user></strong>
           </div>
           <div class="flex items-center gap-space-sm">
-            <button
-              id="refresh-button"
-              type="button"
-              class="flex items-center gap-space-xs rounded-lg bg-surface-container px-space-md py-space-xs font-label-md text-label-md text-primary shadow-sm transition-colors hover:bg-surface-container-high"
+            <a
+              class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+              href="/admin/letters/"
             >
-              <span class="material-symbols-outlined text-base" aria-hidden="true">
-                refresh
-              </span>
-              刷新
-            </button>
+              留言审核
+            </a>
             <button
-              id="logout-button"
               type="button"
-              class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary"
+              id="logout-button"
+              class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
             >
               退出
             </button>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-space-sm sm:grid-cols-5" id="stat-cards">
-          <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
-            <span class="font-label-sm text-label-sm text-on-surface-variant">累计来信</span>
-            <span class="font-headline-sm text-headline-sm text-primary" data-admin-stat="total">
-              —
-            </span>
-          </div>
-          <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
-            <span class="font-label-sm text-label-sm text-on-surface-variant">待审核</span>
-            <span class="font-headline-sm text-headline-sm text-tertiary" data-admin-stat="pending">
-              —
-            </span>
-          </div>
-          <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
-            <span class="font-label-sm text-label-sm text-on-surface-variant">已上墙</span>
-            <span class="font-headline-sm text-headline-sm text-primary" data-admin-stat="approved">
-              —
-            </span>
-          </div>
-          <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
-            <span class="font-label-sm text-label-sm text-on-surface-variant">已隐藏</span>
-            <span class="font-headline-sm text-headline-sm text-on-surface-variant" data-admin-stat="hidden">
-              —
-            </span>
-          </div>
-          <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
-            <span class="font-label-sm text-label-sm text-on-surface-variant">回复率</span>
-            <span class="font-headline-sm text-headline-sm text-secondary" data-admin-stat="reply-rate">
-              —
-            </span>
+        <div class="grid grid-cols-1 items-start gap-space-lg lg:grid-cols-12">
+          <form
+            id="photo-form"
+            class="flex flex-col gap-space-sm rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm lg:col-span-5"
+          >
+            <div class="flex items-center justify-between gap-space-sm">
+              <h2 id="photo-form-title" class="font-headline-sm text-headline-sm text-primary">
+                新增照片
+              </h2>
+              <button
+                type="button"
+                id="photo-reset"
+                class="font-label-sm text-label-sm text-secondary hover:text-primary"
+              >
+                清空
+              </button>
+            </div>
+            <input id="photo-id" type="hidden" />
+
+            <div class="flex flex-col gap-2 rounded-lg bg-surface-container p-space-sm">
+              <label class="font-label-sm text-label-sm text-on-surface-variant" for="photo-file">
+                上传图片
+              </label>
+              <input
+                id="photo-file"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                class="block w-full max-w-full text-xs text-on-surface-variant file:mr-2 file:rounded file:border-0 file:bg-primary file:px-3 file:py-1.5 file:font-label-sm file:text-label-sm file:text-on-primary"
+              />
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  id="upload-button"
+                  class="rounded-lg bg-surface-container-high px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-highest"
+                >
+                  上传并填入
+                </button>
+                <span
+                  id="upload-status"
+                  class="font-label-sm text-[0.625rem] text-on-surface-variant"
+                  role="status"
+                ></span>
+              </div>
+              <img id="photo-preview" alt="" class="mt-1 hidden h-28 w-full rounded object-cover" />
+            </div>
+
+            <div class="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+              <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                标题
+                <input id="photo-title" class="field" required />
+              </label>
+              <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                slug（英文/数字/-）
+                <input id="photo-slug" class="field" />
+              </label>
+              <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                系列
+                <select id="photo-series" class="field">
+                  <option value="anime">动漫插画</option>
+                  <option value="reality">现实纪实</option>
+                  <option value="virtual">虚拟 CG</option>
+                </select>
+              </label>
+              <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                拍摄日期
+                <input id="photo-taken-at" type="date" class="field" />
+              </label>
+              <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                宽（px）
+                <input id="photo-width" type="number" min="1" step="1" class="field" value="1200" />
+              </label>
+              <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                高（px）
+                <input id="photo-height" type="number" min="1" step="1" class="field" value="800" />
+              </label>
+            </div>
+
+            <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+              图片地址（上传后自动填入，也可粘外链）
+              <input id="photo-src" class="field" required />
+            </label>
+            <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+              图片描述（alt，必须有）<textarea id="photo-alt" class="field min-h-[4rem]" required></textarea>
+            </label>
+            <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+              手记 / 图注<textarea id="photo-note" class="field min-h-[4rem]"></textarea>
+            </label>
+            <div class="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+              <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                角标（badge）
+                <input id="photo-badge" class="field" />
+              </label>
+              <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                排序（越小越靠前）
+                <input id="photo-sort-order" type="number" step="1" class="field" value="0" />
+              </label>
+            </div>
+
+            <details class="rounded-lg bg-surface-container p-space-sm">
+              <summary class="cursor-pointer font-label-sm text-label-sm text-secondary">
+                EXIF · 拍摄参数（可选）
+              </summary>
+              <div class="mt-2 grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+                <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                  机身
+                  <input id="exif-camera" class="field" />
+                </label>
+                <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                  镜头
+                  <input id="exif-lens" class="field" />
+                </label>
+                <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                  光圈
+                  <input id="exif-aperture" class="field" />
+                </label>
+                <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                  快门
+                  <input id="exif-shutter" class="field" />
+                </label>
+                <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                  ISO
+                  <input id="exif-iso" class="field" />
+                </label>
+                <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                  地点
+                  <input id="exif-location" class="field" />
+                </label>
+              </div>
+            </details>
+
+            <div class="flex flex-wrap items-center gap-space-sm pt-1">
+              <button
+                type="submit"
+                class="rounded-lg bg-primary px-space-lg py-2 font-label-md text-label-md text-on-primary hover:bg-primary-container"
+              >
+                保存照片
+              </button>
+              <button
+                type="button"
+                id="photo-delete"
+                class="hidden rounded-lg border border-error/40 px-space-md py-2 font-label-sm text-label-sm text-error hover:bg-error/10"
+              >
+                删除
+              </button>
+              <span
+                id="photo-status"
+                class="font-label-sm text-label-sm text-on-surface-variant"
+                role="status"
+                aria-live="polite"
+              ></span>
+            </div>
+          </form>
+
+          <div class="flex flex-col gap-space-sm lg:col-span-7">
+            <div class="flex flex-wrap items-center justify-between gap-space-sm">
+              <h2 class="font-headline-sm text-headline-sm text-primary">
+                影集列表 <span id="photo-count" class="font-label-sm text-label-sm text-on-surface-variant"></span>
+              </h2>
+              <button
+                type="button"
+                id="refresh-button"
+                class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+              >
+                刷新
+              </button>
+            </div>
+            <div id="photo-list" class="grid grid-cols-1 gap-space-sm sm:grid-cols-2"></div>
           </div>
         </div>
-
-        <div class="flex flex-col gap-space-md sm:flex-row sm:items-center sm:justify-between">
-          <div
-            id="status-tabs"
-            class="no-scrollbar flex items-center gap-space-xs overflow-x-auto rounded-full bg-surface-container-low p-1"
-            role="group"
-            aria-label="按审核状态筛选"
-          >
-            <button
-              type="button"
-              data-status-filter="pending"
-              aria-pressed="false"
-              class="filter-btn rounded-full px-space-md py-space-xs font-label-sm text-label-sm transition-all"
-            >
-              待审核 <span data-tab-count="pending">0</span>
-            </button>
-            <button
-              type="button"
-              data-status-filter="approved"
-              aria-pressed="false"
-              class="filter-btn rounded-full px-space-md py-space-xs font-label-sm text-label-sm transition-all"
-            >
-              已上墙 <span data-tab-count="approved">0</span>
-            </button>
-            <button
-              type="button"
-              data-status-filter="hidden"
-              aria-pressed="false"
-              class="filter-btn rounded-full px-space-md py-space-xs font-label-sm text-label-sm transition-all"
-            >
-              已隐藏 <span data-tab-count="hidden">0</span>
-            </button>
-            <button
-              type="button"
-              data-status-filter="all"
-              aria-pressed="false"
-              class="filter-btn rounded-full px-space-md py-space-xs font-label-sm text-label-sm transition-all"
-            >
-              全部 <span data-tab-count="total">0</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-space-sm rounded-xl bg-surface-container-low p-space-md shadow-sm">
-          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">导出</span>
-          <button
-            type="button"
-            data-export
-            data-kind="letters"
-            data-format="json"
-            class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high"
-          >
-            留言 JSON
-          </button>
-          <button
-            type="button"
-            data-export
-            data-kind="letters"
-            data-format="csv"
-            class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high"
-          >
-            留言 CSV
-          </button>
-          <span class="text-outline-variant" aria-hidden="true">
-            ·
-          </span>
-          <button
-            type="button"
-            data-export
-            data-kind="subscribers"
-            data-format="json"
-            class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high"
-          >
-            订阅 JSON
-          </button>
-          <button
-            type="button"
-            data-export
-            data-kind="subscribers"
-            data-format="csv"
-            class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high"
-          >
-            订阅 CSV
-          </button>
-        </div>
-
-        <p
-          id="letters-loading"
-          class="hidden py-space-lg text-center font-body-sm text-body-sm text-on-surface-variant"
-        >
-          正在取信…
-        </p>
-
-        <div id="letters-list" class="flex flex-col gap-space-md"></div>
-
-        <p
-          id="letters-empty"
-          class="hidden rounded-xl border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant"
-        >
-          这里还没有信笺。
-        </p>
       </section>
     </main>
 
+    <style>
+      .field {
+        border-radius: 0.25rem;
+        border: 1px solid #ebe8e3;
+        background: #fcf9f4;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        color: #1c1c19;
+      }
+      .field:focus {
+        outline: none;
+        border-color: #526354;
+      }
+    </style>
+
     <script>
-      type LetterStatus = 'pending' | 'approved' | 'hidden';
-      type AdminLetter = {
+      type PhotoRecord = {
         id: string;
-        name: string;
-        station: string;
-        message: string;
-        tag: string;
-        is_private: number;
-        status: LetterStatus;
-        reply: string;
-        replied_at: string | null;
-        created_at: string;
-      };
-      type LetterCounts = {
-        total?: number;
-        pending?: number;
-        approved?: number;
-        hidden?: number;
-        replied?: number;
-      };
-      type AdminState = {
-        status: LetterStatus | 'all';
-        letters: AdminLetter[];
-        counts: LetterCounts;
-      };
-      type ApiError = Error & { status?: number; code?: string };
-      type ApiResponse = {
-        ok?: boolean;
-        error?: string;
-        letters?: AdminLetter[];
-        letter?: AdminLetter;
-        counts?: LetterCounts;
+        slug: string;
+        title: string;
+        src: string;
+        alt: string;
+        width: number;
+        height: number;
+        series: 'anime' | 'reality' | 'virtual';
+        takenAt: string;
+        note: string;
+        badge: string;
+        exif?: Record<string, string | undefined>;
+        sortOrder: number;
       };
 
-      const TOKEN_KEY = 'fengyu-admin-token';
-      const tokenPanel = document.getElementById('token-panel');
-      const tokenForm = document.getElementById('token-form') as HTMLFormElement | null;
-      const tokenInput = document.getElementById('admin-token') as HTMLInputElement | null;
-      const dashboard = document.getElementById('dashboard');
-      const notice = document.getElementById('notice');
-      const list = document.getElementById('letters-list');
-      const empty = document.getElementById('letters-empty');
-      const loading = document.getElementById('letters-loading');
-      const statusTabs = document.getElementById('status-tabs');
-      const refreshButton = document.getElementById('refresh-button');
-      const connectButton = document.getElementById('connect-button') as HTMLButtonElement | null;
-      const logoutButton = document.getElementById('logout-button');
-
-      const STATUS_META: Record<LetterStatus, { label: string; className: string }> = {
-        pending: { label: '待审核', className: 'bg-tertiary-fixed text-on-tertiary-fixed' },
-        approved: { label: '已上墙', className: 'bg-secondary-container text-on-secondary-container' },
-        hidden: { label: '已隐藏', className: 'bg-surface-container-high text-on-surface-variant' },
+      const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
+      const loginPanel = $('login-panel');
+      const dashboard = $('dashboard');
+      const loginForm = $<HTMLFormElement>('login-form');
+      const loginUser = $<HTMLInputElement>('login-user');
+      const loginPassword = $<HTMLInputElement>('login-password');
+      const loginMessage = $('login-message');
+      const sessionUser = document.querySelector<HTMLElement>('[data-session-user]');
+      const photoForm = $<HTMLFormElement>('photo-form');
+      const photoFormTitle = $('photo-form-title');
+      const photoId = $<HTMLInputElement>('photo-id');
+      const photoTitle = $<HTMLInputElement>('photo-title');
+      const photoSlug = $<HTMLInputElement>('photo-slug');
+      const photoSeries = $<HTMLSelectElement>('photo-series');
+      const photoTakenAt = $<HTMLInputElement>('photo-taken-at');
+      const photoWidth = $<HTMLInputElement>('photo-width');
+      const photoHeight = $<HTMLInputElement>('photo-height');
+      const photoSrc = $<HTMLInputElement>('photo-src');
+      const photoAlt = $<HTMLTextAreaElement>('photo-alt');
+      const photoNote = $<HTMLTextAreaElement>('photo-note');
+      const photoBadge = $<HTMLInputElement>('photo-badge');
+      const photoSortOrder = $<HTMLInputElement>('photo-sort-order');
+      const photoFile = $<HTMLInputElement>('photo-file');
+      const photoPreview = $<HTMLImageElement>('photo-preview');
+      const uploadStatus = $('upload-status');
+      const photoStatus = $('photo-status');
+      const photoDelete = $<HTMLButtonElement>('photo-delete');
+      const photoList = $('photo-list');
+      const photoCount = $('photo-count');
+      const exifFields = {
+        camera: $<HTMLInputElement>('exif-camera'),
+        lens: $<HTMLInputElement>('exif-lens'),
+        aperture: $<HTMLInputElement>('exif-aperture'),
+        shutter: $<HTMLInputElement>('exif-shutter'),
+        iso: $<HTMLInputElement>('exif-iso'),
+        location: $<HTMLInputElement>('exif-location'),
       };
 
-      const state: AdminState = { status: 'pending', letters: [], counts: {} };
+      let photos: PhotoRecord[] = [];
+      let wantSlug = new URLSearchParams(window.location.search).get('photo');
 
-      function getToken() {
+      function localToday(): string {
+        const now = new Date();
+        return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+      }
+
+      function setText(node: HTMLElement | null, value: string) {
+        if (node) node.textContent = value;
+      }
+
+      function showLogin(message = '') {
+        loginPanel?.removeAttribute('hidden');
+        dashboard?.setAttribute('hidden', '');
+        setText(loginMessage, message);
+      }
+
+      function showDashboard(user: string) {
+        loginPanel?.setAttribute('hidden', '');
+        dashboard?.removeAttribute('hidden');
+        setText(sessionUser, user);
+      }
+
+      async function request(path: string, options: RequestInit = {}) {
+        const response = await fetch(path, {
+          ...options,
+          headers: {
+            ...(options.body instanceof FormData ? {} : { 'content-type': 'application/json' }),
+            ...(options.headers ?? {}),
+          },
+        });
+        let data: any = null;
         try {
-          return sessionStorage.getItem(TOKEN_KEY) || '';
-        } catch {
-          return '';
-        }
-      }
-
-      function setToken(token: string) {
-        try {
-          sessionStorage.setItem(TOKEN_KEY, token);
-        } catch {
-          /* 隐私模式下可能不可用，忽略 */
-        }
-      }
-
-      function clearToken() {
-        try {
-          sessionStorage.removeItem(TOKEN_KEY);
-        } catch {
-          /* 同上 */
-        }
-      }
-
-      function showNotice(message: string, tone: 'error' | 'success' = 'error') {
-        if (!notice) return;
-        notice.textContent = message;
-        notice.classList.remove('hidden');
-        notice.classList.toggle('border-error/40', tone === 'error');
-        notice.classList.toggle('text-error', tone === 'error');
-        notice.classList.toggle('border-secondary/40', tone === 'success');
-        notice.classList.toggle('text-on-surface-variant', tone !== 'error');
-      }
-
-      function hideNotice() {
-        if (!notice) return;
-        notice.classList.add('hidden');
-        notice.textContent = '';
-      }
-
-      function describeError(error: unknown) {
-        if (!error) return '请求失败，请稍后重试。';
-        const err = error as ApiError;
-        if (err.code === 'admin_disabled' || err.status === 503) {
-          return '服务器还没有配置 ADMIN_TOKEN，后台接口暂不可用。请让运维在 /opt/fengyu/.env 设置后重建 app 容器。';
-        }
-        if (err.status === 401) return '令牌不正确或已失效，请重新输入 ADMIN_TOKEN。';
-        if (err.status === 404) return '这封信不存在，可能已经被删除。';
-        if (err.status === 429) return '操作太频繁，等一会儿再试。';
-        if (err.code === 'invalid_status' || err.code === 'invalid_reply') return '提交的内容不合法，请检查后重试。';
-        if (err.code === 'server_error' || (err.status ?? 0) >= 500) return '服务器处理失败，稍后再试。';
-        return '请求失败，请稍后重试。';
-      }
-
-      async function request(path: string, options: RequestInit = {}): Promise<ApiResponse> {
-        const headers: Record<string, string> = {
-          Accept: 'application/json',
-          ...((options.headers as Record<string, string> | undefined) ?? {}),
-        };
-        const token = getToken();
-        if (token) headers.Authorization = `Bearer ${token}`;
-
-        const response = await fetch(path, { ...options, headers });
-        let data: ApiResponse | null = null;
-        try {
-          data = (await response.json()) as ApiResponse;
+          data = await response.json();
         } catch {
           data = null;
         }
-
+        if (response.status === 401) {
+          showLogin('登录已过期，请重新登录。');
+          throw new Error('unauthorized');
+        }
         if (!response.ok || (data && data.ok === false)) {
-          const error = new Error((data && data.error) || `http_${response.status}`) as ApiError;
-          error.status = response.status;
-          error.code = data?.error;
-          throw error;
+          throw new Error((data && (data.message || data.error)) || `HTTP ${response.status}`);
         }
-        return data ?? {};
+        return data;
       }
 
-      function showTokenPanel() {
-        tokenPanel?.classList.remove('hidden');
-        dashboard?.classList.add('hidden');
-        dashboard?.classList.remove('flex');
-      }
-
-      function showDashboard() {
-        tokenPanel?.classList.add('hidden');
-        dashboard?.classList.remove('hidden');
-        dashboard?.classList.add('flex');
-      }
-
-      function setBusy(busy: boolean) {
-        if (connectButton) {
-          connectButton.disabled = busy;
-          connectButton.classList.toggle('opacity-60', busy);
-          connectButton.textContent = busy ? '连接中…' : '连接后台';
-        }
-      }
-
-      function setStat(name: string, value?: number | string | null) {
-        for (const node of document.querySelectorAll<HTMLElement>(`[data-admin-stat="${name}"]`)) {
-          node.textContent = value === undefined || value === null || value === '' ? '—' : String(value);
-        }
-      }
-
-      function renderCounts() {
-        const counts = state.counts;
-        const map: Record<string, number | undefined> = {
-          pending: counts.pending,
-          approved: counts.approved,
-          hidden: counts.hidden,
-          total: counts.total,
-        };
-
-        for (const node of document.querySelectorAll<HTMLElement>('[data-tab-count]')) {
-          const value = map[node.dataset.tabCount ?? ''];
-          node.textContent = typeof value === 'number' ? String(value) : '0';
-        }
-
-        setStat('total', typeof counts.total === 'number' ? counts.total : undefined);
-        setStat('pending', typeof counts.pending === 'number' ? counts.pending : undefined);
-        setStat('approved', typeof counts.approved === 'number' ? counts.approved : undefined);
-        setStat('hidden', typeof counts.hidden === 'number' ? counts.hidden : undefined);
-        const total = typeof counts.total === 'number' ? counts.total : 0;
-        const replied = typeof counts.replied === 'number' ? counts.replied : 0;
-        setStat('reply-rate', total > 0 ? `${Math.round((replied / total) * 100)}%` : '0%');
-      }
-
-      function renderTabs() {
-        if (!statusTabs) return;
-        for (const button of statusTabs.querySelectorAll<HTMLElement>('[data-status-filter]')) {
-          const on = button.dataset.statusFilter === state.status;
-          button.classList.toggle('bg-primary', on);
-          button.classList.toggle('text-on-primary', on);
-          button.classList.toggle('shadow-sm', on);
-          button.classList.toggle('text-on-surface-variant', !on);
-          button.setAttribute('aria-pressed', on ? 'true' : 'false');
-        }
-      }
-
-      function formatTime(iso?: string | null) {
-        if (!iso) return '';
-        const date = new Date(iso);
-        if (Number.isNaN(date.getTime())) return '';
-        return date.toLocaleString('zh-CN', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        });
-      }
-
-      function element<K extends keyof HTMLElementTagNameMap>(
-        tag: K,
-        className?: string,
-        text?: string,
-      ): HTMLElementTagNameMap[K] {
-        const node = document.createElement(tag);
-        if (className) node.className = className;
-        if (typeof text === 'string') node.textContent = text;
-        return node;
-      }
-
-      function createLetterCard(letter: AdminLetter) {
-        const card = element(
-          'article',
-          'flex flex-col gap-space-md rounded-xl bg-surface-container-low p-space-lg shadow-sm',
-        );
-        card.dataset.id = letter.id;
-
-        const top = element('div', 'flex flex-wrap items-start justify-between gap-space-sm');
-        const who = element('div', 'flex min-w-0 items-center gap-space-sm');
-
-        const badge = element(
-          'div',
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-container-high font-serif text-lg font-semibold text-primary shadow-inner',
-          (letter.name || '匿').slice(0, 1),
-        );
-        const identity = element('div', 'flex min-w-0 flex-col');
-        identity.append(
-          element('span', 'break-words font-body-lg font-medium leading-tight text-primary', letter.name || '匿名旅人'),
-          element(
-            'span',
-            'mt-1 break-words font-label-sm text-label-sm text-on-surface-variant',
-            [letter.station, letter.tag ? `#${letter.tag}` : '', formatTime(letter.created_at)]
-              .filter(Boolean)
-              .join(' · '),
-          ),
-        );
-        who.append(badge, identity);
-
-        const tags = element('div', 'flex shrink-0 flex-wrap items-center gap-space-xs');
-        if (letter.is_private) {
-          tags.append(
-            element(
-              'span',
-              'flex items-center gap-0.5 rounded bg-surface-container px-space-sm py-0.5 font-label-sm text-label-sm text-tertiary',
-              '悄悄话',
-            ),
-          );
-        }
-        const statusMeta = STATUS_META[letter.status] || STATUS_META.pending;
-        tags.append(
-          element(
-            'span',
-            `rounded px-space-sm py-0.5 font-label-sm text-label-sm ${statusMeta.className}`,
-            statusMeta.label,
-          ),
-        );
-        top.append(who, tags);
-
-        const message = element(
-          'p',
-          'whitespace-pre-line break-words font-body-md leading-relaxed text-primary',
-          letter.message || '',
-        );
-
-        card.append(top, message);
-
-        // 回复区
-        const replyBox = element('div', 'flex flex-col gap-space-sm rounded-lg bg-surface-container p-space-md');
-        const replyHead = element('div', 'flex flex-wrap items-center justify-between gap-space-sm');
-        const replyLabel = element('span', 'flex items-center gap-1 font-label-sm font-medium text-primary');
-        const replyIcon = element('span', 'material-symbols-outlined text-xs text-secondary', 'reply');
-        replyIcon.setAttribute('aria-hidden', 'true');
-        replyLabel.append(replyIcon, document.createTextNode(letter.reply ? '房主回信' : '写一封回信'));
-        const replyMeta = element(
-          'span',
-          'font-label-sm text-[0.6875rem] text-outline-variant',
-          letter.reply ? (letter.replied_at ? formatTime(letter.replied_at) : '已回复') : '尚未回复',
-        );
-        replyHead.append(replyLabel, replyMeta);
-
-        const textarea = document.createElement('textarea');
-        textarea.className =
-          'min-h-[5rem] w-full resize-y rounded-lg bg-surface-container-lowest p-space-sm font-body-sm text-body-sm leading-relaxed text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary';
-        textarea.rows = 3;
-        textarea.maxLength = 2000;
-        textarea.value = letter.reply || '';
-        textarea.placeholder = '写给这位旅人的回信；公开留言的回信会显示在留言页。';
-        textarea.setAttribute('aria-label', `回复 ${letter.name || '匿名旅人'} 的留言`);
-
-        const replyActions = element('div', 'flex flex-wrap items-center gap-space-sm');
-        const saveReply = element(
-          'button',
-          'rounded-lg bg-primary px-space-md py-space-xs font-label-sm text-label-sm text-on-primary shadow-sm transition-all hover:bg-primary/90 active:scale-95',
-          '保存回复',
-        );
-        saveReply.type = 'button';
-        const replyFeedback = element('span', 'font-label-sm text-label-sm text-on-surface-variant', '');
-        replyFeedback.setAttribute('aria-live', 'polite');
-        replyActions.append(saveReply, replyFeedback);
-
-        saveReply.addEventListener('click', async () => {
-          saveReply.disabled = true;
-          saveReply.classList.add('opacity-60');
-          replyFeedback.textContent = '保存中…';
-          const wasReplied = Boolean((letter.reply || '').trim());
-          try {
-            const data = await request(`/api/admin/letters/${encodeURIComponent(letter.id)}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ reply: textarea.value }),
-            });
-            if (data.letter) {
-              letter.reply = data.letter.reply;
-              letter.replied_at = data.letter.replied_at;
-            }
-            const nowReplied = Boolean((letter.reply || '').trim());
-            if (wasReplied !== nowReplied) {
-              const replied = typeof state.counts.replied === 'number' ? state.counts.replied : 0;
-              state.counts.replied = Math.max(0, replied + (nowReplied ? 1 : -1));
-              renderCounts();
-            }
-            replyMeta.textContent = letter.replied_at ? formatTime(letter.replied_at) : '已回复';
-            replyFeedback.textContent = '已保存';
-          } catch (error) {
-            replyFeedback.textContent = describeError(error);
-          } finally {
-            saveReply.disabled = false;
-            saveReply.classList.remove('opacity-60');
-          }
-        });
-
-        replyBox.append(replyHead, textarea, replyActions);
-        card.append(replyBox);
-
-        // 状态操作
-        const actions = element('div', 'flex flex-wrap items-center gap-space-sm');
-        if (letter.status !== 'approved') {
-          actions.append(
-            createStatusButton(letter, 'approved', '通过并上墙', 'bg-secondary-container text-on-secondary-container'),
-          );
-        }
-        if (letter.status !== 'hidden') {
-          actions.append(
-            createStatusButton(letter, 'hidden', '隐藏这封信', 'bg-surface-container text-on-surface-variant'),
-          );
-        }
-        if (letter.status !== 'pending') {
-          actions.append(
-            createStatusButton(letter, 'pending', '退回待审核', 'bg-surface-container text-on-surface-variant'),
-          );
-        }
-        const privateHint = letter.is_private
-          ? element(
-              'span',
-              'font-label-sm text-label-sm text-outline-variant',
-              '悄悄话：通过后也不会出现在公开留言页。',
-            )
-          : null;
-        if (privateHint) actions.append(privateHint);
-        card.append(actions);
-
-        return card;
-      }
-
-      function createStatusButton(letter: AdminLetter, status: LetterStatus, label: string, className: string) {
-        const button = element(
-          'button',
-          `rounded-lg ${className} px-space-md py-space-xs font-label-sm text-label-sm shadow-sm transition-colors hover:brightness-95 active:scale-95`,
-          label,
-        );
-        button.type = 'button';
-        button.addEventListener('click', async () => {
-          button.disabled = true;
-          button.classList.add('opacity-60');
-          try {
-            await request(`/api/admin/letters/${encodeURIComponent(letter.id)}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ status }),
-            });
-            await refresh();
-            showNotice(`已更新为「${STATUS_META[status].label}」。`, 'success');
-          } catch (error) {
-            showNotice(describeError(error), 'error');
-          } finally {
-            button.disabled = false;
-            button.classList.remove('opacity-60');
-          }
-        });
-        return button;
-      }
-
-      function renderLetters() {
-        if (!list) return;
-        list.replaceChildren(...state.letters.map(createLetterCard));
-
-        if (empty) {
-          if (state.letters.length === 0) {
-            const messages: Record<string, string> = {
-              pending: '待审核信箱是空的，暂时不用操心。',
-              approved: '还没有已上墙的公开留言。',
-              hidden: '没有被隐藏的信笺。',
-              all: '这里还没有信笺。',
-            };
-            empty.textContent = messages[state.status] || messages.all;
-            empty.classList.remove('hidden');
-          } else {
-            empty.classList.add('hidden');
-            empty.textContent = '';
-          }
-        }
-      }
-
-      async function fetchLetters() {
-        const data = await request(`/api/admin/letters?status=${encodeURIComponent(state.status)}`);
-        state.letters = Array.isArray(data.letters) ? data.letters : [];
-        state.counts = data.counts && typeof data.counts === 'object' ? data.counts : {};
-        renderCounts();
-        renderTabs();
-        renderLetters();
-      }
-
-      async function refresh() {
-        if (loading) loading.classList.remove('hidden');
+      async function checkSession() {
         try {
-          await fetchLetters();
-          hideNotice();
+          const data = await request('/api/admin/session');
+          showDashboard(data.user);
+          await loadPhotos();
         } catch (error) {
-          const apiError = error as ApiError;
-          if (apiError.status === 401) {
-            clearToken();
-            showTokenPanel();
-          }
-          showNotice(describeError(error), 'error');
-          if (empty) {
-            empty.textContent = '暂时读不到信笺，请检查令牌或稍后刷新。';
-            empty.classList.remove('hidden');
-          }
-          if (list) list.replaceChildren();
-        } finally {
-          if (loading) loading.classList.add('hidden');
+          if (error instanceof Error && error.message === 'unauthorized') return;
+          showLogin();
         }
       }
 
-      async function connect(token: string) {
-        setBusy(true);
-        hideNotice();
-        setToken(token);
-        try {
-          await fetchLetters();
-          showDashboard();
-          showNotice('已连接后台，令牌只保存在本标签页。', 'success');
-        } catch (error) {
-          const apiError = error as ApiError;
-          if (apiError.status === 401 || apiError.code === 'admin_disabled') clearToken();
-          showTokenPanel();
-          showNotice(describeError(error), 'error');
-        } finally {
-          setBusy(false);
-        }
-      }
-
-      tokenForm?.addEventListener('submit', (event) => {
+      loginForm?.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const token = tokenInput ? tokenInput.value.trim() : '';
-        if (!token) {
-          showNotice('请先填写管理令牌。', 'error');
+        setText(loginMessage, '');
+        try {
+          const data = await request('/api/admin/login', {
+            method: 'POST',
+            body: JSON.stringify({ username: loginUser?.value.trim() ?? '', password: loginPassword?.value ?? '' }),
+          });
+          showDashboard(data.user);
+          if (loginPassword) loginPassword.value = '';
+          await loadPhotos();
+        } catch (error) {
+          setText(loginMessage, error instanceof Error ? error.message : '登录失败');
+        }
+      });
+
+      $('logout-button')?.addEventListener('click', async () => {
+        await fetch('/api/admin/logout', { method: 'POST' });
+        window.location.href = '/admin/';
+      });
+
+      function fillForm(photo: PhotoRecord) {
+        if (photoId) photoId.value = photo.id;
+        if (photoTitle) photoTitle.value = photo.title;
+        if (photoSlug) photoSlug.value = photo.slug;
+        if (photoSeries) photoSeries.value = photo.series;
+        if (photoTakenAt) photoTakenAt.value = photo.takenAt;
+        if (photoWidth) photoWidth.value = String(photo.width);
+        if (photoHeight) photoHeight.value = String(photo.height);
+        if (photoSrc) photoSrc.value = photo.src;
+        if (photoAlt) photoAlt.value = photo.alt;
+        if (photoNote) photoNote.value = photo.note;
+        if (photoBadge) photoBadge.value = photo.badge;
+        if (photoSortOrder) photoSortOrder.value = String(photo.sortOrder);
+        for (const [key, input] of Object.entries(exifFields)) {
+          if (input) input.value = photo.exif?.[key] ?? '';
+        }
+        setText(photoFormTitle, '编辑照片');
+        photoDelete?.classList.remove('hidden');
+        updatePreview();
+        photoForm?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function resetForm() {
+        photoForm?.reset();
+        if (photoId) photoId.value = '';
+        if (photoSeries) photoSeries.value = 'anime';
+        if (photoTakenAt) photoTakenAt.value = localToday();
+        if (photoWidth) photoWidth.value = '1200';
+        if (photoHeight) photoHeight.value = '800';
+        if (photoSortOrder) photoSortOrder.value = '0';
+        setText(photoFormTitle, '新增照片');
+        setText(photoStatus, '');
+        setText(uploadStatus, '');
+        photoDelete?.classList.add('hidden');
+        updatePreview();
+      }
+
+      function updatePreview() {
+        if (!photoPreview) return;
+        const src = photoSrc?.value.trim() ?? '';
+        if (src) {
+          photoPreview.src = src;
+          photoPreview.classList.remove('hidden');
+        } else {
+          photoPreview.classList.add('hidden');
+        }
+      }
+
+      photoSrc?.addEventListener('input', updatePreview);
+      $('photo-reset')?.addEventListener('click', resetForm);
+
+      $('upload-button')?.addEventListener('click', async () => {
+        const file = photoFile?.files?.[0];
+        if (!file) {
+          setText(uploadStatus, '先选择图片');
           return;
         }
-        connect(token);
-      });
-
-      logoutButton?.addEventListener('click', () => {
-        clearToken();
-        if (tokenInput) tokenInput.value = '';
-        showTokenPanel();
-        hideNotice();
-      });
-
-      refreshButton?.addEventListener('click', () => refresh());
-
-      statusTabs?.addEventListener('click', (event) => {
-        const target =
-          event.target instanceof Element ? event.target.closest<HTMLElement>('[data-status-filter]') : null;
-        if (!target) return;
-        state.status = (target.dataset.statusFilter as AdminState['status'] | undefined) || 'pending';
-        renderTabs();
-        refresh();
-      });
-
-      function parseFilename(header: string | null) {
-        if (!header) return '';
-        const match = /filename="?([^";]+)"?/i.exec(header);
-        return match ? match[1] : '';
-      }
-
-      async function exportFile(button: HTMLButtonElement) {
-        const kind = button.dataset.kind || 'letters';
-        const format = button.dataset.format || 'json';
-        const original = button.textContent;
-        button.disabled = true;
-        button.classList.add('opacity-60');
-        button.textContent = '导出中…';
+        const form = new FormData();
+        form.append('file', file);
+        setText(uploadStatus, '上传中…');
         try {
-          const token = getToken();
-          const response = await fetch(
-            `/api/admin/export?kind=${encodeURIComponent(kind)}&format=${encodeURIComponent(format)}`,
-            { headers: { Authorization: `Bearer ${token}` } },
-          );
-
-          if (!response.ok) {
-            let data: ApiResponse | null = null;
-            try {
-              data = (await response.json()) as ApiResponse;
-            } catch {
-              data = null;
-            }
-            const error = new Error((data && data.error) || `http_${response.status}`) as ApiError;
-            error.status = response.status;
-            error.code = data?.error;
-            throw error;
+          const data = await request('/api/admin/upload', { method: 'POST', body: form });
+          if (photoSrc) photoSrc.value = data.url;
+          if (photoSlug && !photoSlug.value.trim()) {
+            const base = file.name
+              .replace(/\.[^.]+$/, '')
+              .replace(/[^a-zA-Z0-9-]+/g, '-')
+              .replace(/^-+|-+$/g, '')
+              .toLowerCase();
+            if (base) photoSlug.value = base;
           }
-
-          const blob = await response.blob();
-          const filename =
-            parseFilename(response.headers.get('content-disposition')) ||
-            `fengyu-${kind}-${new Date().toISOString().slice(0, 10)}.${format}`;
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = filename;
-          document.body.append(link);
-          link.click();
-          link.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-          showNotice(`已导出${kind === 'letters' ? '留言' : '订阅'}（${format.toUpperCase()}）。`, 'success');
+          const image = new Image();
+          image.onload = () => {
+            if (photoWidth && (!photoWidth.value || Number(photoWidth.value) === 1200))
+              photoWidth.value = String(image.naturalWidth);
+            if (photoHeight && (!photoHeight.value || Number(photoHeight.value) === 800))
+              photoHeight.value = String(image.naturalHeight);
+          };
+          image.src = data.url;
+          updatePreview();
+          setText(uploadStatus, '已上传，记得保存照片');
         } catch (error) {
-          showNotice(describeError(error), 'error');
-        } finally {
-          button.disabled = false;
-          button.classList.remove('opacity-60');
-          button.textContent = original;
+          setText(uploadStatus, error instanceof Error ? error.message : '上传失败');
+        }
+      });
+
+      photoForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        setText(photoStatus, '保存中…');
+        const exif: Record<string, string> = {};
+        for (const [key, input] of Object.entries(exifFields)) {
+          if (input?.value.trim()) exif[key] = input.value.trim();
+        }
+        const payload = {
+          title: photoTitle?.value.trim() ?? '',
+          slug: photoSlug?.value.trim() ?? '',
+          series: photoSeries?.value ?? 'anime',
+          takenAt: photoTakenAt?.value ?? '',
+          width: Number(photoWidth?.value ?? 1200),
+          height: Number(photoHeight?.value ?? 800),
+          src: photoSrc?.value.trim() ?? '',
+          alt: photoAlt?.value.trim() ?? '',
+          note: photoNote?.value.trim() ?? '',
+          badge: photoBadge?.value.trim() ?? '',
+          sortOrder: Number(photoSortOrder?.value ?? 0),
+          exif,
+        };
+
+        try {
+          const id = photoId?.value;
+          if (id) {
+            await request(`/api/admin/photos/${encodeURIComponent(id)}`, {
+              method: 'PATCH',
+              body: JSON.stringify(payload),
+            });
+          } else {
+            await request('/api/admin/photos', { method: 'POST', body: JSON.stringify(payload) });
+          }
+          setText(photoStatus, '已保存');
+          resetForm();
+          await loadPhotos();
+        } catch (error) {
+          setText(photoStatus, error instanceof Error ? error.message : '保存失败');
+        }
+      });
+
+      photoDelete?.addEventListener('click', async () => {
+        const id = photoId?.value;
+        if (!id || !window.confirm('确定删除这张照片吗？')) return;
+        try {
+          await request(`/api/admin/photos/${encodeURIComponent(id)}`, { method: 'DELETE' });
+          resetForm();
+          await loadPhotos();
+          setText(photoStatus, '已删除');
+        } catch (error) {
+          setText(photoStatus, error instanceof Error ? error.message : '删除失败');
+        }
+      });
+
+      $('refresh-button')?.addEventListener('click', () => void loadPhotos());
+
+      function renderList() {
+        if (!photoList) return;
+        photoList.replaceChildren();
+        setText(photoCount, `(${photos.length})`);
+        for (const photo of photos) {
+          const card = document.createElement('article');
+          card.className =
+            'flex gap-space-sm rounded-xl border border-surface-container-high bg-surface-container-low p-3 shadow-sm';
+
+          const image = document.createElement('img');
+          image.src = photo.src;
+          image.alt = photo.alt;
+          image.className = 'h-24 w-24 shrink-0 rounded object-cover';
+          image.loading = 'lazy';
+
+          const body = document.createElement('div');
+          body.className = 'flex min-w-0 flex-1 flex-col gap-1';
+
+          const title = document.createElement('strong');
+          title.className = 'truncate text-sm font-medium text-primary';
+          title.textContent = photo.title;
+
+          const meta = document.createElement('span');
+          meta.className = 'font-label-sm text-[0.625rem] text-on-surface-variant';
+          meta.textContent = `${photo.series} · ${photo.takenAt} · ${photo.slug}`;
+
+          const actions = document.createElement('div');
+          actions.className = 'mt-auto flex items-center gap-2';
+          const edit = document.createElement('button');
+          edit.type = 'button';
+          edit.className = 'text-xs text-secondary hover:text-primary';
+          edit.textContent = '编辑';
+          edit.addEventListener('click', () => fillForm(photo));
+          const open = document.createElement('a');
+          open.href = '/photos/';
+          open.target = '_blank';
+          open.rel = 'noopener';
+          open.className = 'text-xs text-secondary hover:text-primary';
+          open.textContent = '查看';
+          actions.append(edit, open);
+
+          body.append(title, meta, actions);
+          card.append(image, body);
+          photoList.append(card);
         }
       }
 
-      for (const button of document.querySelectorAll<HTMLButtonElement>('[data-export]')) {
-        button.addEventListener('click', () => exportFile(button));
+      async function loadPhotos() {
+        try {
+          const data = await request('/api/admin/photos');
+          photos = data.photos;
+          renderList();
+          if (wantSlug) {
+            const target = photos.find((photo) => photo.slug === wantSlug);
+            wantSlug = null;
+            if (target) fillForm(target);
+          }
+        } catch (error) {
+          setText(photoStatus, error instanceof Error ? error.message : '加载失败');
+        }
       }
 
-      renderTabs();
-
-      const savedToken = getToken();
-      if (savedToken && tokenInput) {
-        tokenInput.value = savedToken;
-        connect(savedToken);
-      } else {
-        showTokenPanel();
-      }
+      if (photoTakenAt) photoTakenAt.value = localToday();
+      void checkSession();
     </script>
   </body>
 </html>

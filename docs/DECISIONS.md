@@ -322,3 +322,55 @@ rate_limits (ip_hash, last_at)
 
 - 需要更快同步可把缓存降到 15–30 秒，或在酷狗 webhook/同步任务里主动失效；
 - 后续可加服务端定时快照，作为酷狗不可用时的只读兜底。
+
+---
+
+## ADR-007 · 内容后台与影集运行时管理
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`/admin/`、`/photos/`、`src/lib/content-db.ts`、`src/lib/admin-auth.ts`、`src/pages/api/admin/photos*`、上传与媒体路由、nginx、备份脚本
+
+### 背景
+
+- 影集是构建期静态数据，改一张照片要改 `src/data/photos.ts`、重新构建、部署；
+- 灯箱翻页不遵守当前分类，且没有下载入口；
+- 用户需要一个带登录的内容后台，逐步替代「改代码运维内容」。
+
+### 决定
+
+1. **内容库**：影集数据落到 `content.sqlite`（默认 `.data/content.sqlite`，容器 `/data/content.sqlite`），首次启动从现有 `src/data/photos.ts` 播种一次；
+2. **后台登录**：`/admin/` 用 `ADMIN_USER` + `ADMIN_PASSWORD_HASH`（scrypt）+ `ADMIN_SESSION_SECRET` 签发 HttpOnly cookie；旧的 `/admin/letters/` 继续用 `ADMIN_TOKEN`；
+3. **影集 CRUD**：`/admin/` 支持新增、编辑、删除、上传图片；上传文件写入 `CONTENT_UPLOADS`（容器 `/data/uploads`），经 `/api/media/photos/...` 读取；
+4. **影集页 SSR**：`/photos/` 设为 `prerender = false`，请求时从内容库读取；nginx 把 `/photos/` 反代给 app；后台改完刷新即生效；
+5. **灯箱修复**：当前分类内翻页（不跨系列）、显示 `n / 分类数量`、增加「下载」和「编辑」入口；
+6. **备份**：每日备份同时覆盖 `guestbook.sqlite`、`content.sqlite` 和 `uploads/`；
+7. **其它死交互**：随笔列表与侧栏的 `#标签` 从装饰 span 改成可点击的标签筛选。
+
+### 影响
+
+**正面**
+
+- 影集可以在网页上维护，不需要改代码或发版；
+- 上传、下载、分类内翻页都有明确行为；
+- 登录态用 HttpOnly cookie，密码只存 scrypt 哈希。
+
+**负面**
+
+- `/photos/` 从纯静态变为按请求渲染，依赖 app 容器；nginx 必须保留 `/photos/` 反代；
+- 上传文件与内容库都在 `/data` 卷，备份/恢复要一起处理；
+- 仍没有多媒体格式校验之外的处理（缩放、EXIF 自动提取、孤儿文件清理）；
+- 目前后台只覆盖影集，随笔/书/台词等内容仍走代码；
+- HTTP 下登录密码明文传输，只应在可信网络使用。
+
+### 回滚
+
+1. 把 `/photos/` 的 `prerender = false` 和 nginx 反代移除，恢复静态页；
+2. `git revert` 后台相关提交；`content.sqlite` 与 `uploads/` 留在卷里，不影响回滚后的静态页；
+3. 如需彻底关闭后台，清空 `.env` 的 `ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`，登录返回 503。
+
+### 后续
+
+- 把随笔、书、台词接入同一内容库与后台；
+- 图片压缩/缩放、EXIF 自动读取、删除照片时清理孤儿文件；
+- 后台增加操作日志；必要时把会话换成服务端存储。

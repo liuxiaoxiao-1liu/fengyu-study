@@ -7,9 +7,15 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy": "./deploy.sh"
+    "deploy": "./deploy.sh",
+    "deploy:docker": "./deploy/docker-deploy.sh",
+    "guestbook:import": "node scripts/import-guestbook-json.mjs",
+    "guestbook:backup": "node scripts/backup-guestbook.mjs",
+    "docker:up": "docker compose up -d --build",
+    "docker:logs": "docker compose logs -f app"
   },
   "dependencies": {
+    "@astrojs/node": "^11.1.9",
     "astro": "^7.4.2"
   },
   "devDependencies": {

@@ -10,6 +10,9 @@ node_modules/
 .docs/
 .preview/
 
+# local SQLite data
+.data/
+
 # logs
 *.log
 .DS_Store

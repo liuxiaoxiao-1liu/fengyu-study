@@ -145,4 +145,6 @@ lines.push('export const kugouTrackByHash = trackMap;');
 lines.push('');
 
 writeFileSync('src/data/kugou-playlists.ts', lines.join('\n'));
-console.log(`写入 src/data/kugou-playlists.ts：${playlists.length} 个歌单，${playlists.reduce((n, p) => n + p.tracks.length, 0)} 首`);
+console.log(
+  `写入 src/data/kugou-playlists.ts：${playlists.length} 个歌单，${playlists.reduce((n, p) => n + p.tracks.length, 0)} 首`,
+);

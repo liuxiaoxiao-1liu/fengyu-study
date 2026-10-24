@@ -60,26 +60,12 @@ export const GET: APIRoute = async ({ request, url }) => {
         };
         return new Response(JSON.stringify(payload, null, 2), {
           status: 200,
-          headers: attachmentHeaders(
-            'application/json; charset=utf-8',
-            `fengyu-letters-${stamp()}.json`,
-          ),
+          headers: attachmentHeaders('application/json; charset=utf-8', `fengyu-letters-${stamp()}.json`),
         });
       }
 
       const csv = toCsv(
-        [
-          'id',
-          'name',
-          'station',
-          'message',
-          'tag',
-          'is_private',
-          'status',
-          'reply',
-          'replied_at',
-          'created_at',
-        ],
+        ['id', 'name', 'station', 'message', 'tag', 'is_private', 'status', 'reply', 'replied_at', 'created_at'],
         letters.map((letter) => [
           letter.id,
           letter.name,
@@ -111,10 +97,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       };
       return new Response(JSON.stringify(payload, null, 2), {
         status: 200,
-        headers: attachmentHeaders(
-          'application/json; charset=utf-8',
-          `fengyu-subscribers-${stamp()}.json`,
-        ),
+        headers: attachmentHeaders('application/json; charset=utf-8', `fengyu-subscribers-${stamp()}.json`),
       });
     }
 

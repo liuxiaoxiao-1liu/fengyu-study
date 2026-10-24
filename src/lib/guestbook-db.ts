@@ -150,9 +150,10 @@ export function listPublicLetters(limit = 60): { messages: PublicLetter[]; total
 
 export function getLetterCounts(): LetterCounts {
   const db = getDb();
-  const rows = db
-    .prepare('SELECT status, COUNT(*) AS count FROM letters GROUP BY status')
-    .all() as unknown as { status: string; count: number }[];
+  const rows = db.prepare('SELECT status, COUNT(*) AS count FROM letters GROUP BY status').all() as unknown as {
+    status: string;
+    count: number;
+  }[];
 
   const counts: LetterCounts = {
     total: 0,
@@ -171,9 +172,8 @@ export function getLetterCounts(): LetterCounts {
     else if (row.status === 'hidden') counts.hidden = row.count;
   }
 
-  const replied = db
-    .prepare("SELECT COUNT(*) AS count FROM letters WHERE reply <> ''")
-    .get() as { count: number } | undefined;
+  const replied = db.prepare("SELECT COUNT(*) AS count FROM letters WHERE reply <> ''").get() as
+    { count: number } | undefined;
   counts.replied = replied?.count ?? 0;
 
   const publicStats = db
@@ -269,9 +269,8 @@ export function updateAdminLetter(id: string, patch: UpdateLetterPatch): AdminLe
 
 export function secondsSinceLastPost(ipHash: string): number | null {
   const db = getDb();
-  const row = db
-    .prepare('SELECT last_at FROM rate_limits WHERE ip_hash = ?')
-    .get(ipHash) as { last_at: number } | undefined;
+  const row = db.prepare('SELECT last_at FROM rate_limits WHERE ip_hash = ?').get(ipHash) as
+    { last_at: number } | undefined;
   if (!row) return null;
   return Math.floor(Date.now() / 1000) - row.last_at;
 }

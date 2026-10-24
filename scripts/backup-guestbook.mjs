@@ -9,9 +9,7 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
-const dbPath = resolve(
-  process.argv[2] ?? process.env.GUESTBOOK_DB ?? './.data/guestbook.sqlite',
-);
+const dbPath = resolve(process.argv[2] ?? process.env.GUESTBOOK_DB ?? './.data/guestbook.sqlite');
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const outPath = resolve(process.argv[3] ?? `${dbPath}.${stamp}.bak`);
 

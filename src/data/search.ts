@@ -26,57 +26,45 @@ const pageEntries: SearchEntry[] = [
 export const searchIndex: SearchEntry[] = [
   ...pageEntries,
 
-  ...essays.map(
-    (essay): SearchEntry => ({
-      title: essay.title,
-      href: `/essays/${essay.slug}/`,
-      kind: '随记',
-      summary: essay.summary,
-    }),
-  ),
+  ...essays.map((essay): SearchEntry => ({
+    title: essay.title,
+    href: `/essays/${essay.slug}/`,
+    kind: '随记',
+    summary: essay.summary,
+  })),
 
-  ...books.map(
-    (book): SearchEntry => ({
-      title: book.title,
-      href: '/reading/#shelf',
-      kind: '网文',
-      summary: `${book.author} · ${book.genre} · ${book.blurb}`,
-    }),
-  ),
+  ...books.map((book): SearchEntry => ({
+    title: book.title,
+    href: '/reading/#shelf',
+    kind: '网文',
+    summary: `${book.author} · ${book.genre} · ${book.blurb}`,
+  })),
 
-  ...albums.map(
-    (album): SearchEntry => ({
-      title: album.title,
-      href: '/reading/#music',
-      kind: '唱片',
-      summary: `${album.artist} · ${album.tag}`,
-    }),
-  ),
+  ...albums.map((album): SearchEntry => ({
+    title: album.title,
+    href: '/reading/#music',
+    kind: '唱片',
+    summary: `${album.artist} · ${album.tag}`,
+  })),
 
-  ...tracks.map(
-    (track): SearchEntry => ({
-      title: track.title,
-      href: '/reading/#music',
-      kind: '酷狗',
-      summary: `${track.artist} · ${track.album}${track.note ? ` · ${track.note}` : ''}`,
-    }),
-  ),
+  ...tracks.map((track): SearchEntry => ({
+    title: track.title,
+    href: '/reading/#music',
+    kind: '酷狗',
+    summary: `${track.artist} · ${track.album}${track.note ? ` · ${track.note}` : ''}`,
+  })),
 
-  ...photos.map(
-    (photo): SearchEntry => ({
-      title: photo.title,
-      href: '/photos/#gallery',
-      kind: '影集',
-      summary: `${SERIES_LABELS[photo.series]} · ${photo.note}`,
-    }),
-  ),
+  ...photos.map((photo): SearchEntry => ({
+    title: photo.title,
+    href: '/photos/#gallery',
+    kind: '影集',
+    summary: `${SERIES_LABELS[photo.series]} · ${photo.note}`,
+  })),
 
-  ...quotes.map(
-    (quote): SearchEntry => ({
-      title: quote.text,
-      href: '/essays/#excerpt',
-      kind: '台词',
-      summary: [quote.source, quote.work].filter(Boolean).join(' · '),
-    }),
-  ),
+  ...quotes.map((quote): SearchEntry => ({
+    title: quote.text,
+    href: '/essays/#excerpt',
+    kind: '台词',
+    summary: [quote.source, quote.work].filter(Boolean).join(' · '),
+  })),
 ];

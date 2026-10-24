@@ -3,694 +3,892 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout current="guestbook" title="留言">
-<main class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)]" id="main">
-<div class="flex flex-col w-full" id="friends">
-<!-- Interactive Navigation Tab Highlighting Script -->
+  <main class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)]" id="main">
+    <div class="flex flex-col w-full" id="friends">
+      <!-- Interactive Navigation Tab Highlighting Script -->
 
-<!-- Section 1: Header / Breadcrumb Hero -->
-<section class="w-full max-w-6xl mx-auto px-gutter pt-space-lg pb-space-xl">
-<div class="flex flex-col gap-space-sm max-w-3xl">
-<div class="flex items-center gap-space-xs text-on-surface-variant">
-<span class="material-symbols-outlined text-secondary text-base">mail_lock</span>
-<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">COMMUNITY &amp; WHISPERS · 拾光留声亭</span>
-<span class="text-outline-variant font-label-sm">/</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">第 <span data-stat="total">—</span> 卷</span>
-</div>
-<h1 class="font-headline-lg text-primary tracking-tight mt-space-xs text-headline-lg-mobile sm:text-headline-lg">
-              来客留言 &amp; 时光信箱
-              <span class="font-display italic text-on-surface-variant text-headline-md font-normal block sm:inline sm:ml-space-xs">Letters &amp; Whispers</span>
-</h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mt-space-xs">
-              若你也是穿梭在网文异界与现世操场的夜行者，不妨留下一枚字句或一首酷狗私藏单曲。支持公开上墙或悄悄话仅房主可见。每一个共鸣的电波，都会在夜晚的自习后被认真拆封。
-            </p>
-<!-- Fast Stat Tags & Metrics -->
-<div class="flex flex-wrap items-center gap-space-sm pt-space-md">
-<div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
-<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">累计收到
-                  <strong class="text-primary font-medium" data-stat="total">—</strong>
-                  封来信</span>
-</div>
-<div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
-<span class="material-symbols-outlined text-sm text-secondary">mark_email_read</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">房主回复率
-                  <strong class="text-primary font-medium" data-stat="reply-rate">—</strong></span>
-</div>
-<div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
-<span class="material-symbols-outlined text-sm text-secondary">forum</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">公开信笺
-                  <strong class="text-primary font-medium" data-stat="approved">—</strong> 封</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Section 2: Interactive Bento Section (Form + Owner's Board) -->
-<section class="w-full max-w-6xl mx-auto px-gutter pb-space-xl">
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start" id="friends">
-<!-- Left Column: Form Card (7 Cols) -->
-<div class="lg:col-span-7 flex flex-col bg-surface-container-low p-space-lg rounded-xl shadow-sm relative overflow-hidden">
-<!-- Vintage Stamp Watermark in corner -->
-<div class="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-surface-container-high/60 flex items-center justify-center pointer-events-none select-none rotate-12">
-<span class="font-label-sm text-[0.625rem] text-outline text-center uppercase tracking-widest leading-tight">POSTAGE<br/>COLLEGE NOOK<br/>★ AIRMAIL ★</span>
-</div>
-<div class="flex items-center justify-between pb-space-md">
-<div class="flex items-center gap-space-sm">
-<span class="material-symbols-outlined text-secondary text-xl">edit_note</span>
-<h2 class="font-headline-sm text-headline-sm text-primary">
-                    投递信笺
-                    <span class="font-label-md text-label-md text-on-surface-variant font-normal">/ Leave a Message</span>
-</h2>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">实时同步 · LIVE</span>
-</div>
-<form class="flex flex-col gap-space-md mt-space-xs" id="guestbook-form">
-                <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
-<!-- Inputs Row -->
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-<div class="flex flex-col gap-space-xs">
-<label class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between" for="author-name">
-<span>昵称 / 笔名</span>
-<span class="text-outline-variant font-normal">必填</span>
-</label>
-<input class="w-full bg-surface-container-lowest px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary transition-all" id="author-name" placeholder="例: 某位塔罗会潜水成员 / 酷狗听友" required="" type="text"/>
-</div>
-<div class="flex flex-col gap-space-xs">
-<label class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between" for="music-station">
-<span>常驻地或校园 / 推荐酷狗单曲</span>
-<span class="text-outline-variant font-normal">选填</span>
-</label>
-<input class="w-full bg-surface-container-lowest px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary transition-all" id="music-station" placeholder="例: 成都 · 酷狗单曲《大鱼》" type="text"/>
-</div>
-</div>
-<!-- Category Tags (Capsules) -->
-<div class="flex flex-col gap-space-xs pt-space-xs">
-<span class="font-label-sm text-label-sm text-on-surface-variant">信件类型 / 归档标签</span>
-<div class="flex flex-wrap gap-space-xs" id="tag-capsules">
-<button class="tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm bg-primary text-on-primary transition-all" data-tag="网文同好" type="button">
-                      [ 网文同好 ]
-                    </button>
-<button class="tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" data-tag="音乐安利" type="button">
-                      [ 音乐安利 ]
-                    </button>
-<button class="tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" data-tag="大学日常" type="button">
-                      [ 大学日常 ]
-                    </button>
-<button class="tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" data-tag="漂流寄语" type="button">
-                      [ 漂流寄语 ]
-                    </button>
-</div>
-</div>
-<!-- Message Body -->
-<div class="flex flex-col gap-space-xs">
-<label class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between" for="message-content">
-<span>信笺正文 / 拾光感触</span>
-<span class="text-outline-variant font-label-sm" id="char-counter">0 / 600</span>
-</label>
-<textarea class="w-full bg-surface-container-lowest p-space-md rounded-lg font-body-md text-body-md text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary transition-all resize-y leading-relaxed" id="message-content" maxlength="600" placeholder="写下你眼前的日落，或是最近循环不休的旋律，抑或是想对房主说的话..." required="" rows="4"></textarea>
-</div>
-<!-- Privacy Switch -->
-<div class="flex items-center justify-between pt-space-xs">
-<label class="flex items-center gap-space-sm cursor-pointer select-none">
-<input class="accent-secondary w-4 h-4 rounded cursor-pointer" id="private-check" type="checkbox"/>
-<div class="flex flex-col">
-<span class="font-label-sm text-label-sm text-primary flex items-center gap-1">
-<span class="material-symbols-outlined text-sm text-on-surface-variant">lock</span>
-                        仅房主可见 (悄悄话加密)
-                      </span>
-<span class="font-label-sm text-[0.625rem] text-on-surface-variant">勾选后不会公开上墙，仅站长后台查阅</span>
-</div>
-</label>
-<span class="hidden sm:inline font-label-sm text-[0.6875rem] text-outline-variant italic">
-                    Paper Texture Encrypted
-                  </span>
-</div>
-<!-- Actions & Side Note -->
-<div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-sm">
-<div class="flex items-center gap-space-sm w-full sm:w-auto">
-<button class="flex-1 sm:flex-initial flex items-center justify-center gap-space-xs bg-primary text-on-primary px-space-lg py-space-sm rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-all shadow-sm active:scale-95" type="submit">
-<span class="material-symbols-outlined text-base">send</span>
-<span>投递信笺 (Seal &amp; Send)</span>
-</button>
-<button class="flex items-center justify-center gap-space-xs bg-surface-container text-primary px-space-md py-space-sm rounded-lg font-label-md text-label-md hover:bg-surface-container-high transition-all shadow-sm active:scale-95" data-fish="" title="随机捞取一条前人留下的时光寄语" type="button">
-<span class="material-symbols-outlined text-base text-secondary">explore</span>
-<span class="hidden md:inline">打捞漂流瓶</span>
-</button>
-</div>
-<p class="font-label-sm text-label-sm text-on-surface-variant text-center sm:text-right">
-                    每晚自习后
-                    <span class="text-primary font-medium">22:30 ~ 23:30</span>
-                    拆信回复
-                  </p>
-</div>
-</form>
-<!-- Dynamic Success Toast (Hidden by default) -->
-<div class="hidden absolute bottom-4 left-4 right-4 bg-primary text-on-primary p-space-md rounded-lg shadow-md flex items-center justify-between transition-all" id="toast-success">
-<div class="flex items-center gap-space-sm">
-<span class="material-symbols-outlined text-secondary-container">mark_email_read</span>
-<span class="font-body-sm text-body-sm">信笺已落锁收妥！待夜晚钟声响起，房主便会拆封细读。</span>
-</div>
-<button class="text-on-primary/70 hover:text-on-primary" data-close-toast="">
-<span class="material-symbols-outlined text-base">close</span>
-</button>
-</div>
-</div>
-<!-- Right Column: Owner's Note & Cyber Neighbors (5 Cols) -->
-<div class="lg:col-span-5 flex flex-col gap-space-lg" id="friends">
-<!-- Card 1: Owner's Pin Note -->
-<div class="bg-surface-container p-space-lg rounded-xl shadow-sm relative overflow-hidden flex flex-col gap-space-sm">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-space-xs text-secondary">
-<span class="material-symbols-outlined text-lg">push_pin</span>
-<span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">房主公告牌 · PIN NOTE</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">大三初春</span>
-</div>
-<p class="font-body-md text-body-md text-primary leading-relaxed">
-                  大三学期正经历密集的专业课与实习准备，但看到同好留言总会第一时间认真回复。聊《诡秘之主》剧情、探讨克苏鲁神话或推荐冷门仙侠（如《道诡异仙》李火旺的癫狂美学），或是酷狗好听的冷门
-                  Live 版，随时欢迎敲门！
-                </p>
-<div class="flex items-center justify-between pt-space-xs text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1">
-<span class="material-symbols-outlined text-sm text-secondary">headphones</span>
-                    伴写背景乐: 周深《达拉崩吧 (Live)》
-                  </span>
-<span class="italic font-quote text-body-sm text-primary">@风屿书房</span>
-</div>
-</div>
-<!-- Card 2: Cyber Neighbors / Blogroll -->
-<div class="bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md" id="friends">
-<div class="flex items-center justify-between" id="friends">
-<div class="flex items-center gap-space-xs text-primary" id="friends">
-<span class="material-symbols-outlined text-base text-secondary">diversity_2</span>
-<h3 class="font-headline-sm text-headline-sm">
-                      赛博邻居 · 友链自留地
-                    </h3>
-</div>
-<a class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors flex items-center gap-0.5" data-prefill-friend="" href="#guestbook-form">
-<span>申请交换</span>
-<span class="material-symbols-outlined text-xs">north_east</span>
-</a>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
-<!-- Friend 1 -->
-<a class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm" href="#friends">
-<div class="flex items-center justify-between">
-<span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">云中漫步</span>
-<span class="font-label-sm text-[0.625rem] text-on-surface-variant">CS 大四</span>
-</div>
-<span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">Astro 与前端引擎折腾记录</span>
-</a>
-<!-- Friend 2 -->
-<a class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm" href="#friends">
-<div class="flex items-center justify-between">
-<span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">晚风便利店</span>
-<span class="font-label-sm text-[0.625rem] text-on-surface-variant">二次元画师</span>
-</div>
-<span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">日常胶片记录与同人速写</span>
-</a>
-<!-- Friend 3 -->
-<a class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm" href="#friends">
-<div class="flex items-center justify-between">
-<span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">落日余晖</span>
-<span class="font-label-sm text-[0.625rem] text-on-surface-variant">古典吉他</span>
-</div>
-<span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">网文书荒避难所 &amp; 乐评</span>
-</a>
-<!-- Friend 4 -->
-<a class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm" href="#friends">
-<div class="flex items-center justify-between">
-<span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">心素之境</span>
-<span class="font-label-sm text-[0.625rem] text-on-surface-variant">《道诡》骨灰粉</span>
-</div>
-<span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">白灵淼同人与街头纪实摄影</span>
-</a>
-</div>
-<div class="flex items-center justify-between bg-surface-container px-space-md py-space-xs rounded-lg text-on-surface-variant font-label-sm text-label-sm">
-<span>友链准则: 保持更新 · 独立博客 · 拒绝商业滥投</span>
-<span class="text-secondary font-medium">4 / 12 席位</span>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Section 3: Guestbook Stream / Letters Corridor -->
-<section class="w-full max-w-6xl mx-auto px-gutter pb-space-xl" id="archive">
-<!-- Filter Bar & Section Header -->
-<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-space-md pb-space-lg">
-<div class="flex flex-col gap-space-xs">
-<div class="flex items-center gap-space-xs text-secondary">
-<span class="material-symbols-outlined text-base">forum</span>
-<span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">LETTERS ARCHIVE</span>
-</div>
-<h2 class="font-headline-md text-headline-md text-primary">
-                时光留言回廊
-              </h2>
-</div>
-<!-- Filter Tabs -->
-<div class="flex items-center gap-space-xs bg-surface-container-low p-1 rounded-full overflow-x-auto" id="comment-filters" role="group" aria-label="留言分类筛选">
-<button class="filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm bg-primary text-on-primary transition-all shadow-sm" data-filter-category="all" type="button" aria-pressed="true">
-                 全部留言 (<span data-filter-count="all">0</span>)
-               </button>
-</div>
-</div>
-<!-- Masonry / Responsive Grid of Letters（由 /api/guestbook 实时渲染） -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg" id="letters-container"></div>
-<p class="hidden rounded-xl border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant" id="letters-empty">回廊里还没有公开的信笺，不如由你写下第一封。</p>
-<!-- Load More and Bottle Action Section -->
-<div class="w-full flex flex-col sm:flex-row items-center justify-center gap-space-md pt-space-xl">
-<button class="flex items-center gap-space-xs bg-surface-container px-space-lg py-space-sm rounded-full font-label-sm text-label-sm text-primary hover:bg-surface-container-high transition-colors shadow-sm" data-load-more="">
-<span class="material-symbols-outlined text-base">unfold_more</span>
-<span data-load-more-label>展开翻阅更早的时光卷轴</span>
-</button>
-<span class="text-outline-variant text-xs hidden sm:inline">·</span>
-<button class="flex items-center gap-space-xs font-label-sm text-label-sm text-secondary hover:text-primary transition-colors" data-fish="">
-<span class="material-symbols-outlined text-base">stream</span>
-<span>打捞一只未公开的匿名心事</span>
-</button>
-</div>
-</section>
-<!-- Interactive Modal: Fish a Bottle -->
-<div class="fixed inset-0 z-50 bg-primary/40 backdrop-blur-sm hidden flex items-center justify-center p-gutter" data-bottle-modal="" id="bottle-modal">
-<div class="bg-surface p-space-xl rounded-xl shadow-xl max-w-lg w-full flex flex-col gap-space-md relative transform transition-all">
-<button class="absolute top-4 right-4 text-on-surface-variant hover:text-primary" data-close-bottle="">
-<span class="material-symbols-outlined text-xl">close</span>
-</button>
-<div class="flex items-center gap-space-xs text-secondary">
-<span class="material-symbols-outlined text-xl">sailing</span>
-<span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">拾光漂流瓶 #BOTTLE-2025</span>
-</div>
-<div class="bg-surface-container-low p-space-lg rounded-lg border border-outline-variant/30 flex flex-col gap-space-sm">
-<span class="font-quote text-quote italic text-primary leading-relaxed" id="bottle-quote">
-                “今晚在操场跑完五公里，躺在草坪上看冬夜猎户座。耳机里正好放到周深的《化身孤岛的鲸》，突然觉得大学四年哪怕有再多迷茫，这一刻的风也是真实的。”
+      <!-- Section 1: Header / Breadcrumb Hero -->
+      <section class="w-full max-w-6xl mx-auto px-gutter pt-space-lg pb-space-xl">
+        <div class="flex flex-col gap-space-sm max-w-3xl">
+          <div class="flex items-center gap-space-xs text-on-surface-variant">
+            <span class="material-symbols-outlined text-secondary text-base">mail_lock</span>
+            <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">
+              COMMUNITY &amp; WHISPERS · 拾光留声亭
+            </span>
+            <span class="text-outline-variant font-label-sm">/</span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant">
+              第 <span data-stat="total">—</span> 卷
+            </span>
+          </div>
+          <h1 class="font-headline-lg text-primary tracking-tight mt-space-xs text-headline-lg-mobile sm:text-headline-lg">
+            来客留言 &amp; 时光信箱
+            <span class="font-display italic text-on-surface-variant text-headline-md font-normal block sm:inline sm:ml-space-xs">
+              Letters &amp; Whispers
+            </span>
+          </h1>
+          <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mt-space-xs">
+            若你也是穿梭在网文异界与现世操场的夜行者，不妨留下一枚字句或一首酷狗私藏单曲。支持公开上墙或悄悄话仅房主可见。每一个共鸣的电波，都会在夜晚的自习后被认真拆封。
+          </p>
+          <!-- Fast Stat Tags & Metrics -->
+          <div class="flex flex-wrap items-center gap-space-sm pt-space-md">
+            <div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant">
+                累计收到
+                <strong class="text-primary font-medium" data-stat="total">
+                  —
+                </strong>
+                封来信
               </span>
-<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm pt-space-xs">
-<span id="bottle-author">— 匿名漫游者 (投递于 2025.02.14)</span>
-<span class="text-secondary">#漂流寄语</span>
-</div>
-</div>
-<div class="flex items-center justify-between pt-space-xs">
-<span class="font-label-sm text-[0.6875rem] text-on-surface-variant">已被打捞 7 次 · 随潮水继续漂向远方</span>
-<button class="flex items-center gap-1 font-label-sm text-label-sm text-primary hover:text-secondary font-medium" data-fish="">
-<span class="material-symbols-outlined text-sm">refresh</span>
-<span>换一只打捞</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Client-side Micro-interactions -->
-
-</div>
-</main>
-<script>
-  const tagButtons = [...document.querySelectorAll('#tag-capsules .tag-pill')];
-  let activeTag = tagButtons[0]?.dataset.tag || '网文同好';
-  for (const btn of tagButtons) {
-    btn.addEventListener('click', () => {
-      for (const b of tagButtons) {
-        b.classList.remove('bg-primary', 'text-on-primary');
-        b.classList.add('bg-surface-container', 'text-on-surface-variant');
-      }
-      btn.classList.remove('bg-surface-container', 'text-on-surface-variant');
-      btn.classList.add('bg-primary', 'text-on-primary');
-      activeTag = btn.dataset.tag || '网文同好';
-    });
-  }
-
-  const author = document.getElementById('author-name');
-  const station = document.getElementById('music-station');
-  const content = document.getElementById('message-content');
-  const privateCheck = document.getElementById('private-check');
-  const counter = document.getElementById('char-counter');
-  const toast = document.getElementById('toast-success');
-  const form = document.getElementById('guestbook-form');
-
-  const query = new URLSearchParams(window.location.search);
-  if (author && query.get('name')) author.value = query.get('name');
-  if (station && query.get('station')) station.value = query.get('station');
-  if (content && query.get('message')) {
-    content.value = query.get('message');
-    if (counter) counter.textContent = `${content.value.length} / 600`;
-  }
-  if (query.get('private') === '1' && privateCheck) privateCheck.checked = true;
-
-  content?.addEventListener('input', () => {
-    if (counter) counter.textContent = `${content.value.length} / 600`;
-  });
-
-  function showToast(message) {
-    if (!toast) return;
-    if (message) {
-      const span = toast.querySelector('.font-body-sm');
-      if (span) span.textContent = message;
-    }
-    toast.classList.remove('hidden');
-    toast.classList.add('toast-enter');
-    window.clearTimeout(showToast.timer);
-    showToast.timer = window.setTimeout(() => toast.classList.add('hidden'), 4500);
-  }
-  window.showToast = showToast;
-
-  document.querySelector('[data-close-toast]')?.addEventListener('click', () => toast?.classList.add('hidden'));
-
-  document.querySelector('[data-prefill-friend]')?.addEventListener('click', () => {
-    if (author) author.value = '某站长';
-    if (content) {
-      content.value = '你好！想申请与《风屿书房》交换友链：\n站名：\n网址：\n简介：\n头像链接：';
-      content.dispatchEvent(new Event('input'));
-    }
-    author?.focus();
-  });
-
-  // ---- 统计：只取聚合数字，失败时保留占位符 ----
-  async function loadStats() {
-    try {
-      const response = await fetch('/api/stats', { headers: { Accept: 'application/json' } });
-      if (!response.ok) return;
-      const data = await response.json();
-      if (!data || !data.ok || !data.letters) return;
-      const values = {
-        total: data.letters.publicTotal,
-        approved: data.letters.approved,
-        replied: data.letters.publicReplied,
-        'reply-rate': typeof data.replyRate === 'number' ? `${data.replyRate}%` : undefined,
-      };
-      for (const node of document.querySelectorAll('[data-stat]')) {
-        const value = values[node.dataset.stat];
-        if (value !== undefined && value !== null) node.textContent = String(value);
-      }
-    } catch {
-      // 静态预览没有 API，保留 — 占位即可。
-    }
-  }
-
-  // ---- 留言回廊：公开列表来自 /api/guestbook ----
-  const lettersContainer = document.getElementById('letters-container');
-  const loadMoreBtn = document.querySelector('[data-load-more]');
-  const lettersEmpty = document.getElementById('letters-empty');
-  const commentFilters = document.getElementById('comment-filters');
-  const LETTER_BATCH = 3;
-  let letterLimit = LETTER_BATCH;
-  let activeLetterFilter = 'all';
-  let publicLetters = [];
-  let lettersLoadFailed = false;
-
-  function setEmptyMessage(message) {
-    if (!lettersEmpty) return;
-    if (message) {
-      lettersEmpty.textContent = message;
-      lettersEmpty.classList.remove('hidden');
-    } else {
-      lettersEmpty.classList.add('hidden');
-    }
-  }
-
-  function formatRelative(iso) {
-    if (!iso) return '';
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return '';
-    const diff = Date.now() - date.getTime();
-    const minute = 60 * 1000;
-    const hour = 60 * minute;
-    const day = 24 * hour;
-    if (diff < minute) return '刚刚';
-    if (diff < hour) return `${Math.floor(diff / minute)}分钟前`;
-    if (diff < day) return `${Math.floor(diff / hour)}小时前`;
-    if (diff < 2 * day) return '昨天';
-    if (diff < 30 * day) return `${Math.floor(diff / day)}天前`;
-    return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-  }
-
-  function setActiveFilterButton(category) {
-    if (!commentFilters) return;
-    for (const btn of commentFilters.querySelectorAll('[data-filter-category]')) {
-      const on = (btn.dataset.filterCategory || 'all') === category;
-      btn.classList.toggle('bg-primary', on);
-      btn.classList.toggle('text-on-primary', on);
-      btn.classList.toggle('shadow-sm', on);
-      btn.classList.toggle('text-on-surface-variant', !on);
-      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    }
-  }
-
-  function renderTagFilters() {
-    if (!commentFilters) return;
-    for (const btn of commentFilters.querySelectorAll('[data-generated-filter]')) btn.remove();
-
-    const allCount = commentFilters.querySelector('[data-filter-count="all"]');
-    if (allCount) allCount.textContent = String(publicLetters.length);
-
-    const counts = new Map();
-    for (const letter of publicLetters) {
-      const tag = (letter.tag || '网文同好').trim() || '网文同好';
-      counts.set(tag, (counts.get(tag) || 0) + 1);
-    }
-
-    for (const [tag, count] of counts) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all';
-      btn.dataset.filterCategory = tag;
-      btn.dataset.generatedFilter = '1';
-      btn.setAttribute('aria-pressed', 'false');
-      btn.textContent = `${tag} (${count})`;
-      commentFilters.append(btn);
-    }
-
-    if (activeLetterFilter !== 'all' && !counts.has(activeLetterFilter)) {
-      activeLetterFilter = 'all';
-    }
-    setActiveFilterButton(activeLetterFilter);
-  }
-
-  commentFilters?.addEventListener('click', (event) => {
-    const target = event.target instanceof Element ? event.target.closest('[data-filter-category]') : null;
-    if (!target) return;
-    activeLetterFilter = target.dataset.filterCategory || 'all';
-    letterLimit = LETTER_BATCH;
-    setActiveFilterButton(activeLetterFilter);
-    refreshLetters();
-  });
-
-  function refreshLetters() {
-    if (!lettersContainer) return;
-    const cards = [...lettersContainer.querySelectorAll('.letter-card')];
-    const matched = cards.filter((card) => activeLetterFilter === 'all' || card.dataset.category === activeLetterFilter);
-    let shown = 0;
-    for (const card of cards) {
-      const isMatch = activeLetterFilter === 'all' || card.dataset.category === activeLetterFilter;
-      const visible = isMatch && shown < letterLimit;
-      card.style.display = visible ? 'flex' : 'none';
-      if (visible) shown += 1;
-    }
-
-    const remaining = Math.max(0, matched.length - shown);
-    if (loadMoreBtn) {
-      loadMoreBtn.style.display = remaining === 0 ? 'none' : '';
-      const label = loadMoreBtn.querySelector('[data-load-more-label]');
-      if (label) {
-        label.textContent = remaining
-          ? `展开翻阅更早的时光卷轴（还有 ${remaining} 封）`
-          : '已经翻到最早的一封了';
-      }
-    }
-
-    if (lettersLoadFailed) {
-      setEmptyMessage('留言回廊暂时没连上，稍后再来看看。');
-    } else if (publicLetters.length === 0) {
-      setEmptyMessage('回廊里还没有公开的信笺，不如由你写下第一封。');
-    } else if (matched.length === 0) {
-      setEmptyMessage('这一类信笺还在整理中，先去别的分类看看吧。');
-    } else {
-      setEmptyMessage('');
-    }
-  }
-
-  function makeLetter(message) {
-    const card = document.createElement('article');
-    card.className = 'letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow';
-    card.dataset.category = (message.tag || '网文同好').trim() || '网文同好';
-    if (message.id) card.dataset.id = message.id;
-
-    const head = document.createElement('div');
-    head.className = 'flex flex-col gap-space-sm';
-
-    const top = document.createElement('div');
-    top.className = 'flex items-start justify-between gap-space-sm';
-
-    const who = document.createElement('div');
-    who.className = 'flex items-center gap-space-sm min-w-0';
-    const badge = document.createElement('div');
-    badge.className = 'w-10 h-10 shrink-0 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-serif font-semibold text-lg shadow-inner';
-    badge.textContent = (message.name || '匿').slice(0, 1);
-    const identity = document.createElement('div');
-    identity.className = 'flex flex-col min-w-0';
-    const name = document.createElement('span');
-    name.className = 'font-body-lg text-primary font-medium leading-none break-words';
-    name.textContent = message.name || '匿名旅人';
-    const where = document.createElement('span');
-    where.className = 'font-label-sm text-[0.6875rem] text-on-surface-variant mt-1 break-words';
-    where.textContent = message.station || '来自一张匿名信笺';
-    identity.append(name, where);
-    who.append(badge, identity);
-
-    const meta = document.createElement('div');
-    meta.className = 'flex items-center gap-space-xs shrink-0';
-    const tag = document.createElement('span');
-    tag.className = 'bg-surface-container px-space-sm py-0.5 rounded font-label-sm text-label-sm text-secondary';
-    tag.textContent = message.tag || '网文同好';
-    const when = document.createElement('span');
-    when.className = 'font-label-sm text-[0.6875rem] text-outline-variant';
-    when.textContent = formatRelative(message.created_at);
-    meta.append(tag, when);
-    top.append(who, meta);
-
-    const body = document.createElement('p');
-    body.className = 'font-body-md text-body-md text-primary leading-relaxed pt-space-xs whitespace-pre-line break-words';
-    body.textContent = message.message || '';
-    head.append(top, body);
-    card.append(head);
-
-    if (typeof message.reply === 'string' && message.reply.trim() !== '') {
-      const replyBox = document.createElement('div');
-      replyBox.className = 'bg-surface-container p-space-md rounded-lg flex flex-col gap-space-xs';
-      const replyHead = document.createElement('div');
-      replyHead.className = 'flex items-center justify-between gap-space-sm text-on-surface-variant font-label-sm text-label-sm';
-      const replyLabel = document.createElement('span');
-      replyLabel.className = 'flex items-center gap-1 font-medium text-primary';
-      const icon = document.createElement('span');
-      icon.className = 'material-symbols-outlined text-xs text-secondary';
-      icon.textContent = 'reply';
-      replyLabel.append(icon, document.createTextNode('房主回信 · 风屿'));
-      const replyTime = document.createElement('span');
-      replyTime.textContent = formatRelative(message.replied_at);
-      replyHead.append(replyLabel, replyTime);
-      const replyBody = document.createElement('p');
-      replyBody.className = 'font-body-sm text-body-sm text-on-surface-variant whitespace-pre-line break-words';
-      replyBody.textContent = message.reply;
-      replyBox.append(replyHead, replyBody);
-      card.append(replyBox);
-    }
-
-    return card;
-  }
-
-  async function loadPublicLetters() {
-    if (!lettersContainer) return;
-    try {
-      const response = await fetch('/api/guestbook', { headers: { Accept: 'application/json' } });
-      if (!response.ok) throw new Error(`http_${response.status}`);
-      const data = await response.json();
-      publicLetters = Array.isArray(data.messages) ? data.messages : [];
-      lettersLoadFailed = false;
-      lettersContainer.replaceChildren(...publicLetters.map(makeLetter));
-    } catch {
-      lettersLoadFailed = true;
-      publicLetters = [];
-      lettersContainer.replaceChildren();
-    }
-    renderTagFilters();
-    refreshLetters();
-  }
-
-  form?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (!author?.value.trim() || !content?.value.trim()) {
-      showToast('昵称和正文都要写一点，才好投递。');
-      return;
-    }
-
-    const submitButton = form.querySelector('button[type="submit"]');
-    const payload = {
-      name: author.value.trim(),
-      station: station?.value.trim() || '',
-      tag: activeTag,
-      message: content.value.trim(),
-      private: Boolean(privateCheck?.checked),
-      website: '',
+            </div>
+            <div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
+              <span class="material-symbols-outlined text-sm text-secondary">mark_email_read</span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant">
+                房主回复率
+                <strong class="text-primary font-medium" data-stat="reply-rate">
+                  —
+                </strong>
+              </span>
+            </div>
+            <div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-space-xs rounded-full shadow-sm">
+              <span class="material-symbols-outlined text-sm text-secondary">forum</span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant">
+                公开信笺
+                <strong class="text-primary font-medium" data-stat="approved">
+                  —
+                </strong>{' '}
+                封
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Section 2: Interactive Bento Section (Form + Owner's Board) -->
+      <section class="w-full max-w-6xl mx-auto px-gutter pb-space-xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start" id="friends">
+          <!-- Left Column: Form Card (7 Cols) -->
+          <div class="lg:col-span-7 flex flex-col bg-surface-container-low p-space-lg rounded-xl shadow-sm relative overflow-hidden">
+            <!-- Vintage Stamp Watermark in corner -->
+            <div class="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-surface-container-high/60 flex items-center justify-center pointer-events-none select-none rotate-12">
+              <span class="font-label-sm text-[0.625rem] text-outline text-center uppercase tracking-widest leading-tight">
+                POSTAGE
+                <br />
+                COLLEGE NOOK
+                <br />★ AIRMAIL ★
+              </span>
+            </div>
+            <div class="flex items-center justify-between pb-space-md">
+              <div class="flex items-center gap-space-sm">
+                <span class="material-symbols-outlined text-secondary text-xl">edit_note</span>
+                <h2 class="font-headline-sm text-headline-sm text-primary">
+                  投递信笺
+                  <span class="font-label-md text-label-md text-on-surface-variant font-normal">/ Leave a Message</span>
+                </h2>
+              </div>
+              <span class="font-label-sm text-label-sm text-on-surface-variant">实时同步 · LIVE</span>
+            </div>
+            <form class="flex flex-col gap-space-md mt-space-xs" id="guestbook-form">
+              <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+              <!-- Inputs Row -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                <div class="flex flex-col gap-space-xs">
+                  <label
+                    class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between"
+                    for="author-name"
+                  >
+                    <span>昵称 / 笔名</span>
+                    <span class="text-outline-variant font-normal">必填</span>
+                  </label>
+                  <input
+                    class="w-full bg-surface-container-lowest px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary transition-all"
+                    id="author-name"
+                    placeholder="例: 某位塔罗会潜水成员 / 酷狗听友"
+                    required=""
+                    type="text"
+                  />
+                </div>
+                <div class="flex flex-col gap-space-xs">
+                  <label
+                    class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between"
+                    for="music-station"
+                  >
+                    <span>常驻地或校园 / 推荐酷狗单曲</span>
+                    <span class="text-outline-variant font-normal">选填</span>
+                  </label>
+                  <input
+                    class="w-full bg-surface-container-lowest px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary transition-all"
+                    id="music-station"
+                    placeholder="例: 成都 · 酷狗单曲《大鱼》"
+                    type="text"
+                  />
+                </div>
+              </div>
+              <!-- Category Tags (Capsules) -->
+              <div class="flex flex-col gap-space-xs pt-space-xs">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">信件类型 / 归档标签</span>
+                <div class="flex flex-wrap gap-space-xs" id="tag-capsules">
+                  <button
+                    class="tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm bg-primary text-on-primary transition-all"
+                    data-tag="网文同好"
+                    type="button"
+                  >
+                    [ 网文同好 ]
+                  </button>
+                  <button
+                    class="tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant hover:text-on-surface transition-all"
+                    data-tag="音乐安利"
+                    type="button"
+                  >
+                    [ 音乐安利 ]
+                  </button>
+                  <button
+                    class="tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant hover:text-on-surface transition-all"
+                    data-tag="大学日常"
+                    type="button"
+                  >
+                    [ 大学日常 ]
+                  </button>
+                  <button
+                    class="tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant hover:text-on-surface transition-all"
+                    data-tag="漂流寄语"
+                    type="button"
+                  >
+                    [ 漂流寄语 ]
+                  </button>
+                </div>
+              </div>
+              <!-- Message Body -->
+              <div class="flex flex-col gap-space-xs">
+                <label
+                  class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between"
+                  for="message-content"
+                >
+                  <span>信笺正文 / 拾光感触</span>
+                  <span class="text-outline-variant font-label-sm" id="char-counter">
+                    0 / 600
+                  </span>
+                </label>
+                <textarea
+                  class="w-full bg-surface-container-lowest p-space-md rounded-lg font-body-md text-body-md text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary transition-all resize-y leading-relaxed"
+                  id="message-content"
+                  maxlength="600"
+                  placeholder="写下你眼前的日落，或是最近循环不休的旋律，抑或是想对房主说的话..."
+                  required=""
+                  rows="4"
+                ></textarea>
+              </div>
+              <!-- Privacy Switch -->
+              <div class="flex items-center justify-between pt-space-xs">
+                <label class="flex items-center gap-space-sm cursor-pointer select-none">
+                  <input class="accent-secondary w-4 h-4 rounded cursor-pointer" id="private-check" type="checkbox" />
+                  <div class="flex flex-col">
+                    <span class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+                      <span class="material-symbols-outlined text-sm text-on-surface-variant">lock</span>
+                      仅房主可见 (悄悄话加密)
+                    </span>
+                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">
+                      勾选后不会公开上墙，仅站长后台查阅
+                    </span>
+                  </div>
+                </label>
+                <span class="hidden sm:inline font-label-sm text-[0.6875rem] text-outline-variant italic">
+                  Paper Texture Encrypted
+                </span>
+              </div>
+              <!-- Actions & Side Note -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-sm">
+                <div class="flex items-center gap-space-sm w-full sm:w-auto">
+                  <button
+                    class="flex-1 sm:flex-initial flex items-center justify-center gap-space-xs bg-primary text-on-primary px-space-lg py-space-sm rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-all shadow-sm active:scale-95"
+                    type="submit"
+                  >
+                    <span class="material-symbols-outlined text-base">send</span>
+                    <span>投递信笺 (Seal &amp; Send)</span>
+                  </button>
+                  <button
+                    class="flex items-center justify-center gap-space-xs bg-surface-container text-primary px-space-md py-space-sm rounded-lg font-label-md text-label-md hover:bg-surface-container-high transition-all shadow-sm active:scale-95"
+                    data-fish=""
+                    title="随机捞取一条前人留下的时光寄语"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-base text-secondary">explore</span>
+                    <span class="hidden md:inline">打捞漂流瓶</span>
+                  </button>
+                </div>
+                <p class="font-label-sm text-label-sm text-on-surface-variant text-center sm:text-right">
+                  每晚自习后
+                  <span class="text-primary font-medium">22:30 ~ 23:30</span>
+                  拆信回复
+                </p>
+              </div>
+            </form>
+            <!-- Dynamic Success Toast (Hidden by default) -->
+            <div
+              class="hidden absolute bottom-4 left-4 right-4 bg-primary text-on-primary p-space-md rounded-lg shadow-md flex items-center justify-between transition-all"
+              id="toast-success"
+            >
+              <div class="flex items-center gap-space-sm">
+                <span class="material-symbols-outlined text-secondary-container">mark_email_read</span>
+                <span class="font-body-sm text-body-sm">信笺已落锁收妥！待夜晚钟声响起，房主便会拆封细读。</span>
+              </div>
+              <button class="text-on-primary/70 hover:text-on-primary" data-close-toast="">
+                <span class="material-symbols-outlined text-base">close</span>
+              </button>
+            </div>
+          </div>
+          <!-- Right Column: Owner's Note & Cyber Neighbors (5 Cols) -->
+          <div class="lg:col-span-5 flex flex-col gap-space-lg" id="friends">
+            <!-- Card 1: Owner's Pin Note -->
+            <div class="bg-surface-container p-space-lg rounded-xl shadow-sm relative overflow-hidden flex flex-col gap-space-sm">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-space-xs text-secondary">
+                  <span class="material-symbols-outlined text-lg">push_pin</span>
+                  <span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">
+                    房主公告牌 · PIN NOTE
+                  </span>
+                </div>
+                <span class="font-label-sm text-label-sm text-on-surface-variant">大三初春</span>
+              </div>
+              <p class="font-body-md text-body-md text-primary leading-relaxed">
+                大三学期正经历密集的专业课与实习准备，但看到同好留言总会第一时间认真回复。聊《诡秘之主》剧情、探讨克苏鲁神话或推荐冷门仙侠（如《道诡异仙》李火旺的癫狂美学），或是酷狗好听的冷门
+                Live 版，随时欢迎敲门！
+              </p>
+              <div class="flex items-center justify-between pt-space-xs text-on-surface-variant font-label-sm text-label-sm">
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm text-secondary">headphones</span>
+                  伴写背景乐: 周深《达拉崩吧 (Live)》
+                </span>
+                <span class="italic font-quote text-body-sm text-primary">@风屿书房</span>
+              </div>
+            </div>
+            <!-- Card 2: Cyber Neighbors / Blogroll -->
+            <div
+              class="bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md"
+              id="friends"
+            >
+              <div class="flex items-center justify-between" id="friends">
+                <div class="flex items-center gap-space-xs text-primary" id="friends">
+                  <span class="material-symbols-outlined text-base text-secondary">diversity_2</span>
+                  <h3 class="font-headline-sm text-headline-sm">赛博邻居 · 友链自留地</h3>
+                </div>
+                <a
+                  class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors flex items-center gap-0.5"
+                  data-prefill-friend=""
+                  href="#guestbook-form"
+                >
+                  <span>申请交换</span>
+                  <span class="material-symbols-outlined text-xs">north_east</span>
+                </a>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+                <!-- Friend 1 -->
+                <a
+                  class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
+                  href="#friends"
+                >
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
+                      云中漫步
+                    </span>
+                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">CS 大四</span>
+                  </div>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
+                    Astro 与前端引擎折腾记录
+                  </span>
+                </a>
+                <!-- Friend 2 -->
+                <a
+                  class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
+                  href="#friends"
+                >
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
+                      晚风便利店
+                    </span>
+                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">二次元画师</span>
+                  </div>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
+                    日常胶片记录与同人速写
+                  </span>
+                </a>
+                <!-- Friend 3 -->
+                <a
+                  class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
+                  href="#friends"
+                >
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
+                      落日余晖
+                    </span>
+                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">古典吉他</span>
+                  </div>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
+                    网文书荒避难所 &amp; 乐评
+                  </span>
+                </a>
+                <!-- Friend 4 -->
+                <a
+                  class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
+                  href="#friends"
+                >
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
+                      心素之境
+                    </span>
+                    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">《道诡》骨灰粉</span>
+                  </div>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">
+                    白灵淼同人与街头纪实摄影
+                  </span>
+                </a>
+              </div>
+              <div class="flex items-center justify-between bg-surface-container px-space-md py-space-xs rounded-lg text-on-surface-variant font-label-sm text-label-sm">
+                <span>友链准则: 保持更新 · 独立博客 · 拒绝商业滥投</span>
+                <span class="text-secondary font-medium">4 / 12 席位</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Section 3: Guestbook Stream / Letters Corridor -->
+      <section class="w-full max-w-6xl mx-auto px-gutter pb-space-xl" id="archive">
+        <!-- Filter Bar & Section Header -->
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-space-md pb-space-lg">
+          <div class="flex flex-col gap-space-xs">
+            <div class="flex items-center gap-space-xs text-secondary">
+              <span class="material-symbols-outlined text-base">forum</span>
+              <span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">LETTERS ARCHIVE</span>
+            </div>
+            <h2 class="font-headline-md text-headline-md text-primary">时光留言回廊</h2>
+          </div>
+          <!-- Filter Tabs -->
+          <div
+            class="flex items-center gap-space-xs bg-surface-container-low p-1 rounded-full overflow-x-auto"
+            id="comment-filters"
+            role="group"
+            aria-label="留言分类筛选"
+          >
+            <button
+              class="filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm bg-primary text-on-primary transition-all shadow-sm"
+              data-filter-category="all"
+              type="button"
+              aria-pressed="true"
+            >
+              全部留言 (<span data-filter-count="all">0</span>)
+            </button>
+          </div>
+        </div>
+        <!-- Masonry / Responsive Grid of Letters（由 /api/guestbook 实时渲染） -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg" id="letters-container"></div>
+        <p
+          class="hidden rounded-xl border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant"
+          id="letters-empty"
+        >
+          回廊里还没有公开的信笺，不如由你写下第一封。
+        </p>
+        <!-- Load More and Bottle Action Section -->
+        <div class="w-full flex flex-col sm:flex-row items-center justify-center gap-space-md pt-space-xl">
+          <button
+            class="flex items-center gap-space-xs bg-surface-container px-space-lg py-space-sm rounded-full font-label-sm text-label-sm text-primary hover:bg-surface-container-high transition-colors shadow-sm"
+            data-load-more=""
+          >
+            <span class="material-symbols-outlined text-base">unfold_more</span>
+            <span data-load-more-label>展开翻阅更早的时光卷轴</span>
+          </button>
+          <span class="text-outline-variant text-xs hidden sm:inline">·</span>
+          <button
+            class="flex items-center gap-space-xs font-label-sm text-label-sm text-secondary hover:text-primary transition-colors"
+            data-fish=""
+          >
+            <span class="material-symbols-outlined text-base">stream</span>
+            <span>打捞一只未公开的匿名心事</span>
+          </button>
+        </div>
+      </section>
+      <!-- Interactive Modal: Fish a Bottle -->
+      <div
+        class="fixed inset-0 z-50 bg-primary/40 backdrop-blur-sm hidden flex items-center justify-center p-gutter"
+        data-bottle-modal=""
+        id="bottle-modal"
+      >
+        <div class="bg-surface p-space-xl rounded-xl shadow-xl max-w-lg w-full flex flex-col gap-space-md relative transform transition-all">
+          <button class="absolute top-4 right-4 text-on-surface-variant hover:text-primary" data-close-bottle="">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+          <div class="flex items-center gap-space-xs text-secondary">
+            <span class="material-symbols-outlined text-xl">sailing</span>
+            <span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">
+              拾光漂流瓶 #BOTTLE-2025
+            </span>
+          </div>
+          <div class="bg-surface-container-low p-space-lg rounded-lg border border-outline-variant/30 flex flex-col gap-space-sm">
+            <span class="font-quote text-quote italic text-primary leading-relaxed" id="bottle-quote">
+              “今晚在操场跑完五公里，躺在草坪上看冬夜猎户座。耳机里正好放到周深的《化身孤岛的鲸》，突然觉得大学四年哪怕有再多迷茫，这一刻的风也是真实的。”
+            </span>
+            <div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm pt-space-xs">
+              <span id="bottle-author">— 匿名漫游者 (投递于 2025.02.14)</span>
+              <span class="text-secondary">#漂流寄语</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-space-xs">
+            <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">
+              已被打捞 7 次 · 随潮水继续漂向远方
+            </span>
+            <button
+              class="flex items-center gap-1 font-label-sm text-label-sm text-primary hover:text-secondary font-medium"
+              data-fish=""
+            >
+              <span class="material-symbols-outlined text-sm">refresh</span>
+              <span>换一只打捞</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Client-side Micro-interactions -->
+    </div>
+  </main>
+  <script>
+    type PublicLetter = {
+      id: string;
+      name: string;
+      station: string;
+      message: string;
+      tag: string;
+      reply: string;
+      replied_at: string | null;
+      created_at: string;
     };
-    submitButton?.setAttribute('disabled', '');
-    submitButton?.classList.add('opacity-60');
 
-    try {
-      const response = await fetch('/api/guestbook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload),
+    type StatsPayload = {
+      ok?: boolean;
+      replyRate?: number;
+      letters?: {
+        publicTotal?: number;
+        approved?: number;
+        publicReplied?: number;
+      };
+    };
+
+    const tagButtons = [...document.querySelectorAll<HTMLElement>('#tag-capsules .tag-pill')];
+    let activeTag = tagButtons[0]?.dataset.tag || '网文同好';
+    for (const btn of tagButtons) {
+      btn.addEventListener('click', () => {
+        for (const b of tagButtons) {
+          b.classList.remove('bg-primary', 'text-on-primary');
+          b.classList.add('bg-surface-container', 'text-on-surface-variant');
+        }
+        btn.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        btn.classList.add('bg-primary', 'text-on-primary');
+        activeTag = btn.dataset.tag || '网文同好';
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.ok) {
-        const friendly = response.status === 422 || response.status === 429;
-        throw new Error(friendly ? (data.message || '这封信暂时投递不了。') : 'offline');
+    }
+
+    const author = document.getElementById('author-name') as HTMLInputElement | null;
+    const station = document.getElementById('music-station') as HTMLInputElement | null;
+    const content = document.getElementById('message-content') as HTMLTextAreaElement | null;
+    const privateCheck = document.getElementById('private-check') as HTMLInputElement | null;
+    const counter = document.getElementById('char-counter');
+    const toast = document.getElementById('toast-success');
+    const form = document.getElementById('guestbook-form') as HTMLFormElement | null;
+
+    const query = new URLSearchParams(window.location.search);
+    const queryName = query.get('name');
+    const queryStation = query.get('station');
+    const queryMessage = query.get('message');
+    if (author && queryName) author.value = queryName;
+    if (station && queryStation) station.value = queryStation;
+    if (content && queryMessage) {
+      content.value = queryMessage;
+      if (counter) counter.textContent = `${content.value.length} / 600`;
+    }
+    if (query.get('private') === '1' && privateCheck) privateCheck.checked = true;
+
+    content?.addEventListener('input', () => {
+      if (counter) counter.textContent = `${content.value.length} / 600`;
+    });
+
+    let toastTimer: number | undefined;
+    function showToast(message: string) {
+      if (!toast) return;
+      if (message) {
+        const span = toast.querySelector('.font-body-sm');
+        if (span) span.textContent = message;
       }
-      showToast(data.message || '信笺已收妥。');
-      form.reset();
-      if (counter) counter.textContent = '0 / 600';
-      resetTags();
-      await loadStats();
-      if (!payload.private) await loadPublicLetters();
-    } catch (error) {
-      // 本地预览或网络异常时，至少把信笺留在浏览器里，不丢失。
+      toast.classList.remove('hidden');
+      toast.classList.add('toast-enter');
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => toast.classList.add('hidden'), 4500);
+    }
+
+    document.querySelector('[data-close-toast]')?.addEventListener('click', () => toast?.classList.add('hidden'));
+
+    document.querySelector('[data-prefill-friend]')?.addEventListener('click', () => {
+      if (author) author.value = '某站长';
+      if (content) {
+        content.value = '你好！想申请与《风屿书房》交换友链：\n站名：\n网址：\n简介：\n头像链接：';
+        content.dispatchEvent(new Event('input'));
+      }
+      author?.focus();
+    });
+
+    // ---- 统计：只取聚合数字，失败时保留占位符 ----
+    async function loadStats() {
       try {
-        const drafts = JSON.parse(localStorage.getItem('fengyu-guestbook-drafts') || '[]');
-        drafts.unshift({ ...payload, at: new Date().toISOString() });
-        localStorage.setItem('fengyu-guestbook-drafts', JSON.stringify(drafts.slice(0, 20)));
-      } catch {}
-      showToast(error instanceof Error && error.message !== 'offline' && error.message !== 'Failed to fetch'
-        ? error.message
-        : '信箱暂时没连上，信笺先存在这只浏览器里。');
-    } finally {
-      submitButton?.removeAttribute('disabled');
-      submitButton?.classList.remove('opacity-60');
+        const response = await fetch('/api/stats', { headers: { Accept: 'application/json' } });
+        if (!response.ok) return;
+        const data = (await response.json()) as StatsPayload;
+        if (!data || !data.ok || !data.letters) return;
+        const values: Record<string, string | number | undefined> = {
+          total: data.letters.publicTotal,
+          approved: data.letters.approved,
+          replied: data.letters.publicReplied,
+          'reply-rate': typeof data.replyRate === 'number' ? `${data.replyRate}%` : undefined,
+        };
+        for (const node of document.querySelectorAll<HTMLElement>('[data-stat]')) {
+          const key = node.dataset.stat ?? '';
+          const value = values[key];
+          if (value !== undefined && value !== null) node.textContent = String(value);
+        }
+      } catch {
+        // 静态预览没有 API，保留 — 占位即可。
+      }
     }
-  });
 
-  function resetTags() {
-    activeTag = tagButtons[0]?.dataset.tag || '网文同好';
-    for (const b of tagButtons) {
-      const on = b === tagButtons[0];
-      b.classList.toggle('bg-primary', on);
-      b.classList.toggle('text-on-primary', on);
-      b.classList.toggle('bg-surface-container', !on);
-      b.classList.toggle('text-on-surface-variant', !on);
+    // ---- 留言回廊：公开列表来自 /api/guestbook ----
+    const lettersContainer = document.getElementById('letters-container');
+    const loadMoreBtn = document.querySelector<HTMLElement>('[data-load-more]');
+    const lettersEmpty = document.getElementById('letters-empty');
+    const commentFilters = document.getElementById('comment-filters');
+    const LETTER_BATCH = 3;
+    let letterLimit = LETTER_BATCH;
+    let activeLetterFilter = 'all';
+    let publicLetters: PublicLetter[] = [];
+    let lettersLoadFailed = false;
+
+    function setEmptyMessage(message: string) {
+      if (!lettersEmpty) return;
+      if (message) {
+        lettersEmpty.textContent = message;
+        lettersEmpty.classList.remove('hidden');
+      } else {
+        lettersEmpty.classList.add('hidden');
+      }
     }
-  }
 
-  // 打捞漂流瓶（站内示例心事，不含私密留言）
-  const bottles = [
-    { text: '“今晚在操场跑完五公里，躺在草坪上看冬夜猎户座。耳机里正好放到周深的《化身孤岛的鲸》，突然觉得大学四年哪怕有再多迷茫，这一刻的风也是真实的。”', author: '— 匿名漫游者 (投递于 2025.02.14)' },
-    { text: '“看完了《诡秘之主》最后一章，合上书的时候宿舍已经熄灯了。愚者先生回到了属于他的地方，而我还得赶明天八点的早课。但今晚的黑暗好像没那么难熬了。”', author: '— 贝克兰德夜行人 (投递于 2025.03.02)' },
-    { text: '“在图书馆四楼靠窗的位置复习，阳光正好落在『道诡异仙』的封面上。李火旺分不清，我也分不清，到底是这世界疯了，还是我们都在假装正常。”', author: '— 心素未泯 (投递于 2025.01.27)' },
-    { text: '“答辩结束的那天傍晚，我一个人走到操场，把耳机里《起风了》放到最大声。四年就这样过去了，好像一首歌的时间。”', author: '— 即将离校的岛民 (投递于 2025.05.20)' },
-    { text: '“第一次在机房通宵渲图，凌晨四点的校园安静得像另一个星球。如果你也还没睡，请记得窗外的天很快就要亮了。”', author: '— 建模喵 (投递于 2025.04.11)' },
-    { text: '“把这张小站存进了浏览器书签栏。以后不开心的时候，就来这里看看别人的日常，感觉世界还没有那么糟。”', author: '— 路过的旅人 (投递于 2025.06.06)' },
-  ];
-  let bottleIndex = 0;
-  const modal = document.querySelector('[data-bottle-modal]');
-  const quoteEl = document.getElementById('bottle-quote');
-  const authorEl = document.getElementById('bottle-author');
-  function openBottle() {
-    bottleIndex = Math.floor(Math.random() * bottles.length);
-    const b = bottles[bottleIndex];
-    if (quoteEl) quoteEl.textContent = b.text;
-    if (authorEl) authorEl.textContent = b.author;
-    modal?.classList.remove('hidden');
-    modal?.classList.add('flex');
-  }
-  function closeBottle() {
-    modal?.classList.add('hidden');
-    modal?.classList.remove('flex');
-  }
-  for (const btn of document.querySelectorAll('[data-fish]')) btn.addEventListener('click', openBottle);
-  for (const btn of document.querySelectorAll('[data-close-bottle]')) btn.addEventListener('click', closeBottle);
-  modal?.addEventListener('click', (e) => { if (e.target === modal) closeBottle(); });
+    function formatRelative(iso: string | null) {
+      if (!iso) return '';
+      const date = new Date(iso);
+      if (Number.isNaN(date.getTime())) return '';
+      const diff = Date.now() - date.getTime();
+      const minute = 60 * 1000;
+      const hour = 60 * minute;
+      const day = 24 * hour;
+      if (diff < minute) return '刚刚';
+      if (diff < hour) return `${Math.floor(diff / minute)}分钟前`;
+      if (diff < day) return `${Math.floor(diff / hour)}小时前`;
+      if (diff < 2 * day) return '昨天';
+      if (diff < 30 * day) return `${Math.floor(diff / day)}天前`;
+      return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    }
 
-  loadMoreBtn?.addEventListener('click', () => {
-    letterLimit += LETTER_BATCH;
-    refreshLetters();
-  });
+    function setActiveFilterButton(category: string) {
+      if (!commentFilters) return;
+      for (const btn of commentFilters.querySelectorAll<HTMLElement>('[data-filter-category]')) {
+        const on = (btn.dataset.filterCategory || 'all') === category;
+        btn.classList.toggle('bg-primary', on);
+        btn.classList.toggle('text-on-primary', on);
+        btn.classList.toggle('shadow-sm', on);
+        btn.classList.toggle('text-on-surface-variant', !on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      }
+    }
 
-  loadStats();
-  loadPublicLetters();
-</script>
+    function renderTagFilters() {
+      if (!commentFilters) return;
+      for (const btn of commentFilters.querySelectorAll('[data-generated-filter]')) btn.remove();
+      const allCount = commentFilters.querySelector('[data-filter-count="all"]');
+      if (allCount) allCount.textContent = String(publicLetters.length);
 
+      const counts = new Map();
+      for (const letter of publicLetters) {
+        const tag = (letter.tag || '网文同好').trim() || '网文同好';
+        counts.set(tag, (counts.get(tag) || 0) + 1);
+      }
+
+      for (const [tag, count] of counts) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className =
+          'filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all';
+        btn.dataset.filterCategory = tag;
+        btn.dataset.generatedFilter = '1';
+        btn.setAttribute('aria-pressed', 'false');
+        btn.textContent = `${tag} (${count})`;
+        commentFilters.append(btn);
+      }
+
+      if (activeLetterFilter !== 'all' && !counts.has(activeLetterFilter)) {
+        activeLetterFilter = 'all';
+      }
+      setActiveFilterButton(activeLetterFilter);
+    }
+
+    commentFilters?.addEventListener('click', (event) => {
+      const target =
+        event.target instanceof Element ? event.target.closest<HTMLElement>('[data-filter-category]') : null;
+      if (!target) return;
+      activeLetterFilter = target.dataset.filterCategory || 'all';
+      letterLimit = LETTER_BATCH;
+      setActiveFilterButton(activeLetterFilter);
+      refreshLetters();
+    });
+
+    function refreshLetters() {
+      if (!lettersContainer) return;
+      const cards = [...lettersContainer.querySelectorAll<HTMLElement>('.letter-card')];
+      const matched = cards.filter(
+        (card) => activeLetterFilter === 'all' || card.dataset.category === activeLetterFilter,
+      );
+      let shown = 0;
+      for (const card of cards) {
+        const isMatch = activeLetterFilter === 'all' || card.dataset.category === activeLetterFilter;
+        const visible = isMatch && shown < letterLimit;
+        card.style.display = visible ? 'flex' : 'none';
+        if (visible) shown += 1;
+      }
+
+      const remaining = Math.max(0, matched.length - shown);
+      if (loadMoreBtn) {
+        loadMoreBtn.style.display = remaining === 0 ? 'none' : '';
+        const label = loadMoreBtn.querySelector('[data-load-more-label]');
+        if (label) {
+          label.textContent = remaining ? `展开翻阅更早的时光卷轴（还有 ${remaining} 封）` : '已经翻到最早的一封了';
+        }
+      }
+
+      if (lettersLoadFailed) {
+        setEmptyMessage('留言回廊暂时没连上，稍后再来看看。');
+      } else if (publicLetters.length === 0) {
+        setEmptyMessage('回廊里还没有公开的信笺，不如由你写下第一封。');
+      } else if (matched.length === 0) {
+        setEmptyMessage('这一类信笺还在整理中，先去别的分类看看吧。');
+      } else {
+        setEmptyMessage('');
+      }
+    }
+
+    function makeLetter(message: PublicLetter) {
+      const card = document.createElement('article');
+      card.className =
+        'letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow';
+      card.dataset.category = (message.tag || '网文同好').trim() || '网文同好';
+      if (message.id) card.dataset.id = message.id;
+
+      const head = document.createElement('div');
+      head.className = 'flex flex-col gap-space-sm';
+
+      const top = document.createElement('div');
+      top.className = 'flex items-start justify-between gap-space-sm';
+
+      const who = document.createElement('div');
+      who.className = 'flex items-center gap-space-sm min-w-0';
+      const badge = document.createElement('div');
+      badge.className =
+        'w-10 h-10 shrink-0 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-serif font-semibold text-lg shadow-inner';
+      badge.textContent = (message.name || '匿').slice(0, 1);
+      const identity = document.createElement('div');
+      identity.className = 'flex flex-col min-w-0';
+      const name = document.createElement('span');
+      name.className = 'font-body-lg text-primary font-medium leading-none break-words';
+      name.textContent = message.name || '匿名旅人';
+      const where = document.createElement('span');
+      where.className = 'font-label-sm text-[0.6875rem] text-on-surface-variant mt-1 break-words';
+      where.textContent = message.station || '来自一张匿名信笺';
+      identity.append(name, where);
+      who.append(badge, identity);
+
+      const meta = document.createElement('div');
+      meta.className = 'flex items-center gap-space-xs shrink-0';
+      const tag = document.createElement('span');
+      tag.className = 'bg-surface-container px-space-sm py-0.5 rounded font-label-sm text-label-sm text-secondary';
+      tag.textContent = message.tag || '网文同好';
+      const when = document.createElement('span');
+      when.className = 'font-label-sm text-[0.6875rem] text-outline-variant';
+      when.textContent = formatRelative(message.created_at);
+      meta.append(tag, when);
+      top.append(who, meta);
+
+      const body = document.createElement('p');
+      body.className =
+        'font-body-md text-body-md text-primary leading-relaxed pt-space-xs whitespace-pre-line break-words';
+      body.textContent = message.message || '';
+      head.append(top, body);
+      card.append(head);
+
+      if (typeof message.reply === 'string' && message.reply.trim() !== '') {
+        const replyBox = document.createElement('div');
+        replyBox.className = 'bg-surface-container p-space-md rounded-lg flex flex-col gap-space-xs';
+        const replyHead = document.createElement('div');
+        replyHead.className =
+          'flex items-center justify-between gap-space-sm text-on-surface-variant font-label-sm text-label-sm';
+        const replyLabel = document.createElement('span');
+        replyLabel.className = 'flex items-center gap-1 font-medium text-primary';
+        const icon = document.createElement('span');
+        icon.className = 'material-symbols-outlined text-xs text-secondary';
+        icon.textContent = 'reply';
+        replyLabel.append(icon, document.createTextNode('房主回信 · 风屿'));
+        const replyTime = document.createElement('span');
+        replyTime.textContent = formatRelative(message.replied_at);
+        replyHead.append(replyLabel, replyTime);
+        const replyBody = document.createElement('p');
+        replyBody.className = 'font-body-sm text-body-sm text-on-surface-variant whitespace-pre-line break-words';
+        replyBody.textContent = message.reply;
+        replyBox.append(replyHead, replyBody);
+        card.append(replyBox);
+      }
+
+      return card;
+    }
+
+    async function loadPublicLetters() {
+      if (!lettersContainer) return;
+      try {
+        const response = await fetch('/api/guestbook', { headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(`http_${response.status}`);
+        const data = (await response.json()) as { messages?: PublicLetter[] };
+        publicLetters = Array.isArray(data.messages) ? data.messages : [];
+        lettersLoadFailed = false;
+        lettersContainer.replaceChildren(...publicLetters.map(makeLetter));
+      } catch {
+        lettersLoadFailed = true;
+        publicLetters = [];
+        lettersContainer.replaceChildren();
+      }
+      renderTagFilters();
+      refreshLetters();
+    }
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!author?.value.trim() || !content?.value.trim()) {
+        showToast('昵称和正文都要写一点，才好投递。');
+        return;
+      }
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      const payload = {
+        name: author.value.trim(),
+        station: station?.value.trim() || '',
+        tag: activeTag,
+        message: content.value.trim(),
+        private: Boolean(privateCheck?.checked),
+        website: '',
+      };
+      submitButton?.setAttribute('disabled', '');
+      submitButton?.classList.add('opacity-60');
+
+      try {
+        const response = await fetch('/api/guestbook', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = (await response.json().catch(() => ({}))) as { ok?: boolean; message?: string };
+        if (!response.ok || !data.ok) {
+          const friendly = response.status === 422 || response.status === 429;
+          throw new Error(friendly ? data.message || '这封信暂时投递不了。' : 'offline');
+        }
+        showToast(data.message || '信笺已收妥。');
+        form.reset();
+        if (counter) counter.textContent = '0 / 600';
+        resetTags();
+        await loadStats();
+        if (!payload.private) await loadPublicLetters();
+      } catch (error) {
+        // 本地预览或网络异常时，至少把信笺留在浏览器里，不丢失。
+        try {
+          const drafts = JSON.parse(localStorage.getItem('fengyu-guestbook-drafts') || '[]');
+          drafts.unshift({ ...payload, at: new Date().toISOString() });
+          localStorage.setItem('fengyu-guestbook-drafts', JSON.stringify(drafts.slice(0, 20)));
+        } catch {}
+        showToast(
+          error instanceof Error && error.message !== 'offline' && error.message !== 'Failed to fetch'
+            ? error.message
+            : '信箱暂时没连上，信笺先存在这只浏览器里。',
+        );
+      } finally {
+        submitButton?.removeAttribute('disabled');
+        submitButton?.classList.remove('opacity-60');
+      }
+    });
+
+    function resetTags() {
+      activeTag = tagButtons[0]?.dataset.tag || '网文同好';
+      for (const b of tagButtons) {
+        const on = b === tagButtons[0];
+        b.classList.toggle('bg-primary', on);
+        b.classList.toggle('text-on-primary', on);
+        b.classList.toggle('bg-surface-container', !on);
+        b.classList.toggle('text-on-surface-variant', !on);
+      }
+    }
+
+    // 打捞漂流瓶（站内示例心事，不含私密留言）
+    const bottles = [
+      {
+        text: '“今晚在操场跑完五公里，躺在草坪上看冬夜猎户座。耳机里正好放到周深的《化身孤岛的鲸》，突然觉得大学四年哪怕有再多迷茫，这一刻的风也是真实的。”',
+        author: '— 匿名漫游者 (投递于 2025.02.14)',
+      },
+      {
+        text: '“看完了《诡秘之主》最后一章，合上书的时候宿舍已经熄灯了。愚者先生回到了属于他的地方，而我还得赶明天八点的早课。但今晚的黑暗好像没那么难熬了。”',
+        author: '— 贝克兰德夜行人 (投递于 2025.03.02)',
+      },
+      {
+        text: '“在图书馆四楼靠窗的位置复习，阳光正好落在『道诡异仙』的封面上。李火旺分不清，我也分不清，到底是这世界疯了，还是我们都在假装正常。”',
+        author: '— 心素未泯 (投递于 2025.01.27)',
+      },
+      {
+        text: '“答辩结束的那天傍晚，我一个人走到操场，把耳机里《起风了》放到最大声。四年就这样过去了，好像一首歌的时间。”',
+        author: '— 即将离校的岛民 (投递于 2025.05.20)',
+      },
+      {
+        text: '“第一次在机房通宵渲图，凌晨四点的校园安静得像另一个星球。如果你也还没睡，请记得窗外的天很快就要亮了。”',
+        author: '— 建模喵 (投递于 2025.04.11)',
+      },
+      {
+        text: '“把这张小站存进了浏览器书签栏。以后不开心的时候，就来这里看看别人的日常，感觉世界还没有那么糟。”',
+        author: '— 路过的旅人 (投递于 2025.06.06)',
+      },
+    ];
+    let bottleIndex = 0;
+    const modal = document.querySelector<HTMLElement>('[data-bottle-modal]');
+    const quoteEl = document.getElementById('bottle-quote');
+    const authorEl = document.getElementById('bottle-author');
+    function openBottle() {
+      bottleIndex = Math.floor(Math.random() * bottles.length);
+      const b = bottles[bottleIndex];
+      if (quoteEl) quoteEl.textContent = b.text;
+      if (authorEl) authorEl.textContent = b.author;
+      modal?.classList.remove('hidden');
+      modal?.classList.add('flex');
+    }
+    function closeBottle() {
+      modal?.classList.add('hidden');
+      modal?.classList.remove('flex');
+    }
+    for (const btn of document.querySelectorAll<HTMLElement>('[data-fish]')) btn.addEventListener('click', openBottle);
+    for (const btn of document.querySelectorAll<HTMLElement>('[data-close-bottle]'))
+      btn.addEventListener('click', closeBottle);
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeBottle();
+    });
+
+    loadMoreBtn?.addEventListener('click', () => {
+      letterLimit += LETTER_BATCH;
+      refreshLetters();
+    });
+
+    loadStats();
+    loadPublicLetters();
+  </script>
 </BaseLayout>

@@ -35,8 +35,6 @@ export function listSubscribers(): SubscriberRow[] {
 
 export function countSubscribers(): number {
   const db = getDb();
-  const row = db.prepare('SELECT COUNT(*) AS count FROM subscribers').get() as
-    | { count: number }
-    | undefined;
+  const row = db.prepare('SELECT COUNT(*) AS count FROM subscribers').get() as { count: number } | undefined;
   return row?.count ?? 0;
 }

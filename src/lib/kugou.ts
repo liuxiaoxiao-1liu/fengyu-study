@@ -118,7 +118,7 @@ export async function resolveKugouUrl(track: KugouTrackRef): Promise<string> {
   const cookie = baseCookie(config, dfid);
   const pickUrl = (body: KugouResponse['body']): string => {
     if (!body) return '';
-    return Array.isArray(body.url) ? body.url[0] ?? '' : body.url ?? body.backupUrl?.[0] ?? '';
+    return Array.isArray(body.url) ? (body.url[0] ?? '') : (body.url ?? body.backupUrl?.[0] ?? '');
   };
 
   // 优先带 album_audio_id；部分曲目（尤其免费/翻唱）带它反而返回版权拦截，退回 0 再试。

@@ -1,5 +1,5 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "_trial"]
+  "exclude": ["dist", "vendor", "_trial", "_scratch", "stitch_astro_personal_website", "stitch-assets", ".preview"]
 }

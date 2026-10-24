@@ -20,10 +20,16 @@ const { essay, newer, older } = Astro.props;
 
 <BaseLayout current="essays" title={essay.title} description={essay.summary}>
   <main id="main" class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)] relative overflow-hidden">
-    <div class="absolute -top-24 right-0 w-[28rem] h-[28rem] rounded-full bg-secondary-container/25 blur-3xl pointer-events-none" aria-hidden="true"></div>
+    <div
+      class="absolute -top-24 right-0 w-[28rem] h-[28rem] rounded-full bg-secondary-container/25 blur-3xl pointer-events-none"
+      aria-hidden="true"
+    ></div>
 
     <div class="relative z-10 w-full max-w-3xl mx-auto px-gutter pt-space-lg pb-space-xl">
-      <a class="inline-flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="/essays/">
+      <a
+        class="inline-flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors"
+        href="/essays/"
+      >
         <span class="material-symbols-outlined text-base">arrow_back</span>
         <span>回到随记</span>
       </a>
@@ -31,12 +37,15 @@ const { essay, newer, older } = Astro.props;
       <header class="mt-space-lg pb-space-lg border-b border-surface-container-high">
         <div class="flex flex-wrap items-center gap-x-space-sm gap-y-1 font-label-sm text-label-sm text-on-surface-variant">
           <span class="text-secondary font-medium tracking-wide">{essay.category}</span>
-          <span class="text-outline-variant" aria-hidden="true">·</span>
+          <span class="text-outline-variant" aria-hidden="true">
+            ·
+          </span>
           <time datetime={essay.date}>{formatEssayDate(essay.date)}</time>
-          <span class="text-outline-variant" aria-hidden="true">·</span>
+          <span class="text-outline-variant" aria-hidden="true">
+            ·
+          </span>
           <span class="flex items-center gap-1">
-            <span class="material-symbols-outlined text-[14px]">schedule</span>
-            约 {essay.readMinutes} 分钟
+            <span class="material-symbols-outlined text-[14px]">schedule</span>约 {essay.readMinutes} 分钟
           </span>
         </div>
         <h1 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary tracking-tight font-normal mt-space-sm text-balance">
@@ -45,9 +54,7 @@ const { essay, newer, older } = Astro.props;
       </header>
 
       <figure class="mt-space-lg p-space-lg bg-surface-container-low rounded-xl border-l-2 border-secondary/50">
-        <blockquote class="font-quote text-quote italic text-primary leading-relaxed">
-          {essay.quote}
-        </blockquote>
+        <blockquote class="font-quote text-quote italic text-primary leading-relaxed">{essay.quote}</blockquote>
       </figure>
 
       <article class="prose-editorial mt-space-xl">
@@ -64,7 +71,9 @@ const { essay, newer, older } = Astro.props;
         </div>
 
         <div class="flex items-center justify-between gap-space-md font-label-sm text-label-sm text-on-surface-variant">
-          <span class="italic">写于 {formatEssayDate(essay.date)} · {SITE.name}</span>
+          <span class="italic">
+            写于 {formatEssayDate(essay.date)} · {SITE.name}
+          </span>
           <a class="inline-flex items-center gap-1 hover:text-primary transition-colors" href="#main">
             <span>回到顶部</span>
             <span class="material-symbols-outlined text-sm">arrow_forward</span>
@@ -73,15 +82,25 @@ const { essay, newer, older } = Astro.props;
 
         <nav class="grid grid-cols-1 sm:grid-cols-2 gap-space-md pt-space-sm" aria-label="文章翻页">
           {older && (
-            <a class="group flex flex-col gap-space-xs p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors" href={`/essays/${older.slug}/`}>
+            <a
+              class="group flex flex-col gap-space-xs p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors"
+              href={`/essays/${older.slug}/`}
+            >
               <span class="font-label-sm text-label-sm text-on-surface-variant">上一篇 · 更早</span>
-              <span class="font-headline-sm text-headline-sm text-primary leading-snug group-hover:text-on-tertiary-container transition-colors">{older.title}</span>
+              <span class="font-headline-sm text-headline-sm text-primary leading-snug group-hover:text-on-tertiary-container transition-colors">
+                {older.title}
+              </span>
             </a>
           )}
           {newer && (
-            <a class="group flex flex-col gap-space-xs p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors sm:text-right" href={`/essays/${newer.slug}/`}>
+            <a
+              class="group flex flex-col gap-space-xs p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors sm:text-right"
+              href={`/essays/${newer.slug}/`}
+            >
               <span class="font-label-sm text-label-sm text-on-surface-variant">下一篇 · 更新</span>
-              <span class="font-headline-sm text-headline-sm text-primary leading-snug group-hover:text-on-tertiary-container transition-colors">{newer.title}</span>
+              <span class="font-headline-sm text-headline-sm text-primary leading-snug group-hover:text-on-tertiary-container transition-colors">
+                {newer.title}
+              </span>
             </a>
           )}
         </nav>

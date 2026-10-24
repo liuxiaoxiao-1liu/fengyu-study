@@ -21,8 +21,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     ? Math.min(Math.max(Math.trunc(requestedLimit), 1), MAX_LIMIT)
     : DEFAULT_LIMIT;
 
-  const status: LetterStatus | 'all' =
-    statusParam === 'all' || isLetterStatus(statusParam) ? statusParam : 'all';
+  const status: LetterStatus | 'all' = statusParam === 'all' || isLetterStatus(statusParam) ? statusParam : 'all';
 
   try {
     const { letters, counts } = listAdminLetters(status, limit);

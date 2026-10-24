@@ -10,9 +10,7 @@ import { dirname, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
 const jsonPath = resolve(process.argv[2] ?? '/var/lib/xiaoquanzi/guestbook.json');
-const dbPath = resolve(
-  process.argv[3] ?? process.env.GUESTBOOK_DB ?? './.data/guestbook.sqlite',
-);
+const dbPath = resolve(process.argv[3] ?? process.env.GUESTBOOK_DB ?? './.data/guestbook.sqlite');
 
 if (!existsSync(jsonPath)) {
   console.error(`找不到 JSON 文件：${jsonPath}`);
@@ -62,8 +60,12 @@ try {
     }
 
     const id = String(item.id ?? '').trim();
-    const name = String(item.name ?? '').trim().slice(0, 40);
-    const message = String(item.message ?? '').trim().slice(0, 800);
+    const name = String(item.name ?? '')
+      .trim()
+      .slice(0, 40);
+    const message = String(item.message ?? '')
+      .trim()
+      .slice(0, 800);
     if (!id || !name || !message) {
       skipped += 1;
       continue;
@@ -73,9 +75,13 @@ try {
     const result = insert.run(
       id,
       name,
-      String(item.station ?? '').trim().slice(0, 100),
+      String(item.station ?? '')
+        .trim()
+        .slice(0, 100),
       message,
-      String(item.tag ?? '网文同好').trim().slice(0, 20) || '网文同好',
+      String(item.tag ?? '网文同好')
+        .trim()
+        .slice(0, 20) || '网文同好',
       isPrivate ? 1 : 0,
       isPrivate ? 'pending' : item.approved ? 'approved' : 'pending',
       String(item.ip_hash ?? 'imported'),

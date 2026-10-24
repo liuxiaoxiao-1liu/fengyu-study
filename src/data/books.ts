@@ -39,8 +39,7 @@ export const books: Book[] = [
     year: 2024,
     cover: '/images/covers/book-guimi.jpg',
     url: 'https://www.qidian.com/book/1010868264/',
-    blurb:
-      '塔罗会二十二条序列魔药途径的宏大架构。克莱恩从廷根值夜者一路升格，每一次扮演与锚定都令人拍案惊奇。',
+    blurb: '塔罗会二十二条序列魔药途径的宏大架构。克莱恩从廷根值夜者一路升格，每一次扮演与锚定都令人拍案惊奇。',
     category: 'webnovel',
     words: '446万字 · 完结二刷',
     progress: '第六卷 逐光者 · 84%',
@@ -72,8 +71,7 @@ export const books: Book[] = [
     year: 2025,
     cover: '/images/covers/book-chixin.jpg',
     url: 'https://www.qidian.com/book/1016530091/',
-    blurb:
-      '“我姜望行事，自有一柄三昧真火与青云剑。”群雄并立的列国世界观，文笔洗练，黄河之会群像极具张力。',
+    blurb: '“我姜望行事，自有一柄三昧真火与青云剑。”群雄并立的列国世界观，文笔洗练，黄河之会群像极具张力。',
     category: 'webnovel',
     words: '650万字 · 追更中',
     footer: '太虚幻境与临淄天下演武',
@@ -87,8 +85,7 @@ export const books: Book[] = [
     year: 2024,
     cover: '/images/covers/book-shenkong.jpg',
     url: 'https://www.qidian.com/book/1027339371/',
-    blurb:
-      '“枯寂的旧土与浩瀚新星，当旧术与新星科技对撞，王煊一人执炉横渡超凡光海。”辰东大开大合的宇宙想象力。',
+    blurb: '“枯寂的旧土与浩瀚新星，当旧术与新星科技对撞，王煊一人执炉横渡超凡光海。”辰东大开大合的宇宙想象力。',
     category: 'webnovel',
     words: '530万字 · 完结精修',
     footer: '神明熄灭与地仙泉探索笔记',

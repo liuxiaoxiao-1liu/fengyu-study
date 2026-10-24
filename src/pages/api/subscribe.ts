@@ -88,26 +88,17 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     if (typeof input.email !== 'string') {
-      return json(
-        { ok: false, error: 'invalid_email', message: '请填写一个有效的邮箱地址。' },
-        422,
-      );
+      return json({ ok: false, error: 'invalid_email', message: '请填写一个有效的邮箱地址。' }, 422);
     }
 
     const email = input.email.trim().toLowerCase();
     if (email === '' || email.length > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.test(email)) {
-      return json(
-        { ok: false, error: 'invalid_email', message: '邮箱格式看起来不太对，请检查一下。' },
-        422,
-      );
+      return json({ ok: false, error: 'invalid_email', message: '邮箱格式看起来不太对，请检查一下。' }, 422);
     }
 
     const ipHash = hashIp(clientIp(request, clientAddress));
     if (isRateLimited(ipHash)) {
-      return json(
-        { ok: false, error: 'rate_limited', message: '提交得太频繁了，过十分钟再试。' },
-        429,
-      );
+      return json({ ok: false, error: 'rate_limited', message: '提交得太频繁了，过十分钟再试。' }, 429);
     }
 
     const { created } = addSubscriber(email, 'quarterly');
@@ -115,9 +106,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json({
       ok: true,
       already: !created,
-      message: created
-        ? '订阅成功，下一期季刊会寄到这个邮箱。'
-        : '这个邮箱已经在订阅名单里了，不会重复记录。',
+      message: created ? '订阅成功，下一期季刊会寄到这个邮箱。' : '这个邮箱已经在订阅名单里了，不会重复记录。',
     });
   } catch (error) {
     console.error('[subscribe] POST failed', error);

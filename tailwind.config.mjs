@@ -1,6 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 const serif = ['Newsreader', 'Noto Serif CJK SC', 'Source Han Serif SC', 'Songti SC', 'SimSun', 'Georgia', 'serif'];
-const sans = ['Space Grotesk', 'Noto Sans CJK SC', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', 'system-ui', 'sans-serif'];
+const sans = [
+  'Space Grotesk',
+  'Noto Sans CJK SC',
+  'Source Han Sans SC',
+  'PingFang SC',
+  'Microsoft YaHei',
+  'system-ui',
+  'sans-serif',
+];
 const mono = ['Space Grotesk', 'JetBrains Maple Mono', 'SFMono-Regular', 'Menlo', 'monospace'];
 
 export default {

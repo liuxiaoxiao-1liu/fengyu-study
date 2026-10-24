@@ -28,9 +28,7 @@ export const GET: APIRoute = async ({ url }) => {
     ? Math.min(Math.max(Math.trunc(requestedSize), 1), MAX_PAGE_SIZE)
     : DEFAULT_PAGE_SIZE;
   const totalPages = Math.max(1, Math.ceil(playlist.tracks.length / pageSize));
-  const page = Number.isFinite(requestedPage)
-    ? Math.min(Math.max(Math.trunc(requestedPage), 1), totalPages)
-    : 1;
+  const page = Number.isFinite(requestedPage) ? Math.min(Math.max(Math.trunc(requestedPage), 1), totalPages) : 1;
   const start = (page - 1) * pageSize;
 
   return json({

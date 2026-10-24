@@ -28,25 +28,37 @@ import '../../styles/global.css';
           <span class="font-display italic text-on-surface-variant text-headline-md font-normal">Letters Desk</span>
         </h1>
         <p class="max-w-3xl font-body-sm text-body-sm leading-relaxed text-on-surface-variant">
-          审核公开留言、回复悄悄话、导出留言与季刊订阅。管理令牌只保存在当前标签页的
-          sessionStorage 里，不会写进页面源码或服务器日志。
+          审核公开留言、回复悄悄话、导出留言与季刊订阅。管理令牌只保存在当前标签页的 sessionStorage
+          里，不会写进页面源码或服务器日志。
         </p>
-        <a class="font-label-sm text-label-sm text-secondary underline decoration-outline-variant underline-offset-4 hover:text-primary" href="/">
+        <a
+          class="font-label-sm text-label-sm text-secondary underline decoration-outline-variant underline-offset-4 hover:text-primary"
+          href="/"
+        >
           ← 返回书房
         </a>
       </header>
 
       <!-- 令牌入口 -->
-      <section id="token-panel" class="flex flex-col gap-space-md rounded-xl bg-surface-container-low p-space-lg shadow-sm" aria-labelledby="token-title">
+      <section
+        id="token-panel"
+        class="flex flex-col gap-space-md rounded-xl bg-surface-container-low p-space-lg shadow-sm"
+        aria-labelledby="token-title"
+      >
         <div class="flex flex-col gap-space-xs">
-          <h2 id="token-title" class="font-headline-sm text-headline-sm text-primary">连接后台</h2>
+          <h2 id="token-title" class="font-headline-sm text-headline-sm text-primary">
+            连接后台
+          </h2>
           <p class="font-label-sm text-label-sm text-on-surface-variant">
-            服务器未配置 <code class="rounded bg-surface-container px-1 py-0.5 font-mono">ADMIN_TOKEN</code> 时接口返回 503；令牌错误返回 401。
+            服务器未配置 <code class="rounded bg-surface-container px-1 py-0.5 font-mono">ADMIN_TOKEN</code> 时接口返回
+            503；令牌错误返回 401。
           </p>
         </div>
         <form id="token-form" class="flex flex-col gap-space-sm sm:flex-row sm:items-end">
           <div class="flex flex-1 flex-col gap-space-xs">
-            <label class="font-label-sm text-label-sm text-on-surface-variant" for="admin-token">管理令牌 / ADMIN_TOKEN</label>
+            <label class="font-label-sm text-label-sm text-on-surface-variant" for="admin-token">
+              管理令牌 / ADMIN_TOKEN
+            </label>
             <input
               id="admin-token"
               name="token"
@@ -81,7 +93,9 @@ import '../../styles/global.css';
       <section id="dashboard" class="hidden flex-col gap-space-lg">
         <div class="flex flex-wrap items-center justify-between gap-space-sm">
           <div class="flex items-center gap-space-xs">
-            <span class="material-symbols-outlined text-base text-secondary" aria-hidden="true">inbox</span>
+            <span class="material-symbols-outlined text-base text-secondary" aria-hidden="true">
+              inbox
+            </span>
             <h2 class="font-headline-sm text-headline-sm text-primary">信笺队列</h2>
           </div>
           <div class="flex items-center gap-space-sm">
@@ -90,7 +104,9 @@ import '../../styles/global.css';
               type="button"
               class="flex items-center gap-space-xs rounded-lg bg-surface-container px-space-md py-space-xs font-label-md text-label-md text-primary shadow-sm transition-colors hover:bg-surface-container-high"
             >
-              <span class="material-symbols-outlined text-base" aria-hidden="true">refresh</span>
+              <span class="material-symbols-outlined text-base" aria-hidden="true">
+                refresh
+              </span>
               刷新
             </button>
             <button
@@ -106,23 +122,33 @@ import '../../styles/global.css';
         <div class="grid grid-cols-2 gap-space-sm sm:grid-cols-5" id="stat-cards">
           <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
             <span class="font-label-sm text-label-sm text-on-surface-variant">累计来信</span>
-            <span class="font-headline-sm text-headline-sm text-primary" data-admin-stat="total">—</span>
+            <span class="font-headline-sm text-headline-sm text-primary" data-admin-stat="total">
+              —
+            </span>
           </div>
           <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
             <span class="font-label-sm text-label-sm text-on-surface-variant">待审核</span>
-            <span class="font-headline-sm text-headline-sm text-tertiary" data-admin-stat="pending">—</span>
+            <span class="font-headline-sm text-headline-sm text-tertiary" data-admin-stat="pending">
+              —
+            </span>
           </div>
           <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
             <span class="font-label-sm text-label-sm text-on-surface-variant">已上墙</span>
-            <span class="font-headline-sm text-headline-sm text-primary" data-admin-stat="approved">—</span>
+            <span class="font-headline-sm text-headline-sm text-primary" data-admin-stat="approved">
+              —
+            </span>
           </div>
           <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
             <span class="font-label-sm text-label-sm text-on-surface-variant">已隐藏</span>
-            <span class="font-headline-sm text-headline-sm text-on-surface-variant" data-admin-stat="hidden">—</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface-variant" data-admin-stat="hidden">
+              —
+            </span>
           </div>
           <div class="flex flex-col gap-space-xs rounded-xl bg-surface-container-low p-space-md shadow-sm">
             <span class="font-label-sm text-label-sm text-on-surface-variant">回复率</span>
-            <span class="font-headline-sm text-headline-sm text-secondary" data-admin-stat="reply-rate">—</span>
+            <span class="font-headline-sm text-headline-sm text-secondary" data-admin-stat="reply-rate">
+              —
+            </span>
           </div>
         </div>
 
@@ -170,22 +196,51 @@ import '../../styles/global.css';
 
         <div class="flex flex-wrap items-center gap-space-sm rounded-xl bg-surface-container-low p-space-md shadow-sm">
           <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">导出</span>
-          <button type="button" data-export data-kind="letters" data-format="json" class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high">
+          <button
+            type="button"
+            data-export
+            data-kind="letters"
+            data-format="json"
+            class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high"
+          >
             留言 JSON
           </button>
-          <button type="button" data-export data-kind="letters" data-format="csv" class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high">
+          <button
+            type="button"
+            data-export
+            data-kind="letters"
+            data-format="csv"
+            class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high"
+          >
             留言 CSV
           </button>
-          <span class="text-outline-variant" aria-hidden="true">·</span>
-          <button type="button" data-export data-kind="subscribers" data-format="json" class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high">
+          <span class="text-outline-variant" aria-hidden="true">
+            ·
+          </span>
+          <button
+            type="button"
+            data-export
+            data-kind="subscribers"
+            data-format="json"
+            class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high"
+          >
             订阅 JSON
           </button>
-          <button type="button" data-export data-kind="subscribers" data-format="csv" class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high">
+          <button
+            type="button"
+            data-export
+            data-kind="subscribers"
+            data-format="csv"
+            class="rounded-lg bg-surface-container px-space-md py-space-xs font-label-sm text-label-sm text-primary transition-colors hover:bg-surface-container-high"
+          >
             订阅 CSV
           </button>
         </div>
 
-        <p id="letters-loading" class="hidden py-space-lg text-center font-body-sm text-body-sm text-on-surface-variant">
+        <p
+          id="letters-loading"
+          class="hidden py-space-lg text-center font-body-sm text-body-sm text-on-surface-variant"
+        >
           正在取信…
         </p>
 
@@ -201,10 +256,44 @@ import '../../styles/global.css';
     </main>
 
     <script>
+      type LetterStatus = 'pending' | 'approved' | 'hidden';
+      type AdminLetter = {
+        id: string;
+        name: string;
+        station: string;
+        message: string;
+        tag: string;
+        is_private: number;
+        status: LetterStatus;
+        reply: string;
+        replied_at: string | null;
+        created_at: string;
+      };
+      type LetterCounts = {
+        total?: number;
+        pending?: number;
+        approved?: number;
+        hidden?: number;
+        replied?: number;
+      };
+      type AdminState = {
+        status: LetterStatus | 'all';
+        letters: AdminLetter[];
+        counts: LetterCounts;
+      };
+      type ApiError = Error & { status?: number; code?: string };
+      type ApiResponse = {
+        ok?: boolean;
+        error?: string;
+        letters?: AdminLetter[];
+        letter?: AdminLetter;
+        counts?: LetterCounts;
+      };
+
       const TOKEN_KEY = 'fengyu-admin-token';
       const tokenPanel = document.getElementById('token-panel');
-      const tokenForm = document.getElementById('token-form');
-      const tokenInput = document.getElementById('admin-token');
+      const tokenForm = document.getElementById('token-form') as HTMLFormElement | null;
+      const tokenInput = document.getElementById('admin-token') as HTMLInputElement | null;
       const dashboard = document.getElementById('dashboard');
       const notice = document.getElementById('notice');
       const list = document.getElementById('letters-list');
@@ -212,16 +301,16 @@ import '../../styles/global.css';
       const loading = document.getElementById('letters-loading');
       const statusTabs = document.getElementById('status-tabs');
       const refreshButton = document.getElementById('refresh-button');
-      const connectButton = document.getElementById('connect-button');
+      const connectButton = document.getElementById('connect-button') as HTMLButtonElement | null;
       const logoutButton = document.getElementById('logout-button');
 
-      const STATUS_META = {
+      const STATUS_META: Record<LetterStatus, { label: string; className: string }> = {
         pending: { label: '待审核', className: 'bg-tertiary-fixed text-on-tertiary-fixed' },
         approved: { label: '已上墙', className: 'bg-secondary-container text-on-secondary-container' },
         hidden: { label: '已隐藏', className: 'bg-surface-container-high text-on-surface-variant' },
       };
 
-      const state = { status: 'pending', letters: [], counts: {} };
+      const state: AdminState = { status: 'pending', letters: [], counts: {} };
 
       function getToken() {
         try {
@@ -231,7 +320,7 @@ import '../../styles/global.css';
         }
       }
 
-      function setToken(token) {
+      function setToken(token: string) {
         try {
           sessionStorage.setItem(TOKEN_KEY, token);
         } catch {
@@ -247,7 +336,7 @@ import '../../styles/global.css';
         }
       }
 
-      function showNotice(message, tone = 'error') {
+      function showNotice(message: string, tone: 'error' | 'success' = 'error') {
         if (!notice) return;
         notice.textContent = message;
         notice.classList.remove('hidden');
@@ -263,54 +352,58 @@ import '../../styles/global.css';
         notice.textContent = '';
       }
 
-      function describeError(error) {
+      function describeError(error: unknown) {
         if (!error) return '请求失败，请稍后重试。';
-        if (error.code === 'admin_disabled' || error.status === 503) {
+        const err = error as ApiError;
+        if (err.code === 'admin_disabled' || err.status === 503) {
           return '服务器还没有配置 ADMIN_TOKEN，后台接口暂不可用。请让运维在 /opt/fengyu/.env 设置后重建 app 容器。';
         }
-        if (error.status === 401) return '令牌不正确或已失效，请重新输入 ADMIN_TOKEN。';
-        if (error.status === 404) return '这封信不存在，可能已经被删除。';
-        if (error.status === 429) return '操作太频繁，等一会儿再试。';
-        if (error.code === 'invalid_status' || error.code === 'invalid_reply') return '提交的内容不合法，请检查后重试。';
-        if (error.code === 'server_error' || error.status >= 500) return '服务器处理失败，稍后再试。';
+        if (err.status === 401) return '令牌不正确或已失效，请重新输入 ADMIN_TOKEN。';
+        if (err.status === 404) return '这封信不存在，可能已经被删除。';
+        if (err.status === 429) return '操作太频繁，等一会儿再试。';
+        if (err.code === 'invalid_status' || err.code === 'invalid_reply') return '提交的内容不合法，请检查后重试。';
+        if (err.code === 'server_error' || (err.status ?? 0) >= 500) return '服务器处理失败，稍后再试。';
         return '请求失败，请稍后重试。';
       }
 
-      async function request(path, options = {}) {
-        const headers = { Accept: 'application/json', ...(options.headers || {}) };
+      async function request(path: string, options: RequestInit = {}): Promise<ApiResponse> {
+        const headers: Record<string, string> = {
+          Accept: 'application/json',
+          ...((options.headers as Record<string, string> | undefined) ?? {}),
+        };
         const token = getToken();
         if (token) headers.Authorization = `Bearer ${token}`;
 
         const response = await fetch(path, { ...options, headers });
-        let data = null;
+        let data: ApiResponse | null = null;
         try {
-          data = await response.json();
+          data = (await response.json()) as ApiResponse;
         } catch {
           data = null;
         }
 
         if (!response.ok || (data && data.ok === false)) {
-          const error = new Error((data && data.error) || `http_${response.status}`);
+          const error = new Error((data && data.error) || `http_${response.status}`) as ApiError;
           error.status = response.status;
-          error.code = data && data.error;
+          error.code = data?.error;
           throw error;
         }
-        return data || {};
+        return data ?? {};
       }
 
       function showTokenPanel() {
-        tokenPanel.classList.remove('hidden');
-        dashboard.classList.add('hidden');
-        dashboard.classList.remove('flex');
+        tokenPanel?.classList.remove('hidden');
+        dashboard?.classList.add('hidden');
+        dashboard?.classList.remove('flex');
       }
 
       function showDashboard() {
-        tokenPanel.classList.add('hidden');
-        dashboard.classList.remove('hidden');
-        dashboard.classList.add('flex');
+        tokenPanel?.classList.add('hidden');
+        dashboard?.classList.remove('hidden');
+        dashboard?.classList.add('flex');
       }
 
-      function setBusy(busy) {
+      function setBusy(busy: boolean) {
         if (connectButton) {
           connectButton.disabled = busy;
           connectButton.classList.toggle('opacity-60', busy);
@@ -318,24 +411,23 @@ import '../../styles/global.css';
         }
       }
 
-      function setStat(name, value) {
-        for (const node of document.querySelectorAll(`[data-admin-stat="${name}"]`)) {
-          node.textContent =
-            value === undefined || value === null || value === '' ? '—' : String(value);
+      function setStat(name: string, value?: number | string | null) {
+        for (const node of document.querySelectorAll<HTMLElement>(`[data-admin-stat="${name}"]`)) {
+          node.textContent = value === undefined || value === null || value === '' ? '—' : String(value);
         }
       }
 
       function renderCounts() {
-        const counts = state.counts || {};
-        const map = {
+        const counts = state.counts;
+        const map: Record<string, number | undefined> = {
           pending: counts.pending,
           approved: counts.approved,
           hidden: counts.hidden,
           total: counts.total,
         };
 
-        for (const node of document.querySelectorAll('[data-tab-count]')) {
-          const value = map[node.dataset.tabCount];
+        for (const node of document.querySelectorAll<HTMLElement>('[data-tab-count]')) {
+          const value = map[node.dataset.tabCount ?? ''];
           node.textContent = typeof value === 'number' ? String(value) : '0';
         }
 
@@ -350,7 +442,7 @@ import '../../styles/global.css';
 
       function renderTabs() {
         if (!statusTabs) return;
-        for (const button of statusTabs.querySelectorAll('[data-status-filter]')) {
+        for (const button of statusTabs.querySelectorAll<HTMLElement>('[data-status-filter]')) {
           const on = button.dataset.statusFilter === state.status;
           button.classList.toggle('bg-primary', on);
           button.classList.toggle('text-on-primary', on);
@@ -360,7 +452,7 @@ import '../../styles/global.css';
         }
       }
 
-      function formatTime(iso) {
+      function formatTime(iso?: string | null) {
         if (!iso) return '';
         const date = new Date(iso);
         if (Number.isNaN(date.getTime())) return '';
@@ -374,15 +466,22 @@ import '../../styles/global.css';
         });
       }
 
-      function element(tag, className, text) {
+      function element<K extends keyof HTMLElementTagNameMap>(
+        tag: K,
+        className?: string,
+        text?: string,
+      ): HTMLElementTagNameMap[K] {
         const node = document.createElement(tag);
         if (className) node.className = className;
         if (typeof text === 'string') node.textContent = text;
         return node;
       }
 
-      function createLetterCard(letter) {
-        const card = element('article', 'flex flex-col gap-space-md rounded-xl bg-surface-container-low p-space-lg shadow-sm');
+      function createLetterCard(letter: AdminLetter) {
+        const card = element(
+          'article',
+          'flex flex-col gap-space-md rounded-xl bg-surface-container-low p-space-lg shadow-sm',
+        );
         card.dataset.id = letter.id;
 
         const top = element('div', 'flex flex-wrap items-start justify-between gap-space-sm');
@@ -479,8 +578,10 @@ import '../../styles/global.css';
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ reply: textarea.value }),
             });
-            letter.reply = data.letter.reply;
-            letter.replied_at = data.letter.replied_at;
+            if (data.letter) {
+              letter.reply = data.letter.reply;
+              letter.replied_at = data.letter.replied_at;
+            }
             const nowReplied = Boolean((letter.reply || '').trim());
             if (wasReplied !== nowReplied) {
               const replied = typeof state.counts.replied === 'number' ? state.counts.replied : 0;
@@ -530,7 +631,7 @@ import '../../styles/global.css';
         return card;
       }
 
-      function createStatusButton(letter, status, label, className) {
+      function createStatusButton(letter: AdminLetter, status: LetterStatus, label: string, className: string) {
         const button = element(
           'button',
           `rounded-lg ${className} px-space-md py-space-xs font-label-sm text-label-sm shadow-sm transition-colors hover:brightness-95 active:scale-95`,
@@ -564,7 +665,7 @@ import '../../styles/global.css';
 
         if (empty) {
           if (state.letters.length === 0) {
-            const messages = {
+            const messages: Record<string, string> = {
               pending: '待审核信箱是空的，暂时不用操心。',
               approved: '还没有已上墙的公开留言。',
               hidden: '没有被隐藏的信笺。',
@@ -594,7 +695,8 @@ import '../../styles/global.css';
           await fetchLetters();
           hideNotice();
         } catch (error) {
-          if (error.status === 401) {
+          const apiError = error as ApiError;
+          if (apiError.status === 401) {
             clearToken();
             showTokenPanel();
           }
@@ -609,7 +711,7 @@ import '../../styles/global.css';
         }
       }
 
-      async function connect(token) {
+      async function connect(token: string) {
         setBusy(true);
         hideNotice();
         setToken(token);
@@ -618,7 +720,8 @@ import '../../styles/global.css';
           showDashboard();
           showNotice('已连接后台，令牌只保存在本标签页。', 'success');
         } catch (error) {
-          if (error.status === 401 || error.code === 'admin_disabled') clearToken();
+          const apiError = error as ApiError;
+          if (apiError.status === 401 || apiError.code === 'admin_disabled') clearToken();
           showTokenPanel();
           showNotice(describeError(error), 'error');
         } finally {
@@ -646,20 +749,21 @@ import '../../styles/global.css';
       refreshButton?.addEventListener('click', () => refresh());
 
       statusTabs?.addEventListener('click', (event) => {
-        const target = event.target instanceof Element ? event.target.closest('[data-status-filter]') : null;
+        const target =
+          event.target instanceof Element ? event.target.closest<HTMLElement>('[data-status-filter]') : null;
         if (!target) return;
-        state.status = target.dataset.statusFilter || 'pending';
+        state.status = (target.dataset.statusFilter as AdminState['status'] | undefined) || 'pending';
         renderTabs();
         refresh();
       });
 
-      function parseFilename(header) {
+      function parseFilename(header: string | null) {
         if (!header) return '';
         const match = /filename="?([^";]+)"?/i.exec(header);
         return match ? match[1] : '';
       }
 
-      async function exportFile(button) {
+      async function exportFile(button: HTMLButtonElement) {
         const kind = button.dataset.kind || 'letters';
         const format = button.dataset.format || 'json';
         const original = button.textContent;
@@ -674,15 +778,15 @@ import '../../styles/global.css';
           );
 
           if (!response.ok) {
-            let data = null;
+            let data: ApiResponse | null = null;
             try {
-              data = await response.json();
+              data = (await response.json()) as ApiResponse;
             } catch {
               data = null;
             }
-            const error = new Error((data && data.error) || `http_${response.status}`);
+            const error = new Error((data && data.error) || `http_${response.status}`) as ApiError;
             error.status = response.status;
-            error.code = data && data.error;
+            error.code = data?.error;
             throw error;
           }
 
@@ -708,7 +812,7 @@ import '../../styles/global.css';
         }
       }
 
-      for (const button of document.querySelectorAll('[data-export]')) {
+      for (const button of document.querySelectorAll<HTMLButtonElement>('[data-export]')) {
         button.addEventListener('click', () => exportFile(button));
       }
 

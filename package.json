@@ -4,15 +4,23 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "smoke": "node scripts/smoke-test.mjs",
+    "verify": "npm run format:check && npm run check && npm run build && npm run smoke",
     "deploy": "./deploy.sh",
     "deploy:docker": "./deploy/docker-deploy.sh",
     "guestbook:import": "node scripts/import-guestbook-json.mjs",
     "guestbook:backup": "node scripts/backup-guestbook.mjs",
     "docker:up": "docker compose up -d --build",
     "docker:logs": "docker compose logs -f app"
+  },
+  "engines": {
+    "node": ">=26"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.9",
@@ -24,9 +32,14 @@
     "pako": "^3.0.2"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/node": "^26.6.5",
     "autoprefixer": "^10.6.1",
     "postcss": "^8.5.31",
-    "tailwindcss": "^3.4.17"
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.2",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^6.0.3"
   },
   "description": "风屿书房 · 一个大学生收藏网文、歌单、影像与随笔的数字秘密基地。"
 }

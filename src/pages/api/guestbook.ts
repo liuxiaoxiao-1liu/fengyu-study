@@ -84,10 +84,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const isPrivate = input.private === true || input.private === 1 || input.private === '1';
 
     if (!name || !message) {
-      return json(
-        { ok: false, error: 'missing_fields', message: '昵称和正文都要写一点。' },
-        422,
-      );
+      return json({ ok: false, error: 'missing_fields', message: '昵称和正文都要写一点。' }, 422);
     }
 
     const ip = clientIp(request, clientAddress);
@@ -95,10 +92,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     const since = secondsSinceLastPost(ipHash);
     if (since !== null && since < RATE_LIMIT_SECONDS) {
-      return json(
-        { ok: false, error: 'rate_limited', message: '投递得太快了，歇一会儿再写吧。' },
-        429,
-      );
+      return json({ ok: false, error: 'rate_limited', message: '投递得太快了，歇一会儿再写吧。' }, 429);
     }
 
     const id = randomUUID();
@@ -118,9 +112,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json({
       ok: true,
       private: isPrivate,
-      message: isPrivate
-        ? '悄悄话已经收妥，只有房主会在夜里拆封。'
-        : '信笺已上墙，谢谢你让这间书房多了一盏灯。',
+      message: isPrivate ? '悄悄话已经收妥，只有房主会在夜里拆封。' : '信笺已上墙，谢谢你让这间书房多了一盏灯。',
     });
   } catch (error) {
     console.error('[guestbook] POST failed', error);

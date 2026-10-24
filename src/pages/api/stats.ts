@@ -10,10 +10,7 @@ export const prerender = false;
 export const GET: APIRoute = async () => {
   try {
     const letters = getLetterCounts();
-    const replyRate =
-      letters.publicTotal > 0
-        ? Math.round((letters.publicReplied / letters.publicTotal) * 100)
-        : 0;
+    const replyRate = letters.publicTotal > 0 ? Math.round((letters.publicReplied / letters.publicTotal) * 100) : 0;
 
     return new Response(JSON.stringify({ ok: true, letters, replyRate }), {
       status: 200,

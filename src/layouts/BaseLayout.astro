@@ -13,12 +13,7 @@ interface Props {
   current: NavKey;
 }
 
-const {
-  title,
-  description = SITE.description,
-  image = '/og.jpg',
-  current,
-} = Astro.props;
+const { title, description = SITE.description, image = '/og.jpg', current } = Astro.props;
 
 const site = Astro.site ?? new URL(SITE.url);
 const canonical = new URL(Astro.url.pathname, site);

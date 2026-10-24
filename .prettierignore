@@ -1,0 +1,41 @@
+# 构建产物与缓存
+dist/
+.astro/
+node_modules/
+.npm-cache/
+.config/
+.preview/
+.data/
+
+# 第三方运行时（保持上游原样，含 LICENSE）
+vendor/
+
+# 设计参考与历史试验
+stitch_astro_personal_website/
+stitch-assets/
+_trial/
+_scratch/
+
+# 二进制素材
+public/
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.avif
+*.gif
+*.ico
+*.woff
+*.woff2
+
+# 锁文件由 npm 维护
+package-lock.json
+
+# 由 scripts/sync-kugou-playlists.mjs 生成，保持脚本输出格式
+src/data/kugou-playlists.ts
+
+# 技能说明保持原文
+.dsh/
+
+# 杂项
+*.log

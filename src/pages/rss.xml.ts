@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { essays, formatEssayDate } from '../data/essays';
+import { essays } from '../data/essays';
 import { SITE } from '../lib/site';
 import { escapeXml } from '../lib/xml';
 

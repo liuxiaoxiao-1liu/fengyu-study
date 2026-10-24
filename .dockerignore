@@ -1,0 +1,11 @@
+node_modules
+.git
+.data
+.npm-cache
+.config
+.astro
+_trial
+_scratch
+stitch-assets
+stitch_astro_personal_website
+*.log

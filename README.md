@@ -11,6 +11,10 @@
 
 线上地址：<http://example.com/>
 
+## 项目规范
+
+开发、提交和部署前请先读 [docs/PROJECT_RULES.md](docs/PROJECT_RULES.md)。当前为 **v0.1 提案，待确认**；确认后从下一项改动开始执行。
+
 ## 本地开发
 
 ```bash

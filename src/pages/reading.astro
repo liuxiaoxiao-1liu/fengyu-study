@@ -301,7 +301,7 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
               <div class="flex flex-wrap items-center justify-between gap-space-sm">
                 <div class="flex flex-wrap items-center justify-between gap-space-sm">
                   <div class="flex items-center gap-space-xs min-w-0">
-                    <span class="font-headline-sm text-headline-sm text-primary font-medium">
+                    <span class="font-headline-sm text-headline-sm text-primary font-medium" data-playlist-title>
                       {PLAYLIST_NAME} · 我的歌单
                     </span>
                     <span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hidden sm:inline-block">
@@ -319,7 +319,7 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
                 data-total-pages="1"
               >
                 <p class="rounded-lg border border-dashed border-outline-variant p-6 text-center font-body-sm text-body-sm text-on-surface-variant">
-                  正在从酷狗同步 {PLAYLIST_NAME} 歌单…
+                  正在从酷狗同步歌单…
                 </p>
               </div>
               <div class="flex items-center justify-between gap-space-sm pt-1" id="playlist-pager">
@@ -605,6 +605,9 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
       }
       for (const node of document.querySelectorAll<HTMLElement>('[data-playlist-count]')) {
         node.textContent = String(data.playlist.total ?? 0);
+      }
+      for (const node of document.querySelectorAll<HTMLElement>('[data-playlist-title]')) {
+        node.textContent = `${data.playlist.name ?? 'maotouying'} · 我的歌单`;
       }
       activeSlug = data.playlist.slug;
       activePage = data.page;

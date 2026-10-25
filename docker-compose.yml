@@ -39,6 +39,9 @@ services:
       KUGOU_MID: ${KUGOU_MID:-}
       KUGOU_GUID: ${KUGOU_GUID:-}
       KUGOU_DFID: ${KUGOU_DFID:-}
+      # 后台扫码登录后的会话与站内歌单选择（持久化在 /data 卷）
+      KUGOU_SESSION_FILE: /data/kugou-session.json
+      KUGOU_SETTINGS_FILE: /data/kugou-settings.json
     volumes:
       - guestbook-data:/data
     expose:

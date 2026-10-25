@@ -5,6 +5,8 @@ const registerDevModule = require('./module/register_dev');
 const songUrlModule = require('./module/song_url');
 const userPlaylistModule = require('./module/user_playlist');
 const playlistTracksModule = require('./module/playlist_track_all');
+const playlistTracksAddModule = require('./module/playlist_tracks_add');
+const playlistTracksDelModule = require('./module/playlist_tracks_del');
 const { createRequest } = require('./util/request');
 const { cookieToJson } = require('./util');
 
@@ -18,4 +20,6 @@ module.exports = {
   songUrl: (params) => call(songUrlModule, params),
   userPlaylist: (params) => call(userPlaylistModule, params),
   playlistTracks: (params) => call(playlistTracksModule, params),
+  playlistTracksAdd: (params) => call(playlistTracksAddModule, params),
+  playlistTracksDel: (params) => call(playlistTracksDelModule, params),
 };

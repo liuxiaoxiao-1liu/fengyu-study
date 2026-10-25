@@ -55,7 +55,13 @@ if docker exec "$CONTAINER" test -d /data/uploads; then
   log "备份完成：$upload_dest（$(du -h "$upload_dest" | cut -f1)）"
 fi
 
+# 站内歌单选择（不含酷狗 token；登录态需重新扫码）
+if docker exec "$CONTAINER" test -f /data/kugou-settings.json; then
+  docker cp "${CONTAINER}:/data/kugou-settings.json" "${BACKUP_DIR}/kugou-settings-${stamp}.json"
+  log "备份完成：${BACKUP_DIR}/kugou-settings-${stamp}.json"
+fi
+
 # 只保留最近 7 天（按修改时间）
 find "$BACKUP_DIR" -maxdepth 1 -type f \
-  \( -name 'guestbook-*.sqlite' -o -name 'content-*.sqlite' -o -name 'uploads-*.tgz' \) \
+  \( -name 'guestbook-*.sqlite' -o -name 'content-*.sqlite' -o -name 'uploads-*.tgz' -o -name 'kugou-settings-*.json' \) \
   -mtime +"$KEEP_DAYS" -delete

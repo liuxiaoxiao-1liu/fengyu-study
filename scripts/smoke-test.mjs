@@ -252,6 +252,9 @@ try {
       const noToken = await request(base, '/api/admin/letters');
       check('无 Token 访问管理接口 → 401', noToken.status === 401, `实际 ${noToken.status}`);
 
+      const kugouNoToken = await request(base, '/api/admin/kugou/status');
+      check('酷狗后台无 Token → 401', kugouNoToken.status === 401, `实际 ${kugouNoToken.status}`);
+
       const wrongToken = await request(base, '/api/admin/letters', {
         headers: { authorization: 'Bearer wrong-token' },
       });

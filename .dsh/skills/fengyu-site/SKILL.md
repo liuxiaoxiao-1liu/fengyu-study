@@ -113,12 +113,15 @@ WEB_PORT=80 npm run deploy:docker  # 确认后切 80
 | 备份体积为 0 | app 容器没跑 | `docker compose ps`；脚本会报错退出 |
 | 留言 429 | 每 IP 60 秒 + nginx 60r/m | 等一分钟，别调高限流 |
 
-## 8. 酷狗站内播放
+## 8. 酷狗站内播放与后台
 
-- 登录态只放服务器 `/opt/fengyu/.env`：`KUGOU_TOKEN`、`KUGOU_USERID`、`KUGOU_VIP_TOKEN`、`KUGOU_VIP_TYPE`、`KUGOU_MID`、`KUGOU_GUID`、可选 `KUGOU_DFID`；**永不进仓库、不贴聊天**。
+- 后台 `/admin/` 的「酷狗」可扫码登录：服务器调用 `/v2/qrcode` 生成二维码，轮询 `/v2/get_userinfo_qrcode`，成功后把 token 写到 `/data/kugou-session.json`（优先于 `.env`）；歌单选择写 `/data/kugou-settings.json`。
+- 登录态也可以继续放服务器 `/opt/fengyu/.env`：`KUGOU_TOKEN`、`KUGOU_USERID`、`KUGOU_VIP_TOKEN`、`KUGOU_VIP_TYPE`、`KUGOU_MID`、`KUGOU_GUID`、可选 `KUGOU_DFID`；**永不进仓库、不贴聊天**。
 - 解析链路：`/register/dev` 换 `dfid` → `/song/url` 换 CDN 直链 → 浏览器 `<audio>` 播放。缺 `dfid` 时酷狗会返回 `20018`。
 - 歌单同步：站内只展示账号歌单 `maotouying`（`KUGOU_PLAYLIST_NAME` 可覆盖）。`/api/kugou/playlist` 运行时向酷狗拉取，内存缓存 60 秒；酷狗上增删歌曲约 1 分钟自动反映，不需要重新构建。
 - 接口：`GET /api/kugou/playlists`（只剩一个歌单）、`GET /api/kugou/playlist?slug=maotouying&page=1`、`GET /api/kugou/url?hash=...`；只认当前歌单缓存里的 hash。
+- 后台接口：`GET /api/admin/kugou/status`、`POST /api/admin/kugou/qr`、`GET /api/admin/kugou/qr?key=...`、`POST /api/admin/kugou/logout`、`GET /api/admin/kugou/playlists`、`POST /api/admin/kugou/settings`、`POST/DELETE /api/admin/kugou/tracks`。
+- 切换歌单后 `resetKugouRuntime()` 清缓存；读听页标题/计数从 `/api/kugou/playlist` 的 `playlist.name` 更新。
 - 运行时来源 `vendor/kugou/`（MIT，从 Folia 内置 KuGouMusicApi 抽取）；不要在页面里 import 它。
 - 登录态过期：管理不了，只能重新扫码（KuGouMusicApi 的 `login_qr_key` + `login_qr_check`），更新 `.env` 后重建 app。
 - 以后上 HTTPS：直链是 `http://`，会被混合内容拦截，需要同源代理或改 https 源；当前站点 HTTP，无此问题。

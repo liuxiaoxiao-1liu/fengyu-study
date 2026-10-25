@@ -27,7 +27,7 @@ import '../../styles/global.css';
           <span class="font-display italic text-headline-md font-normal text-on-surface-variant">Content Desk</span>
         </h1>
         <p class="max-w-3xl font-body-sm leading-relaxed text-body-sm text-on-surface-variant">
-          登录后直接在网页上维护影集、随笔、书籍、唱片、曲目、台词与友链，不需要改代码或重新部署。影集支持上传图片，唱片/曲目封面可填图片地址。
+          登录后直接在网页上维护影集、随笔、书籍、唱片、曲目、台词、友链与酷狗账号，不需要改代码或重新部署。影集支持上传图片，唱片/曲目封面可填图片地址。
         </p>
         <div class="flex flex-wrap items-center gap-space-md font-label-sm text-label-sm">
           <a class="text-secondary underline decoration-outline-variant underline-offset-4 hover:text-primary" href="/">
@@ -148,6 +148,13 @@ import '../../styles/global.css';
             class="admin-tab rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
           >
             友链
+          </button>
+          <button
+            type="button"
+            data-admin-tab="kugou"
+            class="admin-tab rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+          >
+            酷狗
           </button>
         </nav>
 
@@ -389,6 +396,131 @@ import '../../styles/global.css';
                 列表 <span id="record-count" class="font-label-sm text-label-sm text-on-surface-variant"></span>
               </h3>
               <div id="record-list" class="flex flex-col gap-space-xs"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="kugou-section" class="flex flex-col gap-space-lg" style="display: none">
+          <div class="flex flex-wrap items-center justify-between gap-space-sm">
+            <div>
+              <h2 class="font-headline-sm text-headline-sm text-primary">酷狗账号与歌单</h2>
+              <p id="kugou-status" class="mt-1 font-label-sm text-label-sm text-on-surface-variant">
+                检查登录状态…
+              </p>
+            </div>
+            <div class="flex items-center gap-space-sm">
+              <button
+                type="button"
+                id="kugou-refresh"
+                class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+              >
+                刷新
+              </button>
+              <button
+                type="button"
+                id="kugou-logout"
+                class="rounded-lg border border-error/40 px-space-md py-1.5 font-label-sm text-label-sm text-error hover:bg-error/10"
+              >
+                退出酷狗
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 items-start gap-space-lg lg:grid-cols-12">
+            <div class="flex flex-col gap-space-lg lg:col-span-5">
+              <div class="rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm">
+                <h3 class="font-headline-sm text-headline-sm text-primary">扫码登录</h3>
+                <p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+                  用手机酷狗 App 扫描二维码，确认后登录态只保存在服务器数据卷里，不下发浏览器。
+                </p>
+                <button
+                  type="button"
+                  id="kugou-qr-start"
+                  class="mt-space-md rounded-lg bg-primary px-space-lg py-2 font-label-md text-label-md text-on-primary hover:bg-primary-container"
+                >
+                  生成登录二维码
+                </button>
+                <div id="kugou-qr-panel" class="mt-space-md flex flex-col items-center gap-2" style="display: none">
+                  <img id="kugou-qr-image" alt="酷狗登录二维码" class="h-44 w-44 rounded bg-white p-2 shadow-sm" />
+                  <p
+                    id="kugou-qr-message"
+                    class="font-label-sm text-label-sm text-on-surface-variant"
+                    role="status"
+                  ></p>
+                  <a
+                    id="kugou-qr-link"
+                    class="font-label-sm text-label-sm text-secondary underline underline-offset-4"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    在酷狗打开
+                  </a>
+                </div>
+              </div>
+
+              <div class="rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm">
+                <h3 class="font-headline-sm text-headline-sm text-primary">我的歌单</h3>
+                <p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+                  点「设为站内歌单」切换 `/reading/` 展示的歌单；默认是 `maotouying`。
+                </p>
+                <div id="kugou-playlists" class="mt-space-sm flex flex-col gap-2"></div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-space-lg lg:col-span-7">
+              <div class="rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h3 class="font-headline-sm text-headline-sm text-primary">
+                    当前站内歌单{' '}
+                    <span id="kugou-playlist-name" class="font-label-sm text-label-sm text-on-surface-variant"></span>
+                  </h3>
+                  <span id="kugou-track-count" class="font-label-sm text-label-sm text-on-surface-variant"></span>
+                </div>
+                <div id="kugou-tracks" class="mt-space-sm flex max-h-[32rem] flex-col gap-1 overflow-y-auto"></div>
+              </div>
+
+              <form
+                id="kugou-add-form"
+                class="flex flex-col gap-space-sm rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm"
+              >
+                <h3 class="font-headline-sm text-headline-sm text-primary">向当前歌单添加曲目</h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                  酷狗添加接口需要曲目 hash；名称、albumId、albumAudioId
+                  可留空。添加后会自动刷新，并让站内歌单缓存失效。
+                </p>
+                <div class="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+                  <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                    hash *<input id="kugou-add-hash" class="field" required placeholder="32 位 hash" />
+                  </label>
+                  <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                    歌名
+                    <input id="kugou-add-name" class="field" />
+                  </label>
+                  <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                    albumId
+                    <input id="kugou-add-album" class="field" value="0" />
+                  </label>
+                  <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+                    albumAudioId
+                    <input id="kugou-add-audio" type="number" class="field" value="0" />
+                  </label>
+                </div>
+                <div class="flex flex-wrap items-center gap-space-sm">
+                  <button
+                    type="submit"
+                    class="rounded-lg bg-primary px-space-lg py-2 font-label-md text-label-md text-on-primary hover:bg-primary-container"
+                  >
+                    添加
+                  </button>
+                  <span
+                    id="kugou-track-status"
+                    class="font-label-sm text-label-sm text-on-surface-variant"
+                    role="status"
+                    aria-live="polite"
+                  ></span>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -765,6 +897,7 @@ import '../../styles/global.css';
       type ContentRecord = { id: string; slug: string; title: string; data: Record<string, unknown> };
 
       const photosSection = $('photos-section');
+      const kugouSection = $('kugou-section');
       const recordsSection = $('records-section');
       const recordsTitle = $('records-title');
       const recordForm = $<HTMLFormElement>('record-form');
@@ -949,13 +1082,24 @@ import '../../styles/global.css';
         activeType = type;
         setTabStyle(type);
         if (type === 'photos') {
+          stopKugouQr();
           if (photosSection) photosSection.style.display = '';
           if (recordsSection) recordsSection.style.display = 'none';
+          if (kugouSection) kugouSection.style.display = 'none';
           await loadPhotos();
           return;
         }
+        if (type === 'kugou') {
+          if (photosSection) photosSection.style.display = 'none';
+          if (recordsSection) recordsSection.style.display = 'none';
+          if (kugouSection) kugouSection.style.display = '';
+          await loadKugou();
+          return;
+        }
+        stopKugouQr();
         if (photosSection) photosSection.style.display = 'none';
         if (recordsSection) recordsSection.style.display = '';
+        if (kugouSection) kugouSection.style.display = 'none';
         await loadSchemas();
         activeSchema = schemas.find((schema) => schema.type === type) ?? null;
         setText(recordsTitle, activeSchema?.label ?? type);
@@ -1012,6 +1156,250 @@ import '../../styles/global.css';
         }
       });
 
+      // ---- 酷狗账号 / 歌单 ----
+      const kugouStatus = $('kugou-status');
+      const kugouPlaylists = $('kugou-playlists');
+      const kugouTracks = $('kugou-tracks');
+      const kugouPlaylistName = $('kugou-playlist-name');
+      const kugouTrackCount = $('kugou-track-count');
+      const kugouTrackStatus = $('kugou-track-status');
+      const kugouQrPanel = $('kugou-qr-panel');
+      const kugouQrImage = $<HTMLImageElement>('kugou-qr-image');
+      const kugouQrMessage = $('kugou-qr-message');
+      const kugouQrLink = $<HTMLAnchorElement>('kugou-qr-link');
+      const kugouQrStart = $<HTMLButtonElement>('kugou-qr-start');
+      const kugouAddForm = $<HTMLFormElement>('kugou-add-form');
+
+      let kugouQrTimer: number | null = null;
+      let kugouQrKey = '';
+
+      function stopKugouQr() {
+        if (kugouQrTimer !== null) {
+          window.clearTimeout(kugouQrTimer);
+          kugouQrTimer = null;
+        }
+        kugouQrKey = '';
+      }
+
+      function renderKugou(data: any) {
+        const status = data.status ?? {};
+        if (kugouStatus) {
+          kugouStatus.textContent = status.configured
+            ? `已登录 ${status.userid} · ${status.source === 'file' ? '后台扫码会话' : '服务器 .env'} · 站内歌单 ${status.playlistName}`
+            : '未登录：生成二维码扫码，或继续使用服务器 .env 里的酷狗会话。';
+        }
+        if (kugouPlaylistName) kugouPlaylistName.textContent = data.playlist?.name ? `· ${data.playlist.name}` : '';
+        if (kugouTrackCount) kugouTrackCount.textContent = data.playlist ? `${data.playlist.total} 首` : '';
+
+        if (kugouPlaylists) {
+          kugouPlaylists.replaceChildren();
+          if (!status.configured) {
+            const note = document.createElement('p');
+            note.className = 'font-body-sm text-body-sm text-on-surface-variant';
+            note.textContent = '登录后这里会列出账号里的全部歌单。';
+            kugouPlaylists.append(note);
+          } else if (!data.playlists?.length) {
+            const note = document.createElement('p');
+            note.className = 'font-body-sm text-body-sm text-on-surface-variant';
+            note.textContent = data.error || '没有读到歌单。';
+            kugouPlaylists.append(note);
+          } else {
+            for (const playlist of data.playlists) {
+              const row = document.createElement('div');
+              row.className = 'flex items-center justify-between gap-2 rounded-lg bg-surface-container px-3 py-2';
+              const meta = document.createElement('div');
+              meta.className = 'min-w-0';
+              const name = document.createElement('strong');
+              name.className = 'block truncate text-sm text-primary';
+              name.textContent = playlist.name;
+              const count = document.createElement('span');
+              count.className = 'block font-label-sm text-[0.625rem] text-on-surface-variant';
+              count.textContent = `${playlist.count} 首 · ${playlist.globalCollectionId}`;
+              meta.append(name, count);
+              const actions = document.createElement('div');
+              actions.className = 'flex shrink-0 items-center gap-2';
+              if (playlist.name === data.playlist?.name || playlist.name === status.playlistName) {
+                const active = document.createElement('span');
+                active.className = 'font-label-sm text-[0.625rem] text-secondary';
+                active.textContent = '站内使用中';
+                actions.append(active);
+              } else {
+                const use = document.createElement('button');
+                use.type = 'button';
+                use.className = 'text-xs text-secondary hover:text-primary';
+                use.textContent = '设为站内歌单';
+                use.addEventListener('click', async () => {
+                  use.disabled = true;
+                  try {
+                    await request('/api/admin/kugou/settings', {
+                      method: 'POST',
+                      body: JSON.stringify({ playlistName: playlist.name }),
+                    });
+                    await loadKugou();
+                  } catch (error) {
+                    if (kugouTrackStatus)
+                      kugouTrackStatus.textContent = error instanceof Error ? error.message : '切换失败';
+                  } finally {
+                    use.disabled = false;
+                  }
+                });
+                actions.append(use);
+              }
+              row.append(meta, actions);
+              kugouPlaylists.append(row);
+            }
+          }
+        }
+
+        if (kugouTracks) {
+          kugouTracks.replaceChildren();
+          const tracks = data.playlist?.tracks ?? [];
+          if (!tracks.length) {
+            const note = document.createElement('p');
+            note.className = 'py-4 text-center font-body-sm text-body-sm text-on-surface-variant';
+            note.textContent = status.configured ? '当前歌单没有曲目。' : '登录后显示当前歌单曲目。';
+            kugouTracks.append(note);
+          } else {
+            for (const track of tracks) {
+              const row = document.createElement('div');
+              row.className =
+                'flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 hover:bg-surface-container';
+              const meta = document.createElement('div');
+              meta.className = 'min-w-0';
+              const title = document.createElement('span');
+              title.className = 'block truncate text-sm text-primary';
+              title.textContent = `${track.title} · ${track.artist}`;
+              const detail = document.createElement('span');
+              detail.className = 'block truncate font-label-sm text-[0.625rem] text-on-surface-variant';
+              detail.textContent = `${track.duration} · ${track.hash}${track.fileid ? ` · fileid ${track.fileid}` : ''}`;
+              meta.append(title, detail);
+              const actions = document.createElement('div');
+              actions.className = 'flex shrink-0 items-center gap-2';
+              if (track.kugou?.hash || track.hash) {
+                const open = document.createElement('a');
+                open.className = 'text-xs text-secondary hover:text-primary';
+                open.href = `https://www.kugou.com/song/#hash=${encodeURIComponent(track.hash)}`;
+                open.target = '_blank';
+                open.rel = 'noopener noreferrer';
+                open.textContent = '打开';
+                actions.append(open);
+              }
+              if (track.fileid) {
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'text-xs text-error hover:underline';
+                remove.textContent = '删除';
+                remove.addEventListener('click', async () => {
+                  if (!window.confirm(`从酷狗歌单删除《${track.title}》？`)) return;
+                  remove.disabled = true;
+                  try {
+                    await request('/api/admin/kugou/tracks', {
+                      method: 'DELETE',
+                      body: JSON.stringify({ fileid: track.fileid }),
+                    });
+                    await loadKugou();
+                  } catch (error) {
+                    if (kugouTrackStatus)
+                      kugouTrackStatus.textContent = error instanceof Error ? error.message : '删除失败';
+                  } finally {
+                    remove.disabled = false;
+                  }
+                });
+                actions.append(remove);
+              }
+              row.append(meta, actions);
+              kugouTracks.append(row);
+            }
+          }
+        }
+      }
+
+      async function loadKugou() {
+        if (kugouStatus) kugouStatus.textContent = '读取酷狗账号…';
+        try {
+          const data = await request('/api/admin/kugou/status');
+          renderKugou(data);
+          if (data.error && kugouTrackStatus) kugouTrackStatus.textContent = data.error;
+          if (!kugouQrKey) {
+            kugouQrPanel?.setAttribute('style', 'display: none');
+          }
+        } catch (error) {
+          if (kugouStatus) kugouStatus.textContent = error instanceof Error ? error.message : '读取失败';
+        }
+      }
+
+      async function startKugouQr() {
+        stopKugouQr();
+        if (kugouQrStart) kugouQrStart.disabled = true;
+        try {
+          const data = await request('/api/admin/kugou/qr', { method: 'POST' });
+          kugouQrKey = data.qr.key;
+          if (kugouQrImage) kugouQrImage.src = data.qr.image;
+          if (kugouQrLink) kugouQrLink.href = data.qr.url;
+          if (kugouQrMessage) kugouQrMessage.textContent = '等待扫码…';
+          if (kugouQrPanel) kugouQrPanel.setAttribute('style', 'display: flex');
+          pollKugouQr(kugouQrKey);
+        } catch (error) {
+          if (kugouQrMessage) kugouQrMessage.textContent = error instanceof Error ? error.message : '二维码生成失败';
+          if (kugouQrPanel) kugouQrPanel.setAttribute('style', 'display: flex');
+        } finally {
+          if (kugouQrStart) kugouQrStart.disabled = false;
+        }
+      }
+
+      async function pollKugouQr(key: string) {
+        if (!kugouQrKey) return;
+        try {
+          const data = await request(`/api/admin/kugou/qr?key=${encodeURIComponent(key)}`);
+          if (kugouQrMessage) kugouQrMessage.textContent = data.message ?? '';
+          if (data.status === 'success') {
+            stopKugouQr();
+            if (kugouQrMessage) kugouQrMessage.textContent = '登录成功，正在刷新歌单…';
+            await loadKugou();
+            return;
+          }
+          if (data.status === 'expired') {
+            stopKugouQr();
+            return;
+          }
+        } catch (error) {
+          if (kugouQrMessage) kugouQrMessage.textContent = error instanceof Error ? error.message : '轮询失败';
+        }
+        kugouQrTimer = window.setTimeout(() => void pollKugouQr(key), 2500);
+      }
+
+      $('kugou-refresh')?.addEventListener('click', () => void loadKugou());
+      $('kugou-qr-start')?.addEventListener('click', () => void startKugouQr());
+      $('kugou-logout')?.addEventListener('click', async () => {
+        if (!window.confirm('退出后站内会停止读取该酷狗账号，确定吗？')) return;
+        try {
+          await request('/api/admin/kugou/logout', { method: 'POST' });
+          await loadKugou();
+        } catch (error) {
+          if (kugouStatus) kugouStatus.textContent = error instanceof Error ? error.message : '退出失败';
+        }
+      });
+
+      kugouAddForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const hash = $<HTMLInputElement>('kugou-add-hash')?.value.trim() ?? '';
+        const name = $<HTMLInputElement>('kugou-add-name')?.value.trim() ?? '';
+        const albumId = $<HTMLInputElement>('kugou-add-album')?.value.trim() ?? '0';
+        const albumAudioId = Number($<HTMLInputElement>('kugou-add-audio')?.value ?? 0);
+        if (kugouTrackStatus) kugouTrackStatus.textContent = '添加中…';
+        try {
+          await request('/api/admin/kugou/tracks', {
+            method: 'POST',
+            body: JSON.stringify({ hash, name, albumId, albumAudioId }),
+          });
+          if (kugouTrackStatus) kugouTrackStatus.textContent = '已添加，正在刷新…';
+          if (kugouAddForm) kugouAddForm.reset();
+          await loadKugou();
+          if (kugouTrackStatus) kugouTrackStatus.textContent = '已添加';
+        } catch (error) {
+          if (kugouTrackStatus) kugouTrackStatus.textContent = error instanceof Error ? error.message : '添加失败';
+        }
+      });
       if (photoTakenAt) photoTakenAt.value = localToday();
       void checkSession();
     </script>

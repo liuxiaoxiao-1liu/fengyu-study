@@ -469,3 +469,53 @@ rate_limits (ip_hash, last_at)
 - 给搜索接口加短缓存/ETag；
 - 搜索支持标签过滤与键盘上下选择；
 - 友链增加头像、申请状态与排序拖拽。
+
+---
+
+## ADR-010 · 酷狗扫码登录与歌单后台
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`src/lib/kugou-login.ts`、`src/lib/kugou-session.ts`、`src/lib/kugou.ts`、`vendor/kugou/module/playlist_tracks_{add,del}.js`、`/admin/`、`/data`
+
+### 背景
+
+- 酷狗登录态只存在服务器 `.env`，过期后要手动改环境变量并重建；
+- 站内歌单固定为 `maotouying`，换歌单/加歌/删歌都要去酷狗客户端；
+- 用户希望后台直接管理登录与歌单。
+
+### 决定
+
+1. 后台 `/admin/` 增加「酷狗」：扫码登录、账号歌单列表、切换站内歌单、当前曲目增删；
+2. 登录走酷狗 Web 二维码接口：`/v2/qrcode` 和 `/v2/get_userinfo_qrcode`，签名用酷狗 Web 的 MD5 salt；二维码图片直接用酷狗返回的 base64；
+3. 扫码成功后的 token 写入 `/data/kugou-session.json`，优先于 `.env`；退出登录写 `disabled: true` 并清空 token，避免回落到旧环境变量；
+4. 站内歌单选择写 `/data/kugou-settings.json`，`getAccountPlaylist` 每次按当前设置取歌单；切换/增删后清空服务端缓存；
+5. 增删曲目复用 KuGouMusicApi 的 `playlist_tracks_add` / `playlist_tracks_del`（MIT），只接受 32 位 hash 和合法 fileid；
+6. 后台不返回 token，只返回掩码 userid；nginx 的 `/api/` 16 KB 限制不变。
+
+### 影响
+
+**正面**
+
+- 登录过期可以自己扫码，不用改 `.env`/重建；
+- 可以在后台切换歌单、加歌、删歌，读听页标题同步。
+
+**负面**
+
+- 扫码会话在 `/data` 卷；卷丢则需要重新扫码（token 不进每日备份）；
+- 增删依赖酷狗私有接口，接口变更时要更新 vendor；
+- 退出登录后 `.env` 里的旧 token 被有意屏蔽，需要重新扫码才能恢复；
+- 后台能改真实账号歌单，误删需要去酷狗恢复；目前没有二次确认之外的回收站。
+
+### 回滚
+
+1. 删除 `/data/kugou-session.json`、`/data/kugou-settings.json`，回到 `.env` 登录态；
+2. 后台「酷狗」入口可保留，不影响读听页；
+3. 如接口不可用，移除 vendor 增删模块与 `/api/admin/kugou/tracks`，只保留只读列表。
+
+### 后续
+
+- 给增删加操作日志/回收站；
+- 支持按歌名搜索再添加，而不是只填 hash；
+- 扫码会话加密落盘/定期刷新；
+- 歌单切换支持 URL slug 而非固定 maotouying。

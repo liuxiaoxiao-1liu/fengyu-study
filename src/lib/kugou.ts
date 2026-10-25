@@ -1,16 +1,21 @@
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { findCuratedTrack } from './content-db';
+import { readKugouConfig, readKugouSettings, type KugouConfig } from './kugou-session';
 
 // 从 Folia 内置的 KuGouMusicApi 里抽出的最小运行时（MIT，见 vendor/kugou/LICENSE）。
 // 只做两件事：/register/dev 换 dfid，/song/url 用账号 token 换音频直链。
 const require = createRequire(import.meta.url);
 const vendorPath = process.env.KUGOU_VENDOR ?? join(process.cwd(), 'vendor/kugou/index.js');
-const { registerDev, songUrl, userPlaylist, playlistTracks } = require(vendorPath) as {
+const { registerDev, songUrl, userPlaylist, playlistTracks, playlistTracksAdd, playlistTracksDel } = require(
+  vendorPath,
+) as {
   registerDev: (params: Record<string, unknown>) => Promise<KugouResponse>;
   songUrl: (params: Record<string, unknown>) => Promise<KugouResponse>;
   userPlaylist: (params: Record<string, unknown>) => Promise<PlaylistResponse>;
   playlistTracks: (params: Record<string, unknown>) => Promise<PlaylistResponse>;
+  playlistTracksAdd: (params: Record<string, unknown>) => Promise<PlaylistResponse>;
+  playlistTracksDel: (params: Record<string, unknown>) => Promise<PlaylistResponse>;
 };
 
 type RawPlaylistInfo = {
@@ -28,6 +33,7 @@ type RawPlaylistSong = {
   album_id?: number | string;
   add_mixsongid?: number | string;
   mixsongid?: number | string;
+  fileid?: number | string;
   timelen?: number;
   singerinfo?: Array<{ name?: string }>;
   singername?: string;
@@ -53,35 +59,14 @@ type KugouResponse = {
   };
 };
 
-type KugouConfig = {
-  token: string;
-  userid: string;
-  vipToken: string;
-  vipType: string;
-  mid: string;
-  guid: string;
-  dfid: string;
-};
-
 const URL_TTL_MS = 4 * 60 * 1000;
 const DFID_TTL_MS = 30 * 60 * 1000;
 
 let dfidCache: { value: string; at: number } | null = null;
 const urlCache = new Map<string, { url: string; at: number }>();
 
-function readConfig(): KugouConfig | null {
-  const token = process.env.KUGOU_TOKEN ?? '';
-  const userid = process.env.KUGOU_USERID ?? '';
-  if (!token || !userid) return null;
-  return {
-    token,
-    userid,
-    vipToken: process.env.KUGOU_VIP_TOKEN ?? '',
-    vipType: process.env.KUGOU_VIP_TYPE ?? '0',
-    mid: process.env.KUGOU_MID ?? '',
-    guid: process.env.KUGOU_GUID ?? '',
-    dfid: process.env.KUGOU_DFID ?? '',
-  };
+function readConfig() {
+  return readKugouConfig();
 }
 
 export function isKugouEnabled(): boolean {
@@ -189,9 +174,12 @@ export async function resolveKugouUrl(track: KugouTrackRef): Promise<string> {
   return url;
 }
 
-/** 账号里用于站内展示的唯一歌单；可用 KUGOU_PLAYLIST_NAME 覆盖（测试/改名时）。 */
+/** 账号里用于站内展示的唯一歌单；后台设置优先，其次 KUGOU_PLAYLIST_NAME。 */
 const PLAYLIST_SLUG = 'maotouying';
-const PLAYLIST_NAME = process.env.KUGOU_PLAYLIST_NAME || 'maotouying';
+
+function playlistName(): string {
+  return (readKugouSettings().playlistName || process.env.KUGOU_PLAYLIST_NAME || 'maotouying').trim();
+}
 const PLAYLIST_CACHE_MS = 60 * 1000;
 const PLAYLIST_PAGE_SIZE = 100;
 
@@ -199,6 +187,7 @@ export type AccountPlaylistTrack = KugouTrackRef & {
   title: string;
   artist: string;
   duration: string;
+  fileid: number;
 };
 
 export type AccountPlaylist = {
@@ -236,6 +225,7 @@ function normalizeSong(song: RawPlaylistSong): AccountPlaylistTrack {
     title,
     artist,
     duration: formatDuration(song.timelen),
+    fileid: Number(song.fileid ?? 0),
   };
 }
 
@@ -258,14 +248,14 @@ async function fetchAccountPlaylist(): Promise<AccountPlaylist> {
     throw new Error(`playlist_list_failed:${meta?.body?.error_code ?? 'unknown'}`);
   }
 
-  const wanted = PLAYLIST_NAME.trim().toLowerCase();
+  const wanted = playlistName().toLowerCase();
   const info = (meta.body.data?.info ?? []).find(
     (item) =>
       String(item.name ?? '')
         .trim()
         .toLowerCase() === wanted,
   );
-  if (!info) throw new Error(`playlist_not_found:${PLAYLIST_NAME}`);
+  if (!info) throw new Error(`playlist_not_found:${playlistName()}`);
 
   const total = Number(info.count) || 0;
   const tracks: AccountPlaylistTrack[] = [];
@@ -299,7 +289,7 @@ async function fetchAccountPlaylist(): Promise<AccountPlaylist> {
 
   return {
     slug: PLAYLIST_SLUG,
-    name: String(info.name ?? PLAYLIST_NAME),
+    name: String(info.name ?? playlistName()),
     total: tracks.length,
     tracks,
     fetchedAt: Date.now(),
@@ -311,7 +301,12 @@ async function fetchAccountPlaylist(): Promise<AccountPlaylist> {
  * 拉到一半失败时优先返回上一次成功结果，避免整页变空。
  */
 export async function getAccountPlaylist(force = false): Promise<AccountPlaylist> {
-  if (!force && playlistCache && Date.now() - playlistCache.fetchedAt < PLAYLIST_CACHE_MS) {
+  if (
+    !force &&
+    playlistCache &&
+    playlistCache.name.toLowerCase() === playlistName().toLowerCase() &&
+    Date.now() - playlistCache.fetchedAt < PLAYLIST_CACHE_MS
+  ) {
     return playlistCache;
   }
   if (playlistInflight) return playlistInflight;
@@ -344,6 +339,7 @@ export async function findAccountTrack(hash: string): Promise<AccountPlaylistTra
       title: curated.title,
       artist: curated.artist,
       duration: curated.duration,
+      fileid: 0,
     };
   }
 
@@ -356,4 +352,118 @@ export async function findAccountTrack(hash: string): Promise<AccountPlaylistTra
   }
 
   return track;
+}
+
+export type KugouPlaylistInfo = {
+  name: string;
+  count: number;
+  listid: number;
+  globalCollectionId: string;
+};
+
+/** 后台用：列出账号里的全部歌单（不改变站内当前歌单）。 */
+export async function listKugouPlaylists(): Promise<KugouPlaylistInfo[]> {
+  const config = readConfig();
+  if (!config) throw new Error('kugou_disabled');
+  const dfid = config.dfid || (await ensureDfid(config));
+  const response = await userPlaylist({
+    cookie: baseCookie(config, dfid),
+    userid: config.userid,
+    token: config.token,
+    page: 1,
+    pagesize: 100,
+  });
+  if (response?.body?.status !== 1) {
+    throw new Error(`playlist_list_failed:${response?.body?.error_code ?? 'unknown'}`);
+  }
+  return (response.body.data?.info ?? []).map((item) => ({
+    name: String(item.name ?? ''),
+    count: Number(item.count ?? 0),
+    listid: Number(item.listid ?? 0),
+    globalCollectionId: String(item.global_collection_id ?? ''),
+  }));
+}
+
+/** 清除播放/歌单缓存；后台登录、切歌单或增删歌曲后调用。 */
+export function resetKugouRuntime(): void {
+  dfidCache = null;
+  urlCache.clear();
+  playlistCache = null;
+  playlistInflight = null;
+}
+
+async function activePlaylistInfo(): Promise<{ name: string; listid: number; count: number }> {
+  const config = readConfig();
+  if (!config) throw new Error('kugou_disabled');
+  const dfid = config.dfid || (await ensureDfid(config));
+  const meta = await userPlaylist({
+    cookie: baseCookie(config, dfid),
+    userid: config.userid,
+    token: config.token,
+    page: 1,
+    pagesize: 100,
+  });
+  if (meta?.body?.status !== 1) throw new Error(`playlist_list_failed:${meta?.body?.error_code ?? 'unknown'}`);
+  const wanted = playlistName().toLowerCase();
+  const info = (meta.body.data?.info ?? []).find(
+    (item) =>
+      String(item.name ?? '')
+        .trim()
+        .toLowerCase() === wanted,
+  );
+  if (!info) throw new Error(`playlist_not_found:${playlistName()}`);
+  return {
+    name: String(info.name ?? playlistName()),
+    listid: Number(info.listid ?? 0),
+    count: Number(info.count ?? 0),
+  };
+}
+
+export type AddKugouTrackInput = {
+  hash: string;
+  name?: string;
+  albumId?: string;
+  albumAudioId?: number;
+};
+
+/** 后台：往当前站内歌单添加一首歌。 */
+export async function addKugouTrack(input: AddKugouTrackInput): Promise<void> {
+  const config = readConfig();
+  if (!config) throw new Error('kugou_disabled');
+  const hash = input.hash.trim().toLowerCase();
+  if (!/^[a-f0-9]{32}$/.test(hash)) throw new Error('invalid_hash');
+  const info = await activePlaylistInfo();
+  const dfid = config.dfid || (await ensureDfid(config));
+  const data = `${input.name?.trim() || hash}|${hash}|${input.albumId || '0'}|${input.albumAudioId || 0}`;
+  const response = await playlistTracksAdd({
+    listid: info.listid,
+    data,
+    cookie: baseCookie(config, dfid),
+    userid: config.userid,
+    token: config.token,
+  });
+  if (response?.body?.status !== 1) {
+    throw new Error(`playlist_add_failed:${response?.body?.error_code ?? 'unknown'}`);
+  }
+  resetKugouRuntime();
+}
+
+/** 后台：从当前站内歌单移除一首歌（fileid 来自歌单列表）。 */
+export async function removeKugouTrack(fileid: number): Promise<void> {
+  const config = readConfig();
+  if (!config) throw new Error('kugou_disabled');
+  if (!Number.isFinite(fileid) || fileid <= 0) throw new Error('invalid_fileid');
+  const info = await activePlaylistInfo();
+  const dfid = config.dfid || (await ensureDfid(config));
+  const response = await playlistTracksDel({
+    listid: info.listid,
+    fileids: String(fileid),
+    cookie: baseCookie(config, dfid),
+    userid: config.userid,
+    token: config.token,
+  });
+  if (response?.body?.status !== 1) {
+    throw new Error(`playlist_del_failed:${response?.body?.error_code ?? 'unknown'}`);
+  }
+  resetKugouRuntime();
 }

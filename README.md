@@ -121,6 +121,7 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 - 内容存在数据卷里的 `content.sqlite`；上传图片在 `/data/uploads`，通过 `/api/media/photos/...` 提供；
 - 首页 `/`、影集 `/photos/`、随记 `/essays/`、读听 `/reading/`、留言 `/guestbook/`、`/rss.xml`、`/sitemap.xml` 都在请求时读取内容库；后台改完刷新即可生效，通常不需要构建发版；
 - 曲目若填了酷狗 `hash` / `albumId` / `albumAudioId`，会自动进入站内播放白名单；
+- `/admin/` 顶部「酷狗」：手机酷狗扫码登录、查看账号全部歌单、切换站内歌单、查看/添加/删除当前歌单曲目；扫码会话保存在 `/data/kugou-session.json`，歌单选择在 `/data/kugou-settings.json`，不把 token 下发浏览器；
 - 站内搜索由 `GET /api/content/search` 在请求时生成，后台新增的随笔/书/歌/照片/友链都会自动进入搜索；
 - `/admin/letters/`：旧的留言后台（审核悄悄话、通过/隐藏、回复、导出 JSON/CSV），仍用 `ADMIN_TOKEN`；
 - 生成登录凭据：`node scripts/set-admin-password.mjs '<新密码>'`（只写本地 `.env`，服务器 `.env` 需同步这三项）；

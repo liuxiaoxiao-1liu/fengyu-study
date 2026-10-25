@@ -1656,6 +1656,23 @@ import '../../styles/global.css';
             actions.append(hide);
           }
 
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'rounded-lg px-space-md py-1.5 font-label-sm text-label-sm text-error hover:bg-error/10';
+          remove.textContent = '删除';
+          remove.addEventListener('click', async () => {
+            if (!window.confirm('永久删除这条留言？删除后不能恢复，隐藏则只是从公开页撤下。')) return;
+            setLettersStatus('删除中…');
+            try {
+              await request(`/api/admin/letters/${encodeURIComponent(letter.id)}`, { method: 'DELETE' });
+              setLettersStatus('已删除');
+              await loadLetters();
+            } catch (error) {
+              setLettersStatus(error instanceof Error ? error.message : '删除失败');
+            }
+          });
+          actions.append(remove);
+
           const replyBox = document.createElement('textarea');
           replyBox.className = 'field min-h-[4rem] flex-1';
           replyBox.placeholder = letter.is_private

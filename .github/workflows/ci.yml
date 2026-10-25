@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   verify:
-    name: format + check + build + smoke
+    name: format + check + test + build + smoke
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -35,6 +35,9 @@ jobs:
 
       - name: Astro check
         run: npm run check
+
+      - name: Unit tests
+        run: npm test
 
       - name: Build
         run: npm run build

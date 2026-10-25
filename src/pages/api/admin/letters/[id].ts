@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { adminGuard, cleanText, json, readJsonObject } from '../_utils';
 import {
+  deleteAdminLetter,
   isLetterStatus,
   updateAdminLetter,
   type LetterStatus,
@@ -53,6 +54,21 @@ export const PATCH: APIRoute = async ({ request, params }) => {
     return json({ ok: true, letter });
   } catch (error) {
     console.error('[admin/letters/:id] PATCH failed', error);
+    return json({ ok: false, error: 'server_error' }, 500);
+  }
+};
+
+export const DELETE: APIRoute = async ({ request, params }) => {
+  const denied = adminGuard(request);
+  if (denied) return denied;
+
+  const id = params.id;
+  if (!id) return json({ ok: false, error: 'missing_id' }, 400);
+
+  try {
+    return deleteAdminLetter(id) ? json({ ok: true }) : json({ ok: false, error: 'not_found' }, 404);
+  } catch (error) {
+    console.error('[admin/letters/:id] DELETE failed', error);
     return json({ ok: false, error: 'server_error' }, 500);
   }
 };

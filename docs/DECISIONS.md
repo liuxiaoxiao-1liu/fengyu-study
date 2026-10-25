@@ -561,3 +561,48 @@ rate_limits (ip_hash, last_at)
 
 - 删除旧 `/admin/letters/` 页面或改成跳转；
 - 留言支持分页/搜索、批量审核、操作日志。
+
+---
+
+## ADR-012 · 全站连续播放（View Transitions）
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`src/layouts/BaseLayout.astro`、`src/components/Player.astro`、全站站内链接
+
+### 背景
+
+- 站点是 Astro MPA，每次点站内链接整页刷新，`<audio>` 被重建，正在播放的歌会停；
+- 用户希望播放器全站式，换页不中断。
+
+### 决定
+
+1. `BaseLayout` 引入 `astro:transitions` 的 `<ClientRouter />`，站内链接走客户端换页；
+2. `Player.astro` 的根节点加 `id="site-player"` + `transition:persist`，让播放器 DOM 和 `<audio>` 跨页保留；
+3. Player 脚本用 `window.__fengyuPlayerBooted` 只初始化一次；监听 `astro:after-swap`，在换页后补回 `body.has-player` 的底部留白；
+4. 不引入 Web Audio/双 deck/音频字节缓存，仍由浏览器 `<audio>` 解码。
+
+### 影响
+
+**正面**
+
+- 站内切页、回到首页、阅读/影集/留言之间切换时音乐不断；
+- 播放器进度、暂停态、当前曲目 UI 都保留。
+
+**负面**
+
+- 引入客户端路由后，页面脚本在换页时的执行/重复绑定需要留意；已有脚本按全局事件委托或页面级重跑处理；
+- 站内链接不再整页刷新，某些依赖完整 reload 的调试方式会失效；
+- 后台 `/admin/` 仍是独立静态页，不经过 ClientRouter；从后台回前台会整页加载并停止播放。
+
+### 回滚
+
+1. 移除 `<ClientRouter />` 和 Player 的 `transition:persist`；
+2. Player 脚本的 boot guard 可保留，不影响普通加载；
+3. 回到整页刷新模式，播放行为恢复为“换页停止”。
+
+### 后续
+
+- 给 ClientRouter 加 `data-astro-reload` 白名单用于确实需要整页刷新的链接；
+- 播放器增加“继续上次播放”的本地记忆；
+- 在换页过渡中避免固定播放器闪烁。

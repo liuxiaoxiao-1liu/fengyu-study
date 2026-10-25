@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Player from '../components/Player.astro';
+import { ClientRouter } from 'astro:transitions';
 import { SITE, type NavKey } from '../lib/site';
 import '../styles/fonts.css';
 import '../styles/icons.css';
@@ -36,6 +37,7 @@ const socialImage = new URL(image, site);
     <link rel="apple-touch-icon" href="/images/logo.png" />
     <link rel="alternate" type="application/rss+xml" title={`${SITE.name} · RSS`} href={new URL('/rss.xml', site)} />
     <meta name="theme-color" content="#fcf9f4" />
+    <ClientRouter />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />

@@ -4,8 +4,10 @@
 ---
 
 <section
+  id="site-player"
   class="fixed inset-x-0 bottom-0 z-[60] px-gutter pb-3 pointer-events-none"
   data-player
+  transition:persist
   hidden
   aria-label="站内播放器"
 >
@@ -102,7 +104,11 @@
 
 <script>
   const player = document.querySelector<HTMLElement>('[data-player]');
-  if (player) {
+  const playerWindow = window as typeof window & { __fengyuPlayerBooted?: boolean };
+
+  // View Transitions 会把播放器节点持久化；脚本可能重跑，只初始化一次，避免重复绑定。
+  if (player && !playerWindow.__fengyuPlayerBooted) {
+    playerWindow.__fengyuPlayerBooted = true;
     const audio = player.querySelector<HTMLAudioElement>('[data-player-audio]');
     const toggle = player.querySelector<HTMLButtonElement>('[data-player-toggle]');
     const closeButton = player.querySelector<HTMLButtonElement>('[data-player-close]');
@@ -325,6 +331,12 @@
       audio.currentTime = Number(seek.value);
       // 知识库的播放管线约定：暂停中拖动进度条，语义是“继续听”。
       if (audio.paused) void audio.play().catch(() => {});
+    });
+
+    // 客户端路由换页后 body 是新的，播放器节点被 persist 保留下来，补回底部留白。
+    document.addEventListener('astro:after-swap', () => {
+      const persisted = document.querySelector<HTMLElement>('[data-player]');
+      if (persisted && !persisted.hidden) document.body.classList.add('has-player');
     });
   }
 </script>

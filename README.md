@@ -123,7 +123,7 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 - 曲目若填了酷狗 `hash` / `albumId` / `albumAudioId`，会自动进入站内播放白名单；
 - `/admin/` 顶部「酷狗」：手机酷狗扫码登录、查看账号全部歌单、切换站内歌单、查看/添加/删除当前歌单曲目；扫码会话保存在 `/data/kugou-session.json`，歌单选择在 `/data/kugou-settings.json`，不把 token 下发浏览器；
 - 站内搜索由 `GET /api/content/search` 在请求时生成，后台新增的随笔/书/歌/照片/友链都会自动进入搜索；
-- `/admin/` 顶部「留言」：直接审核悄悄话、通过/隐藏、回复、导出 JSON/CSV，使用后台登录 cookie，不需要另点链接；旧的 `/admin/letters/` 仍保留给 `ADMIN_TOKEN` 应急。
+- `/admin/` 顶部「留言」：直接审核悄悄话、通过/隐藏/删除、回复、导出 JSON/CSV，使用后台登录 cookie，不需要另点链接；旧的 `/admin/letters/` 仍保留给 `ADMIN_TOKEN` 应急。
 - 生成登录凭据：`node scripts/set-admin-password.mjs '<新密码>'`（只写本地 `.env`，服务器 `.env` 需同步这三项）；
 - 其它接口：`GET /api/stats`（聚合计数）、`POST /api/subscribe`（季刊订阅入库）；
 - 管理端走 HTTP 当前没有 TLS，令牌/密码只在本机/可信网络使用，后续上 HTTPS 后再日常使用。
@@ -135,7 +135,7 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 - 站内只展示账号里的 `maotouying` 歌单（可用 `KUGOU_PLAYLIST_NAME` 改名）；`/api/kugou/playlist` 运行时从酷狗拉取并缓存 60 秒，在酷狗上增删歌曲约 1 分钟内自动同步，不需要重新构建或部署；
 - `/reading/` 只展示这一个歌单并分页（每页 30 首）；`/api/kugou/url` 只解析当前歌单或首页/专辑精选里出现过的 hash，按 IP 限流（30 次 / 10 分钟）；
 - 播放入口统一用 `data-play` 指令：读听歌单行、读听「专辑归档」卡片、首页「酷狗音乐」卡片都会驱动同一个站内播放器；
-- 播放器固定在页面底部（`BaseLayout` 单实例），首次点播出现、可收起；多页站整页刷新会停止播放，跨页连续播放留待 View Transitions；
+- 播放器固定在页面底部（`BaseLayout` 单实例），首次点播出现、可收起；已启用 Astro View Transitions，播放器 DOM 用 `transition:persist` 保留，站内切页/刷新内容区时音频继续播放；
 - 浏览器 `<audio>` 负责解码；直链过期或断流时自动重取一次地址并按原进度续播，暂停中拖动进度条会自动恢复播放；
 - 登录态过期或酷狗改接口时，`/api/kugou/url` 返回 502，播放器自动降级为酷狗外链；重新扫码登录后更新 `.env` 即可。
 - 运行时来源是 `vendor/kugou/`（从 Folia 内置的 KuGouMusicApi 抽取，MIT），只保留 `register_dev` / `song_url` / 歌单读取。

@@ -267,6 +267,12 @@ export function updateAdminLetter(id: string, patch: UpdateLetterPatch): AdminLe
   return getAdminLetter(id);
 }
 
+/** 永久删除一条留言（公开/悄悄话都适用），用于清理垃圾或测试内容。 */
+export function deleteAdminLetter(id: string): boolean {
+  const result = getDb().prepare('DELETE FROM letters WHERE id = ?').run(id);
+  return Number(result.changes) > 0;
+}
+
 export function secondsSinceLastPost(ipHash: string): number | null {
   const db = getDb();
   const row = db.prepare('SELECT last_at FROM rate_limits WHERE ip_hash = ?').get(ipHash) as

@@ -8,7 +8,7 @@
 ## ADR-001 · 留言后端从 PHP + JSON 迁移到 Astro API + SQLite
 
 - **日期**：2026-10-24
-- **状态**：已接受，实施中
+- **状态**：已接受，已落地（第 1、2、5 条已被 ADR-007/008/009 部分取代：页面改为混合渲染，nginx 也反代动态页面）
 - **影响范围**：`/api/guestbook`、部署方式、服务器运行时
 
 ### 背景
@@ -78,7 +78,7 @@ rate_limits (ip_hash, last_at)
 ## ADR-002 · 管理后台用单令牌鉴权，内容改为数据驱动
 
 - **日期**：2026-10-24
-- **状态**：已接受，实施中
+- **状态**：已接受，已落地（第 1 条鉴权已被 ADR-007/011 取代为主后台 cookie，第 4 条内容来源已被 ADR-007/008/009 取代为 `content.sqlite`）
 - **影响范围**：`/admin/`、`/api/admin/*`、`/api/stats`、`/api/subscribe`、`src/data/*`
 
 ### 背景
@@ -131,7 +131,7 @@ rate_limits (ip_hash, last_at)
 ## ADR-003 · 酷狗站内播放：账号登录态 + 白名单解析
 
 - **日期**：2026-10-24
-- **状态**：已接受，已上线
+- **状态**：已接受，已上线（第 1 条登录态与第 4 条静态歌单快照已由 ADR-006/010 取代）
 - **影响范围**：`/reading/`、`/api/kugou/*`、`vendor/kugou/`、服务器 `.env`
 
 ### 背景
@@ -222,12 +222,14 @@ rate_limits (ip_hash, last_at)
 - 补 Playwright 视觉/交互测试与链接检查；
 - 视需要再评估 ESLint 与 Lighthouse。
 
+> 后续（ADR-014）：已补 Vitest 单元测试，冒烟扩展到 cookie 登录、内容 CRUD、上传与媒体路径；仍无 Playwright/Lighthouse。
+
 ---
 
 ## ADR-005 · 站内播放器：单 `<audio>` + `data-play` 指令 + 站内音源门面
 
 - **日期**：2026-10-25
-- **状态**：已接受，已落地
+- **状态**：已接受，已落地（负面结论中的“没有上 View Transitions”已被 ADR-012 取代）
 - **影响范围**：`src/components/Player.astro`、`src/layouts/BaseLayout.astro`、`src/pages/index.astro`、`src/pages/reading.astro`
 
 ### 背景
@@ -280,7 +282,7 @@ rate_limits (ip_hash, last_at)
 ## ADR-006 · 只展示账号歌单 maotouying，运行时同步
 
 - **日期**：2026-10-25
-- **状态**：已接受，已落地
+- **状态**：已接受，已落地（第 1 条歌单选择已被 ADR-010 取代为后台设置优先）
 - **影响范围**：`src/lib/kugou.ts`、`src/pages/api/kugou/{playlist,playlists,url}.ts`、`src/pages/reading.astro`、`src/data/`
 
 ### 背景
@@ -328,7 +330,7 @@ rate_limits (ip_hash, last_at)
 ## ADR-007 · 内容后台与影集运行时管理
 
 - **日期**：2026-10-25
-- **状态**：已接受，已落地
+- **状态**：已接受，已落地（负面结论中的“后台只覆盖影集”已被 ADR-008 取代；回滚步骤适用于影集上线时）
 - **影响范围**：`/admin/`、`/photos/`、`src/lib/content-db.ts`、`src/lib/admin-auth.ts`、`src/pages/api/admin/photos*`、上传与媒体路由、nginx、备份脚本
 
 ### 背景
@@ -340,7 +342,7 @@ rate_limits (ip_hash, last_at)
 ### 决定
 
 1. **内容库**：影集数据落到 `content.sqlite`（默认 `.data/content.sqlite`，容器 `/data/content.sqlite`），首次启动从现有 `src/data/photos.ts` 播种一次；
-2. **后台登录**：`/admin/` 用 `ADMIN_USER` + `ADMIN_PASSWORD_HASH`（scrypt）+ `ADMIN_SESSION_SECRET` 签发 HttpOnly cookie；旧的 `/admin/letters/` 继续用 `ADMIN_TOKEN`；
+2. **后台登录**：`/admin/` 用 `ADMIN_USER` + `ADMIN_PASSWORD_HASH`（scrypt）+ `ADMIN_SESSION_SECRET` 签发 HttpOnly cookie；旧的 `/admin/letters/` 继续用 `ADMIN_TOKEN`（现状：旧页已由 ADR-013 改为跳转，`ADMIN_TOKEN` 仅 Bearer/脚本兼容）；
 3. **影集 CRUD**：`/admin/` 支持新增、编辑、删除、上传图片；上传文件写入 `CONTENT_UPLOADS`（容器 `/data/uploads`），经 `/api/media/photos/...` 读取；
 4. **影集页 SSR**：`/photos/` 设为 `prerender = false`，请求时从内容库读取；nginx 把 `/photos/` 反代给 app；后台改完刷新即生效；
 5. **灯箱修复**：当前分类内翻页（不跨系列）、显示 `n / 分类数量`、增加「下载」和「编辑」入口；
@@ -380,7 +382,7 @@ rate_limits (ip_hash, last_at)
 ## ADR-008 · 内容后台扩展到随笔 / 书架 / 唱片 / 曲目 / 台词
 
 - **日期**：2026-10-25
-- **状态**：已接受，已落地
+- **状态**：已接受，已落地（负面结论中的“搜索仍是构建期静态”已被 ADR-009 取代）
 - **影响范围**：`CONTENT_DB` 的 `content_records` 表、`/admin/` 导航、`/`、`/essays/`、`/reading/`、`/rss.xml`、`/sitemap.xml`、nginx
 
 ### 背景
@@ -551,6 +553,8 @@ rate_limits (ip_hash, last_at)
 - `adminGuard` 的 503/401 语义变复杂；两种凭据都没配置时仍 503；
 - 旧 `/admin/letters/` 页面和主后台的留言 UI 有重复，后续可以删旧页。
 
+> 后续（ADR-013）：旧页已改为 0 秒跳转，`adminGuard` 统一为 `requireAdmin`，`src/pages/api/admin/_utils.ts` 已删除。
+
 ### 回滚
 
 1. 恢复主后台「留言审核」外链，移除「留言」导航；
@@ -606,3 +610,100 @@ rate_limits (ip_hash, last_at)
 - 给 ClientRouter 加 `data-astro-reload` 白名单用于确实需要整页刷新的链接；
 - 播放器增加“继续上次播放”的本地记忆；
 - 在换页过渡中避免固定播放器闪烁。
+
+---
+
+## ADR-013 · 前端组件化与公共 API 层收敛
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`src/pages/**`、`src/components/**`、`src/scripts/**`、`src/lib/**`、`src/pages/api/**`、`deploy/**`、`docker/**`
+
+### 背景
+
+- 页面严重超标：`admin/index` 1737 行、`admin/letters` 830 行、`guestbook` 857 行、`index` 723 行、`reading` 649 行、`essays` 503 行；内联脚本最大 1074 行；
+- 组件只有 5 个，卡片/表单/弹层在页面里重复；
+- API 有 13 份本地 `json()`、两套管理端鉴权（`adminGuard` / `requireContentAdmin`，503/401 语义不一致）、三份限流 Map、重复的 `text`/`slugify`；
+- `docker/app.Dockerfile` 已无人使用且缺 `vendor/` 拷贝；仓库还保留旧 PHP/nginx 部署脚本与设计稿目录。
+
+### 决定
+
+1. 页面按区块拆到 `src/components/{site,guestbook,admin}/`，浏览器逻辑拆到 `src/scripts/{site,guestbook,admin}/`；页面只保留一个 `<script>` 入口，页面 <200 行、组件 <150 行；Header 的搜索弹层拆为 `SearchDialog`，Player / PhotoLightbox 脚本抽到 `src/scripts/site/`；ClientRouter 页面统一用 `onPageLoad` / `astro:page-load` 重初始化，修复换页后搜索与灯箱失效；
+2. 新增 `src/lib/http.ts`（统一 JSON）、`src/lib/validate.ts`（text/integer/slugify/tags）、`src/lib/rate-limit.ts`（clientIp/hashIp/createRateLimiter，带 key 上限清理）；
+3. 管理端统一 `requireAdmin()`：cookie 优先、兼容 Bearer；两种凭据都未配置返回 503，否则 401；删除 `_utils.ts` 与 `requireContentAdmin`；
+4. 内容/照片种子改为版本化 manifest（`settings` 里记录已播种 slug），新增种子可补入，后台删除的条目不会被重新插回；
+5. `/admin/letters/` 改为 0 秒跳转页（静态，不依赖 nginx 反代），`ADMIN_TOKEN` 退为 Bearer/脚本兼容；
+6. 删除 `deploy.sh`、`deploy/guestbook.php`、`deploy/nginx.conf`、`docker/app.Dockerfile` 与设计稿/试验目录；服务器上的旧 PHP 站仍保留作回滚。
+
+### 影响
+
+**正面**
+
+- 单文件可读性和 review 成本显著下降；页面/组件行数全部达标；
+- API 的错误语义、响应头、限流策略一致；
+- 种子数据可增量补入，不再需要“删库重播”。
+
+**负面**
+
+- 组件/脚本文件数量增加，跨文件定位需要熟悉目录；
+- 管理端脚本从 inline classic 变为 Astro 打包 module，初始化时机依赖 `DOMContentLoaded`/`readyState` 兜底；
+- 旧书签的 `/admin/letters/` 是 HTTP 200 的跳转页，不是 301；要真 301 需给 nginx 增加对应反代。
+
+### 回滚
+
+1. 保留原页面在 Git 历史；回滚时逐个恢复 `src/pages/*.astro` 与 `admin/index.astro` 即可；
+2. 恢复 `_utils.ts` 与旧 `requireContentAdmin` 需同时恢复所有 API import；
+3. 旧部署文件可从 ADR-001 与 Git 历史找回；服务器侧旧站未删除。
+
+### 后续
+
+- 把管理端大脚本继续按面板细拆（当前 `photos`/`records`/`kugou`/`letters` 已分离）；
+- 真 301 跳转（需要 nginx 反代 `/admin/`）；
+- Content Collections 迁移。
+
+---
+
+## ADR-014 · 测试补齐：Vitest 单元测试 + 扩展冒烟
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`tests/`、`vitest.config.ts`、`package.json`、`scripts/smoke-test.mjs`、`docs/**`
+
+### 背景
+
+- ADR-004 只有 `astro check` + 构建 + 冒烟，纯函数（校验、schema、限流、鉴权、内容库）没有单元测试；
+- 冒烟只覆盖旧 Bearer 管理端，主后台 cookie 登录、内容 CRUD、上传与媒体路径没覆盖；
+- 页面拆分后需要更快的回归信号。
+
+### 决定
+
+1. 引入 `vitest`（devDependency），`npm test` 跑 `tests/**/*.test.ts`；
+2. 覆盖 `validate`、`content-schema`、`rate-limit`、`admin-auth`、`content-db`（临时 SQLite + `closeContentDb()`）；
+3. `npm run verify` 串联 `format:check → check → test → build → smoke`；
+4. 冒烟扩展为 70 项：新增测试账号 cookie 登录、`/api/admin/session`、内容创建/列表/更新/搜索/删除、照片创建/删除、图片上传、媒体访问、路径穿越拒绝、退出登录；
+5. 仍不引入 Playwright；视觉/交互/链接检查留到第三阶段。
+
+### 影响
+
+**正面**
+
+- 纯函数和数据库行为可在毫秒级验证；接口回归覆盖主后台主路径；
+- 页面拆分后，`npm run verify` 能同时拦住类型、逻辑、构建和接口回归。
+
+**负面**
+
+- 开发依赖增加 `vitest` 及其传递依赖；
+- 测试使用临时 SQLite，需注意关闭句柄与清理目录；
+- 冒烟仍不覆盖真实浏览器 DOM/视觉。
+
+### 回滚
+
+1. 删除 `tests/`、`vitest.config.ts`，从 `package.json`/`package-lock.json` 移除 `vitest`；
+2. `npm run verify` 恢复为 ADR-004 的四段链；
+3. 冒烟脚本可保留原 52 项覆盖。
+
+### 后续
+
+- Playwright 视觉回归与关键交互；
+- 链接检查、Lighthouse、`npm audit` 纳入 CI；
+- 远程仓库接通后让 Actions 执行同一套 `npm run verify`。

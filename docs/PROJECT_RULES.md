@@ -1,11 +1,11 @@
 # 风屿书房 · 项目规范
 
-> 版本：v0.2
+> 版本：v0.4
 > 日期：2026-10-25
-> 状态：**生效**。v0.2 起按本文执行；尚未拍板的事项收敛在[第 16 节](#16-待确认事项)，不影响已生效条款。
+> 状态：**生效**。v0.4 起按本文执行；尚未拍板的事项收敛在[第 16 节](#16-待确认事项)，不影响已生效条款。
 > 适用：本地仓库、构建产物、部署脚本、服务器上的站点与接口、站点内容与素材。
 >
-> **v0.2 变更**：按 [DECISIONS.md](DECISIONS.md) 的 ADR-001 / ADR-002 / ADR-003 / ADR-004 全面对齐当前实现——Astro 静态页 + Node API + SQLite + Docker Compose；移除与 PHP / JSON 留言、手工 `deploy.sh` 相关的过期描述；补充自动化校验（`astro check` / Prettier / `npm run verify` / 冒烟）与备份、回滚现状。
+> **v0.4 变更**：按 ADR-013/014 完成前端组件化与公共层收敛——页面/组件控制在 200/150 行内，浏览器脚本抽到 `src/scripts/`，API 统一 `json()` / `requireAdmin()` / 限流与校验；新增 Vitest 单元测试，冒烟覆盖 cookie 登录、内容 CRUD、上传与媒体路径；删除旧 PHP 部署脚本、旧管理页与设计稿目录。
 
 ---
 
@@ -39,37 +39,50 @@
   Astro 7 构建（Node ≥ 26）
         │  npm run build
         ▼
-  dist/client（纯静态 HTML / CSS / JS / 图片 / 字体）
-  dist/server（API bundle，仅 /api/* 在请求时执行）
+  dist/client（静态 HTML / CSS / JS / 图片 / 字体）
+  dist/server（Node adapter：API + 按请求渲染的页面）
         │  ./deploy/docker-deploy.sh（npm run deploy:docker）→ rsync
         ▼
 服务器 example.com（/opt/fengyu）
   web 容器（nginx 1.27-alpine）:80
-    ├─ /            → /usr/share/nginx/html（dist/client）
-    └─ /api/*       → app 容器 :4321
+    ├─ 静态资源        → /usr/share/nginx/html（dist/client）
+    ├─ /               → app 容器 :4321
+    ├─ /essays/        → app 容器 :4321
+    ├─ /essays/[slug]/ → app 容器 :4321
+    ├─ /reading/       → app 容器 :4321
+    ├─ /photos/        → app 容器 :4321
+    ├─ /guestbook/     → app 容器 :4321
+    ├─ /rss.xml        → app 容器 :4321
+    ├─ /sitemap.xml    → app 容器 :4321
+    └─ /api/*          → app 容器 :4321
   app 容器（Node 26 / @astrojs/node standalone）
-    └─ 命名卷 fengyu_guestbook-data → /data/guestbook.sqlite（WAL）
+    └─ 命名卷 fengyu_guestbook-data → /data/
+         ├─ guestbook.sqlite（letters / subscribers / rate_limits）
+         ├─ content.sqlite（content_records / photos / settings）
+         ├─ uploads/
+         └─ kugou-session.json / kugou-settings.json
   xray :443 独立代理，不属于本站代码
 ```
 
-- 页面**全量预渲染**，只有 `src/pages/api/**`（`prerender = false`）由 app 容器执行；
+- 首页、`/essays/`、`/essays/[slug]/`、`/reading/`、`/photos/`、`/guestbook/`、`/rss.xml`、`/sitemap.xml` 设 `prerender = false`，由 app 容器在请求时读取内容库；`/admin/` 与 404 等仍预渲染，`/admin/letters/` 是 0 秒自动跳转到 `/admin/` 的静态页；
+- 所有 `src/pages/api/**` 均为 `prerender = false`，由 app 容器执行；
 - 服务器只放构建产物、`vendor/`、编排文件与运维脚本，**不存放源码和 `.git`**；
-- 旧 PHP 站点 `/var/www/xiaoquanzi` 与 `deploy/guestbook.php` 仅作为回滚路径保留。
+- 服务器上的旧 PHP 站点 `/var/www/xiaoquanzi` 仅作为回滚路径保留；仓库不再包含 `deploy.sh`、`deploy/guestbook.php`、`deploy/nginx.conf` 或 `docker/app.Dockerfile`。
 
 ### 1.3 关键事实
 
-| 项              | 值                                                                                                   |
-| --------------- | ---------------------------------------------------------------------------------------------------- |
-| 本地技术栈      | Astro 7.4.2 + Tailwind CSS 3.4.17 + PostCSS 8 + Autoprefixer 10 + `@astrojs/node` 11                 |
-| 运行时          | Node ≥ 26（本机 v26.11.1）；数据库用内置 `node:sqlite`                                               |
-| 包管理器        | npm，锁文件 `package-lock.json` 必须提交                                                             |
-| 服务器          | Ubuntu 24.04 / Docker 24+ / Compose v2 / xray 443                                                    |
-| 部署目录        | `/opt/fengyu`（`dist/`、`vendor/`、`docker-compose.yml`、`.env`、`backups/`、`scripts/`）            |
-| 站点入口        | `http://example.com/`，尚未启用 HTTPS                                                                |
-| 留言 / 订阅 API | app 容器内 `/api/guestbook`、`/api/stats`、`/api/subscribe`、`/api/admin/*`                          |
-| 数据卷          | `fengyu_guestbook-data` → `/data/guestbook.sqlite`（letters / subscribers / rate_limits）            |
-| 旧站（回滚）    | `/var/www/xiaoquanzi`、`/var/www/xiaoquanzi-api/guestbook.php`、`/var/lib/xiaoquanzi/guestbook.json` |
-| 部署入口        | `npm run deploy:docker`（默认 8080）；`WEB_PORT=80 npm run deploy:docker` 切正式端口                 |
+| 项              | 值                                                                                                                                                   |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 本地技术栈      | Astro 7.4.2 + Tailwind CSS 3.4.17 + PostCSS 8 + Autoprefixer 10 + `@astrojs/node` 11                                                                 |
+| 运行时          | Node ≥ 26（本机 v26.11.1）；数据库用内置 `node:sqlite`                                                                                               |
+| 包管理器        | npm，锁文件 `package-lock.json` 必须提交                                                                                                             |
+| 服务器          | Ubuntu 24.04 / Docker 24+ / Compose v2 / xray 443                                                                                                    |
+| 部署目录        | `/opt/fengyu`（`dist/`、`vendor/`、`docker/`、`deploy/`、`package.json`、`package-lock.json`、`docker-compose.yml`、`.env`、`backups/`、`scripts/`） |
+| 站点入口        | `http://example.com/`，尚未启用 HTTPS                                                                                                                |
+| 公开 / 管理 API | app 容器内 `/api/guestbook`、`/api/stats`、`/api/subscribe`、`/api/content/search`、`/api/kugou/*`、`/api/admin/*`、`/api/media/*`                   |
+| 数据卷          | `fengyu_guestbook-data` → `/data/`（`guestbook.sqlite`、`content.sqlite`、`uploads/`、酷狗会话/设置）                                                |
+| 旧站（回滚）    | 服务器 `/var/www/xiaoquanzi`、`/var/lib/xiaoquanzi/guestbook.json`；仓库只保留回滚说明                                                               |
+| 部署入口        | `npm run deploy:docker`（默认 8080）；`WEB_PORT=80 npm run deploy:docker` 切正式端口                                                                 |
 
 ---
 
@@ -79,7 +92,7 @@
 
 - **Node.js**：本地开发、构建与 app 容器统一使用 Node ≥ 26（Astro 7 + `node:sqlite`）；当前本机 v26.11.1。
 - **Docker + Compose v2**：服务器唯一运行时；`web`（nginx）与 `app`（Node）两个服务，见 [docker-compose.yml](../docker-compose.yml)。
-- **nginx**：只在 `web` 容器内提供静态文件、缓存、安全头、限流与 `/api/` 反代。
+- **nginx**：在 `web` 容器内提供静态文件、缓存、安全头、限流，并把 `/api/` 与动态页面路由反代到 app。
 - **PHP**：不属于当前站点的构建与运行链路，仅旧站 `/var/www/xiaoquanzi` 作为回滚路径保留；不得为新功能编写 PHP。
 - **数据库**：只允许 `node:sqlite`（单文件 + WAL）。禁止引入 ORM、`sqlite3` 命令行、PostgreSQL/MySQL/Redis。
 - **不允许**在 app 容器之外新增 Node 进程或数据库容器；结构性变更必须单独评审并写 ADR。
@@ -107,17 +120,24 @@
 
 ```text
 src/
-  components/   Header、Footer、Player、TrackRow、PhotoLightbox
-  data/         books、music、photos、quotes、essays、search
+  components/   Header、SearchDialog、Footer、Player、TrackRow、PhotoLightbox、PhotoLightboxSlides
+    site/       首页、读听、影集、随记的区块组件
+    guestbook/  留言页区块
+    admin/      登录、导航、影集、内容、留言、酷狗面板
+  data/         books、music、photos、quotes、essays、links、search（首启种子 + 搜索兜底）
   layouts/      BaseLayout
-  lib/          site、xml、guestbook-db、newsletter-db、kugou
+  lib/          site、xml、http、validate、rate-limit、admin-auth、uploads、
+                guestbook-db、newsletter-db、content-db、content-schema、content-input、
+                kugou、kugou-login、kugou-session
   pages/        五个栏目、essays/[slug]、admin、404、rss.xml、sitemap.xml
-  pages/api/    guestbook、stats、subscribe、kugou/*、admin/*
+  pages/api/    guestbook、stats、subscribe、content/search、kugou/*、admin/*、media/*
+  scripts/      site/、guestbook/、admin/ 浏览器交互模块；site/page-init.ts 负责换页重初始化
   styles/       fonts、icons、global
+tests/          Vitest 单元测试（validate、content-schema、rate-limit、admin-auth、content-db）
 public/         图片、字体、og、robots
-deploy/         docker-deploy.sh、nginx.container.conf、server/（cron、logrotate）、旧 PHP（仅回滚）
-docker/         app 镜像（构建 / 运行时）
-scripts/        SQLite 备份、留言导入、探活、酷狗歌单同步、冒烟测试
+deploy/         docker-deploy.sh、nginx.container.conf、server/（cron、logrotate）
+docker/         app.runtime.Dockerfile（部署运行时）
+scripts/        SQLite/上传备份、留言导入、探活、管理员密码、冒烟测试
 vendor/kugou/   酷狗解析最小运行时（MIT）
 docs/           规范、ADR、功能契约
 ```
@@ -125,26 +145,23 @@ docs/           规范、ADR、功能契约
 ### 3.2 后续目标结构（渐进，不一次性重写）
 
 ```text
-src/
-  components/   继续按页面拆：site/、home/、reading/、photos/、essays/、guestbook/
-  content/      随记迁移为 Content Collections（*.md + content.config.ts）
-  scripts/      浏览器端交互从页面 <script> 抽出（按需，不强制）
-tests/          Playwright 冒烟测试（与 scripts/smoke-test.mjs 并存）
+src/content/    随记迁移为 Content Collections（*.md + content.config.ts）
+tests/e2e/      Playwright 视觉/交互测试（与 scripts/smoke-test.mjs 并存）
 docs/           ASSETS.md（素材来源与许可证）
 ```
 
 ### 3.3 目录规则
 
 - `src/pages/` 只做路由、数据获取和页面组装，**不写大段业务逻辑和重复卡片 HTML**。
-- 页面文件超过 **200 行** 必须拆分组件；组件超过 **150 行** 考虑继续拆分（存量见附录 A，按阶段处理）。
-- `src/data/` 是内容数据的唯一来源。书籍、专辑、照片、台词、随笔、歌单不得同时写在多个地方。
-- `src/pages/api/` 只做 HTTP 编排；SQL、校验与复用逻辑放 `src/lib/`。
+- 页面文件硬上限 **200 行**；组件超过 **150 行** 必须继续拆分。当前所有页面与组件均已达标，回归时用 `wc -l` 抽查。
+- 页面只保留一个 `<script>` 入口；交互逻辑放 `src/scripts/` 对应模块，模块顶层不得直接访问 DOM，必须在初始化函数里查询；模块要可重复初始化。
+- 组件通过 `interface Props` 接收数据；页面级数据在 `src/pages/` 获取，组件不自行读数据库。
+- `src/data/` 是首启种子数据；站点运行时以 `content.sqlite` 为准。书籍、专辑、照片、台词、随笔、友链不得在页面模板里另写一份。
+- `src/pages/api/` 只做 HTTP 编排；统一从 `src/lib/http.ts` 取 `json()` / `readJsonObject()`，从 `src/lib/admin-auth.ts` 取 `requireAdmin()`，从 `src/lib/rate-limit.ts` 取 `clientIp()` / `createRateLimiter()`，从 `src/lib/validate.ts` 取校验函数。禁止再复制本地 JSON/鉴权/限流/校验实现。
 - `src/lib/` 只放纯函数、类型与数据访问；不做 UI，不拼 HTML。
-- `public/` 只放需要按原路径服务的文件；源素材、生成脚本、设计稿放 `scripts/` 或仓库内素材目录，不要混进 `public/`。
+- `public/` 只放需要按原路径服务的文件；源素材、生成脚本、设计稿不要混进 `public/`，也不要长期留在仓库根目录。
 - `deploy/` 只放服务器侧配置与运维脚本；不得放密钥、密码、token、UUID。
-- 文档统一放 `docs/`，根目录只保留 README、许可证和必要配置。
-
----
+- 文档统一放 `docs/`，根目录只保留 README、许可证、测试/配置文件与项目源码。
 
 ## 4. 命名规范
 
@@ -177,6 +194,9 @@ docs/           ASSETS.md（素材来源与许可证）
 - 页面 `<main>` 的唯一 ID 为 `main`；不要嵌套 `<main>`。
 - 不写内联事件属性（`onclick`、`onsubmit`）；统一用 `data-*` + `addEventListener`。
 - 用户输入一律用 `textContent` 输出，禁止把用户数据拼进 `innerHTML`。
+- 页面只保留一个 `<script>` 入口；浏览器交互放 `src/scripts/`。会被 ClientRouter 重新挂载的页面/组件必须用 `onPageLoad` / `astro:page-load` 重初始化；普通静态后台页可在模块顶层查询 DOM，但要保证重复加载不重复绑定。
+- 使用 `ClientRouter` 的页面必须处理换页重初始化：页面脚本用 `src/scripts/site/page-init.ts` 的 `onPageLoad(key, init)`；Header 等跨页组件监听 `astro:page-load` 并以新元素去重。只绑定一次的事件在换页后会失效。
+- 唯一允许的富文本例外是 `/admin/` 写入的随笔 `body`/`title`，经 `set:html` 渲染；它只接受可信后台输入，不接收匿名用户内容。若未来多人写稿，必须加 sanitizer 并更新本规范。
 - 外部链接必须带 `target="_blank"` 与 `rel="noopener noreferrer external"`。
 
 ### 5.2 TypeScript / JavaScript
@@ -184,7 +204,8 @@ docs/           ASSETS.md（素材来源与许可证）
 - 保持 `astro/tsconfigs/strict`；不使用无理由的 `any`。
 - 优先 `const`；异步用 `async/await`；错误要处理，不吞异常。
 - 不在浏览器脚本里访问 Node API。
-- 交互逻辑必须可重复初始化，不能依赖页面只加载一次。
+- 交互逻辑必须可重复初始化，不能依赖页面只加载一次；初始化函数要能安全处理元素不存在的情况。
+- API 的 JSON、鉴权、限流、校验统一使用 `src/lib/http.ts`、`admin-auth.ts`、`rate-limit.ts`、`validate.ts`，不要在路由里复制。
 - 动画与滚动监听尊重 `prefers-reduced-motion`。
 
 ### 5.3 HTML / CSS
@@ -193,6 +214,7 @@ docs/           ASSETS.md（素材来源与许可证）
 - 每页只能有一个 `<h1>`；标题层级不跳级。
 - Tailwind 优先；自定义 CSS 只放在 `src/styles/global.css` 或组件 `<style>` 中，并加注释说明用途。
 - 颜色、字号、间距从 `tailwind.config.mjs` 的设计 token 取；禁止在模板里散落新的十六进制颜色。
+- 随笔正文是受信任后台输入的 HTML；除此之外不得新增 `set:html` / `innerHTML`。
 - 图片必须有 `alt`；装饰图用 `alt=""`；内容图必须有 `width` / `height` 或明确比例。
 - 禁止为了“看起来干净”全局隐藏滚动条；当前使用细滚动条样式。
 
@@ -203,12 +225,14 @@ docs/           ASSETS.md（素材来源与许可证）
 ```bash
 npm run format:check   # Prettier 检查（不写文件）
 npm run check          # astro check（TypeScript + Astro）
+npm test               # Vitest 单元测试
 npm run build          # 构建静态页与 server bundle
 npm run smoke          # 启动构建产物，跑接口冒烟
-npm run verify         # 上面四项的合集，发布前的总闸门
+npm run verify         # 上面五项的总闸门
 ```
 
 - `npm run format` 写入格式化结果；一次提交只做格式或只做功能，不混在一起。
+- 新增/修改 `src/lib/` 的纯函数时补 `tests/` 单元测试；改接口时同步更新 `scripts/smoke-test.mjs`。
 - 不使用编辑器自动格式化去改无关文件。
 - 本机 `$HOME` 只读，直接跑 Astro 可能因遥测写 `~/.config` 报错；`npm run verify` 与部署脚本已内置 `ASTRO_TELEMETRY_DISABLED=1`，手工执行时也可自行加上。
 - CI 模板见 `.github/workflows/ci.yml`，执行同样的检查链；没有远程仓库时以本地 `npm run verify` 为准。
@@ -219,8 +243,8 @@ npm run verify         # 上面四项的合集，发布前的总闸门
 
 ### 6.1 文章（随记）
 
-- **现状**：正文在 `src/data/essays.ts`（`kind: 'essay' | 'micro'`），页面只遍历渲染。
-- **目标形态**：迁移到 `src/content/essays/*.md` + `content.config.ts` 的 schema；迁移前不得新增第二份文章数据。
+- **现状**：`src/data/essays.ts` 是首启种子（`kind: 'essay' | 'micro'`）；日常正文存在 `content.sqlite` 的 `content_records` 表，页面请求时读取。
+- **目标形态**：迁移到 `src/content/essays/*.md` + `content.config.ts` 的 schema；迁移前以内容库为运行时唯一来源，页面模板不得另写一份正文。
 - frontmatter 字段（迁移后）：`title`、`date`、`category`、`readMinutes`、`tags`、`quote`、`summary`、`draft`（可选）。
 - 日期使用 `YYYY-MM-DD`，展示时统一为“2024年12月20日”。
 - 摘要 40–120 字；标题不堆关键词；正文段落短，适合中文长阅读。
@@ -230,10 +254,10 @@ npm run verify         # 上面四项的合集，发布前的总闸门
 ### 6.2 图片与素材
 
 - 内容图必须有描述性 `alt`；照片可加拍摄地点、时间、器材说明。
-- 页面展示图统一放 `public/images/`；封面生成脚本放 `scripts/` 并纳入版本控制（当前仍在 `stitch-assets/`，见附录 A）。
+- 页面展示图统一放 `public/images/`；如需封面生成脚本，放 `scripts/` 并纳入版本控制。
 - 图片版权必须可追溯：自有、授权、Unsplash 等；在 `docs/ASSETS.md` 记录来源与许可证（尚未建立，见附录 A）。
 - 不使用来源不明的网图、书籍封面扫描件或明星照片作为站点素材。
-- 设计参考稿 `stitch_astro_personal_website/` 只作为参考，不直接作为线上素材来源。
+- 设计稿导出目录已从仓库清理；需要回溯时看 Git 历史，不直接作为线上素材来源。
 
 ### 6.3 文案与语气
 
@@ -261,15 +285,17 @@ npm run verify         # 上面四项的合集，发布前的总闸门
 
 ## 7. 数据规范
 
-- `src/data/` 是书籍、专辑、曲目、照片、台词、随笔的单一来源；账号歌单改为运行时同步，不再落静态数据。
-- `src/data/search.ts` 必须从其他数据与文章集合**自动生成**，不再手工维护重复摘要。
-- 账号歌单：`/api/kugou/playlist` 运行时用 `KUGOU_PLAYLIST_NAME`（默认 `maotouying`）从酷狗拉取，服务端内存缓存 60 秒；`/api/kugou/url` 的白名单来自这份缓存（另保留 `src/data/music.ts` 里首页/专辑精选的曲目），新增歌曲约 1 分钟内可播放。
+- `src/data/` 是首启种子，不是运行时内容库：书籍、专辑、曲目、照片、台词、随笔、友链首次启动时播种到 `content.sqlite`。种子用 `settings` 里的版本化 manifest 记录已播种 slug；新增种子条目会在下次启动补入，后台删掉的条目不会被重新插回。修改已有条目的内容不会覆盖内容库。
+- 日常内容以 `/admin/` 写入的 `content.sqlite` 为准；页面与 RSS/sitemap 请求时读取内容库。
+- `src/data/search.ts` 只作为首屏/断网兜底；正常搜索走 `GET /api/content/search`，从内容库动态汇总。
+- 账号歌单：`/api/kugou/playlist` 运行时从酷狗拉取，服务端内存缓存 60 秒；站内只展示后台选中的歌单，后台设置优先于 `KUGOU_PLAYLIST_NAME`。`/api/kugou/url` 的白名单来自当前歌单缓存，另保留 `src/data/music.ts` 里首页/专辑精选的曲目。
 - 数据字段命名统一 camelCase；日期用 ISO 字符串；URL 用完整绝对地址。
 - `id` / `slug` 必须稳定，不随展示文案变化。
-- 页面不直接内嵌数据数组；通过 `import` 使用。
-- 站点数据与内容分离：留言、订阅、限流在服务器 SQLite 卷（`letters` / `subscribers` / `rate_limits`），不进仓库；本地开发默认写 `.data/guestbook.sqlite`。
+- 页面不直接内嵌数据数组；通过 `import` 使用；运行时要读内容库的页面用 `src/lib/content-db.ts`。
+- 站点数据与内容分离：留言、订阅、限流在 `guestbook.sqlite`，内容在 `content.sqlite`，上传文件与酷狗会话/设置在 `/data/`，都不进仓库；本地开发默认写 `.data/`。
 - 任何数据迁移必须提供一次性脚本（现有：`scripts/import-guestbook-json.mjs`），并在提交信息中说明。
-- 数据库访问只走 `src/lib/guestbook-db.ts` / `src/lib/newsletter-db.ts`，页面与 API 不直接写 SQL。
+- 读库时 `content_records.data` 由 API 写入校验保证；种子/旧数据若手工修改，需先备份并用 `/admin/` 重新保存一次，避免缺字段。
+- 数据库访问只走 `src/lib/guestbook-db.ts` / `src/lib/newsletter-db.ts` / `src/lib/content-db.ts`，页面与 API 不直接写 SQL。
 
 ---
 
@@ -375,7 +401,7 @@ security(nginx): rate-limit guestbook API
 ### 11.2 服务器规则
 
 - 源码、`.git`、`node_modules` 不上服务器；服务器只保留 `dist/`、`vendor/`、`docker/`、`deploy/`、`scripts/`、`docker-compose.yml` 与 `.env`。
-- 部署目录 `/opt/fengyu` 归 root；`.env` 权限 600，只存 `ADMIN_TOKEN` 与 `KUGOU_*`。
+- 部署目录 `/opt/fengyu` 归 root；`.env` 权限 600，存 `ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`、旧 `ADMIN_TOKEN` 与 `KUGOU_*`；扫码会话与内容库设置落在 `/data` 卷。
 - 数据只在命名卷 `fengyu_guestbook-data` 中；不要在容器外手工改库，改动前先备份。
 - 不新增公网端口：对外只有 80（xray 占用 443，不要动）。
 - 容器以最小权限运行：`cap_drop: ALL`、`no-new-privileges`、只挂载必要目录；`web` 对 `dist` 只读。
@@ -385,7 +411,7 @@ security(nginx): rate-limit guestbook API
 ### 11.3 备份
 
 - 源码：远程 Git（必须；当前仍缺，见附录 A）。
-- 站点数据：`/opt/fengyu/scripts/backup-guestbook.sh` 每日 04:17 用 `VACUUM INTO` 备份到 `/opt/fengyu/backups/`，保留 7 天。
+- 站点数据：`/opt/fengyu/scripts/backup-guestbook.sh` 每日 04:17 用 `VACUUM INTO` 备份 `guestbook.sqlite` / `content.sqlite`，并打包 `uploads/` 与 `kugou-settings.json` 到 `/opt/fengyu/backups/`，保留 7 天。
 - 配置：`docker-compose.yml`、`deploy/` 随部署同步；`.env` 另存密码管理器。
 - 至少每月把一份备份拉到本地/对象存储做异地备份；备份与源库同盘时，同盘故障会一起丢失。
 - 恢复流程：先 `PRAGMA integrity_check` 校验，再停止 app、替换数据卷文件、启动并验证；每季度演练一次。
@@ -393,10 +419,10 @@ security(nginx): rate-limit guestbook API
 ### 11.4 安全
 
 - SSH 只允许密钥；fail2ban、UFW 保持开启；不随意开放端口。
-- 接口防护：管理端会话 cookie / Bearer Token（`timingSafeEqual` 比较）、普通 API 16 KB 请求体上限（`/api/admin/upload` 单独 10 MB）、留言每 IP 60 秒一次、订阅 5 次/10 分钟、nginx 粗粒度限流、蜜罐字段、SQL 全部参数化。
-- `ADMIN_TOKEN` 未配置时留言管理接口统一 503；`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 未配置时内容后台登录返回 503；公开接口不返回私密留言与 `ip_hash`；`/api/content/search` 只返回公开内容。
-- 不在 HTTP 下收集敏感信息；HTTPS 未启用前，管理后台只应在可信网络使用，留言页保留提示。
-- 酷狗登录态等价于账号凭据：建议使用专用小号、不绑定支付；泄露或失效时清空服务器 `.env` 中的 `KUGOU_*` 并重建 app。
+- 接口防护：管理端统一 `requireAdmin()`（cookie + 旧 Bearer，`timingSafeEqual` 比较）；JSON 用 `src/lib/http.ts`；普通 API 16 KB 请求体上限（`/api/admin/upload` 应用层 8 MB；nginx 10m、Astro 12 MB 只是外层上限）；留言每 IP 60 秒一次（SQLite 持久限流）；订阅 5 次/10 分钟、酷狗解析 30 次/10 分钟、登录 10 次/10 分钟（`createRateLimiter()`，带 2000 key 上限清理）；蜜罐字段；SQL 全部参数化。
+- `ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 未配置时，主后台登录返回 503；`ADMIN_TOKEN` 未配置时旧 Bearer 接口不可用，但主后台 cookie 仍可访问管理 API，只有两种凭据都不可用时才返回 503、配了主账号但请求既无 cookie 又无 token 时返回 401；公开接口不返回私密留言与 `ip_hash`；`/api/content/search` 只返回公开内容。
+- 不在 HTTP 下收集敏感信息；HTTPS 未启用前，管理后台只应在可信网络使用，留言页保留提示。当前 cookie 为 `HttpOnly; SameSite=Lax`，因 HTTP 未加 `Secure`，也没有 CSRF token；上 HTTPS 后必须补 `Secure`，多人协作前补 CSRF token。
+- 酷狗登录态等价于账号凭据：建议使用专用小号、不绑定支付；退出登录请在 `/admin/` 的「酷狗」操作（会写 `disabled: true` 屏蔽旧 `.env`），只清空 `.env` 不一定生效。
 - 服务器密钥、xray UUID、任何 token 不进入仓库、不贴聊天记录；泄露后立即轮换。
 - 安全响应头（nosniff、X-Frame-Options、Referrer-Policy、Permissions-Policy）由 nginx 统一加；CSP 待评估后补。
 - 系统与依赖安全更新每月检查，重大漏洞及时升级并记录。
@@ -422,9 +448,10 @@ security(nginx): rate-limit guestbook API
 已落地（`npm run verify`）：
 
 - `npm run format:check`：Prettier 格式检查（Astro / TS / CSS / Markdown / 配置）；
-- `npm run check`：`astro check`（TypeScript + Astro + 页面内联脚本）；
-- `npm run build`：静态页与 server bundle；
-- `npm run smoke`：`scripts/smoke-test.mjs` 拉起构建产物，用临时 SQLite 验证页面 200、留言公开/悄悄话、限流、管理端鉴权与审核、订阅幂等与导出、酷狗歌单接口。
+- `npm run check`：`astro check`（TypeScript + Astro + 页面脚本）；
+- `npm test`：Vitest 单元测试，覆盖校验函数、内容 schema、限流器、管理端鉴权、内容库 CRUD 与种子 manifest；
+- `npm run build`：静态页 + 按请求渲染的页面 + server bundle；
+- `npm run smoke`：`scripts/smoke-test.mjs` 拉起构建产物，用临时 SQLite 验证页面 200、留言公开/悄悄话、限流、管理端 401 + cookie 登录 + Bearer、内容 CRUD、照片 CRUD、图片上传与媒体路径穿越、订阅幂等与导出、酷狗歌单只读接口。
 
 待补：
 
@@ -452,14 +479,14 @@ security(nginx): rate-limit guestbook API
 - `docs/DECISIONS.md`：结构性决策（ADR），每次一个条目。
 - `docs/FEATURES.md`：功能契约、接口表与验收清单；契约变更先改这里。
 - `docs/ASSETS.md`：图片、字体、图标来源与许可证（待建立）。
-- `scripts/smoke-test.mjs` 与 `.github/workflows/ci.yml`：自动化校验入口；改动接口时要同步更新冒烟测试。
+- `tests/`、`scripts/smoke-test.mjs` 与 `.github/workflows/ci.yml`：自动化校验入口；改纯函数补单元测试，改接口同步更新冒烟测试。
 - 行为变化必须同步 README 或相关文档；不允许“代码改了文档不管”。
 
 ---
 
 ## 14. 变更管理与豁免
 
-- 本规范由项目所有者确认后生效；v0.2 于 2026-10-25 按当前实现对齐后生效。
+- 本规范由项目所有者确认后生效；v0.2 于 2026-10-25 按 Docker + Node + SQLite 对齐，v0.3 同日按 ADR-005~012 补充混合渲染、内容库与酷狗后台，v0.4 按 ADR-013/014 完成组件化、公共层与测试。
 - 现有不符合项列入附录 A，按阶段处理；在迁移完成前不强制一次性整改。
 - 任何新代码从生效日起遵守规范。
 - 临时绕过规范必须在提交信息写 `EXCEPTION:` 并说明原因、期限、回滚方式。
@@ -471,24 +498,26 @@ security(nginx): rate-limit guestbook API
 
 ### 已完成（截至 2026-10-25）
 
-- 内容数据化：`books` / `music` / `photos` / `quotes` / `essays`；账号歌单改为运行时同步；
-- 搜索索引构建期自动生成；
-- `/admin/` 审核、回复、导出；`/api/stats`、`/api/subscribe`；
-- 酷狗歌单同步与站内播放（登录态在服务器 `.env`）；
+- 内容数据化：`books` / `music` / `photos` / `quotes` / `essays` / `links`；账号歌单改为运行时同步；
+- 搜索改为 `/api/content/search` 请求时生成，`src/data/search.ts` 仅作兜底；
+- `/admin/` 内容管理、留言审核/回复/导出；`/api/stats`、`/api/subscribe`、`/api/content/search`；
+- 酷狗歌单同步、站内播放、扫码登录与后台歌单管理（会话语义优先于 `.env`）；
 - Docker Compose 部署、每日备份、探活、cron / logrotate；
 - `.editorconfig`、Prettier、`astro check`、`scripts/smoke-test.mjs`、`npm run verify`、GitHub Actions 模板；
+- 页面/组件拆分（`src/components/{site,guestbook,admin}`）与浏览器脚本抽出（`src/scripts/`）；
+- 公共 API 层（`http`、`validate`、`rate-limit`、`admin-auth.requireAdmin`）与 Vitest 单元测试；
+- 清理 `deploy.sh`、旧 PHP/nginx、`docker/app.Dockerfile`、旧 `/admin/letters/` 页面与设计稿目录；
 - 站点技能文档（`.dsh/skills/fengyu-site/SKILL.md`）。
 
 ### 下一步（按优先级）
 
 1. 建立私有远程仓库并推送全部历史，默认分支改为 `main`（最高优先）；
 2. 生成 `docs/ASSETS.md`，记录字体、图标、封面、照片来源与许可证；
-3. 把 `stitch-assets/make-covers.py` 移入 `scripts/` 并纳入版本控制；
-4. 拆分 `guestbook` / `index` / `reading` / `admin` 的超大页面为组件（见附录 A）；
-5. 随记迁移到 Content Collections；
-6. Playwright 视觉/交互测试、链接检查、Lighthouse；
-7. 域名 + HTTPS（443 与 xray 做 SNI 分流）；
-8. 异地备份与恢复演练。
+3. 如需重新生成封面，把生成脚本放 `scripts/` 并纳入版本控制；
+4. 随记迁移到 Content Collections；
+5. Playwright 视觉/交互测试、链接检查、Lighthouse；
+6. 域名 + HTTPS（443 与 xray 做 SNI 分流）；
+7. 异地备份与恢复演练。
 
 ---
 
@@ -500,37 +529,34 @@ security(nginx): rate-limit guestbook API
 2. 默认分支是否改为 `main`？
 3. 是否已有域名？是否要上 HTTPS？（443 目前被 xray 占用）
 4. 留言继续保持“公开自动上墙、悄悄话只后台可见”，还是改为“审核后上墙”？
-5. 是否同意删除或归档 `_trial/`、`_scratch/`？
-6. 图片/字体是否保留当前来源，还是全部换成自有素材？
-7. 是否接受“页面文件 ≤ 200 行、组件 ≤ 150 行”的硬性拆分线？
-8. 异地备份放在哪里（对象存储 / 本地 NAS / 另一台服务器）？
-9. 酷狗是否换专用小号，登录态多久轮换一次？
+5. 图片/字体是否保留当前来源，还是全部换成自有素材？
+6. 异地备份放在哪里（对象存储 / 本地 NAS / 另一台服务器）？
+7. 酷狗是否换专用小号，登录态多久轮换一次？
 
 ---
 
 ## 附录 A · 当前技术债
 
-| 项               | 现状                                                                                   | 处理阶段       |
-| ---------------- | -------------------------------------------------------------------------------------- | -------------- |
-| 无远程仓库       | 只有本地 `.git`，无 `origin`                                                           | 最高优先       |
-| 远程 CI 未接通   | 本地 `npm run verify` + Actions 模板已就绪                                             | 接通远程仓库后 |
-| 页面过大         | `admin/index` 约 768 行、`guestbook` 约 718 行、`index` 约 462 行、`reading` 约 415 行 | 第二阶段       |
-| 组件过少         | 只有 Header、Footer、Player、TrackRow、PhotoLightbox                                   | 第二阶段       |
-| 内联脚本         | 页面 `<script>` 已通过类型检查，但未抽到 `src/scripts/`                                | 第二阶段       |
-| 随记仍是 TS 数据 | 尚未迁移 Content Collections                                                           | 第二阶段       |
-| 素材许可证未记录 | 字体 OFL、示例图片、封面来源未集中记录                                                 | 第一阶段       |
-| 生成脚本未入库   | `make-covers.py` 仍在 ignored 的 `stitch-assets/`                                      | 第一阶段       |
-| 示例内容         | 书、歌、照片、友链仍以示例素材为主                                                     | 内容阶段       |
-| 备份未异地       | 备份与源库同盘                                                                         | 运维阶段       |
-| HTTP             | 站点、管理后台、酷狗直链均为明文                                                       | 待域名/443     |
-| 酷狗依赖         | 非官方接口 + 账号登录态，可能随时失效                                                  | 持续           |
-| 无视觉回归       | 只有接口/页面冒烟，无截图对比与链接检查                                                | 第三阶段       |
+| 项                 | 现状                                                                                  | 处理阶段       |
+| ------------------ | ------------------------------------------------------------------------------------- | -------------- |
+| 无远程仓库         | 只有本地 `.git`，无 `origin`                                                          | 最高优先       |
+| 远程 CI 未接通     | 本地 `npm run verify` + Actions 模板已就绪                                            | 接通远程仓库后 |
+| 随记仍是内容库数据 | 种子在 `src/data/essays.ts`，运行时在 `content_records`；尚未迁移 Content Collections | 第二阶段       |
+| 管理端写操作 CSRF  | HTTP 阶段依赖 SameSite=Lax，未加 CSRF token；上 HTTPS 时补                            | HTTPS 阶段     |
+| 无视觉回归         | 只有单元测试 + API/页面冒烟，没有截图对比与链接检查                                   | 第三阶段       |
+| 素材许可证未记录   | 字体 OFL、示例图片、封面来源未集中记录                                                | 第一阶段       |
+| 示例内容           | 书、歌、照片、友链仍以示例素材为主                                                    | 内容阶段       |
+| 备份未异地         | 备份与源库同盘                                                                        | 运维阶段       |
+| HTTP               | 站点、管理后台、酷狗直链均为明文                                                      | 待域名/443     |
+| 酷狗依赖           | 非官方接口 + 账号登录态，可能随时失效                                                 | 持续           |
 
 ---
 
 ## 附录 B · 规范版本记录
 
-| 版本 | 日期       | 变更                                                                                                                                                                            |
-| ---- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v0.1 | 2026-10-24 | 初稿，待确认                                                                                                                                                                    |
-| v0.2 | 2026-10-25 | 按 ADR-001/002/003/004 对齐 Docker + Node + SQLite 架构；更新目录、部署、备份、安全章节；删除过期 PHP/JSON 描述；补充 `npm run verify` 自动化与 CI 模板；刷新技术债与分阶段计划 |
+| 版本 | 日期       | 变更                                                                                                                                                                                   |
+| ---- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v0.1 | 2026-10-24 | 初稿，待确认                                                                                                                                                                           |
+| v0.2 | 2026-10-25 | 按 ADR-001/002/003/004 对齐 Docker + Node + SQLite 架构；更新目录、部署、备份、安全章节；删除过期 PHP/JSON 描述；补充 `npm run verify` 自动化与 CI 模板；刷新技术债与分阶段计划        |
+| v0.3 | 2026-10-25 | 按 ADR-005~012 对齐混合渲染、`content.sqlite` / `uploads/`、动态搜索、酷狗扫码与 View Transitions；修正管理端 503/401、上传 8 MB、nginx 60r/m、备份范围与技术债行数                    |
+| v0.4 | 2026-10-25 | 按 ADR-013/014 完成页面/组件拆分、`src/scripts/` 抽取、公共 API 层、Vitest 单元测试与扩展冒烟；删除旧 PHP/nginx 部署、旧管理页、旧 Dockerfile 与设计稿目录；更新目录、测试、安全与债务 |

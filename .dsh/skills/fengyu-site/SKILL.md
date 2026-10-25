@@ -46,7 +46,7 @@ npm run verify     # format:check + check + build + smoke
 ```
 
 - 本地库默认 `.data/guestbook.sqlite`；`GUESTBOOK_DB=/tmp/x.sqlite` 可隔离测试；冒烟测试用临时库，不碰本地数据。
-- 后台本地调试：先 `set -a; . ./.env; set +a` 再 `npm run dev`；`/admin/` 用 `ADMIN_USER` + 密码登录（内容后台），`/admin/letters/` 仍用 `ADMIN_TOKEN`。
+- 后台本地调试：先 `set -a; . ./.env; set +a` 再 `npm run dev`；`/admin/` 用 `ADMIN_USER` + 密码登录（内容 + 留言 + 酷狗）；`/admin/letters/` 仍保留给 `ADMIN_TOKEN` 应急。
 - 并发构建用 `flock /tmp/fengyu-build.lock npm run build`，避免两个进程抢 `.astro/`。
 - 改接口后同步更新 `scripts/smoke-test.mjs`；`astro check` 已排除 `vendor/`，不要把它加回 `tsconfig.json` 的检查范围。
 
@@ -66,7 +66,7 @@ npm run verify     # format:check + check + build + smoke
 ## 4. 后台与数据
 
 - 内容后台 `/admin/`：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 只放 `.env`）；顶部导航管理影集/随笔/书架/唱片/曲目/台词/友链。内容写入 `CONTENT_DB`（容器 `/data/content.sqlite`），图片写入 `CONTENT_UPLOADS`（容器 `/data/uploads`）。
-- 留言后台 `/admin/letters/`：仍用 `ADMIN_TOKEN`；接口 `GET /api/admin/letters`、`PATCH /api/admin/letters/:id`、`GET /api/admin/export?...`。
+- 留言后台在 `/admin/` 顶部「留言」：cookie 登录即可审核/回复/导出；接口 `GET /api/admin/letters`、`PATCH /api/admin/letters/:id`、`GET /api/admin/export?...` 同时兼容 cookie 与旧 Bearer `ADMIN_TOKEN`。
 - 内容接口：`GET /api/admin/schema`、`GET/POST /api/admin/content/:type`、`PATCH/DELETE /api/admin/content/:type/:id`、`GET/POST /api/admin/photos`、`PATCH/DELETE /api/admin/photos/:id`、`POST /api/admin/upload`；登录态是 HttpOnly cookie。
 - `/`、`/essays/`、`/reading/`、`/photos/`、`/guestbook/`、`/rss.xml`、`/sitemap.xml` 由 app 请求时读取内容库；nginx 必须保留这些反代，删掉会让页面 404。
 - 公开接口：`GET/POST /api/guestbook`、`GET /api/content/search`、`GET /api/stats`、`POST /api/subscribe`。

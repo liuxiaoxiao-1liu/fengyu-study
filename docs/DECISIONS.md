@@ -519,3 +519,45 @@ rate_limits (ip_hash, last_at)
 - 支持按歌名搜索再添加，而不是只填 hash；
 - 扫码会话加密落盘/定期刷新；
 - 歌单切换支持 URL slug 而非固定 maotouying。
+
+---
+
+## ADR-011 · 留言审核并入主后台
+
+- **日期**：2026-10-25
+- **状态**：已接受，已落地
+- **影响范围**：`/admin/`、`src/pages/api/admin/_utils.ts`、`src/pages/api/admin/letters*`、`src/pages/api/admin/export.ts`
+
+### 背景
+
+- 留言后台仍在 `/admin/letters/`，主后台只有「留言审核」链接，用户要再点一次；
+- 该页用 `ADMIN_TOKEN`，主后台用 `ADMIN_USER` 密码 cookie，两套登录态。
+
+### 决定
+
+1. `/admin/` 增加「留言」导航，直接列表、筛选、通过/隐藏、回复、导出 JSON/CSV；
+2. `adminGuard` 优先接受主后台 cookie，会话无效或未登录时再兼容 Bearer `ADMIN_TOKEN`；
+3. 主后台移除「留言审核」外链；旧 `/admin/letters/` 页面保留给 token 应急，不再作为日常入口。
+
+### 影响
+
+**正面**
+
+- 一个后台、一个登录态处理全部日常内容与留言；
+- 导出链接直接走 cookie，不需要再输入 token。
+
+**负面**
+
+- `adminGuard` 的 503/401 语义变复杂；两种凭据都没配置时仍 503；
+- 旧 `/admin/letters/` 页面和主后台的留言 UI 有重复，后续可以删旧页。
+
+### 回滚
+
+1. 恢复主后台「留言审核」外链，移除「留言」导航；
+2. `adminGuard` 恢复纯 Bearer 校验；
+3. 旧页面和 token 环境变量保留，不影响回滚。
+
+### 后续
+
+- 删除旧 `/admin/letters/` 页面或改成跳转；
+- 留言支持分页/搜索、批量审核、操作日志。

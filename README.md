@@ -123,7 +123,7 @@ npm run verify       # 发布总闸门：format:check + check + build + smoke
 - 曲目若填了酷狗 `hash` / `albumId` / `albumAudioId`，会自动进入站内播放白名单；
 - `/admin/` 顶部「酷狗」：手机酷狗扫码登录、查看账号全部歌单、切换站内歌单、查看/添加/删除当前歌单曲目；扫码会话保存在 `/data/kugou-session.json`，歌单选择在 `/data/kugou-settings.json`，不把 token 下发浏览器；
 - 站内搜索由 `GET /api/content/search` 在请求时生成，后台新增的随笔/书/歌/照片/友链都会自动进入搜索；
-- `/admin/letters/`：旧的留言后台（审核悄悄话、通过/隐藏、回复、导出 JSON/CSV），仍用 `ADMIN_TOKEN`；
+- `/admin/` 顶部「留言」：直接审核悄悄话、通过/隐藏、回复、导出 JSON/CSV，使用后台登录 cookie，不需要另点链接；旧的 `/admin/letters/` 仍保留给 `ADMIN_TOKEN` 应急。
 - 生成登录凭据：`node scripts/set-admin-password.mjs '<新密码>'`（只写本地 `.env`，服务器 `.env` 需同步这三项）；
 - 其它接口：`GET /api/stats`（聚合计数）、`POST /api/subscribe`（季刊订阅入库）；
 - 管理端走 HTTP 当前没有 TLS，令牌/密码只在本机/可信网络使用，后续上 HTTPS 后再日常使用。

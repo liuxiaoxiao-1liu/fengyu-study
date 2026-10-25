@@ -1,4 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { isAdminAuthConfigured, readAdminSession } from '../../../lib/admin-auth';
 
 const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -15,13 +16,17 @@ export function json(data: unknown, status = 200, extraHeaders: Record<string, s
 
 /**
  * 管理端鉴权：
- * - ADMIN_TOKEN 未设置 → 503 admin_disabled（后台整体关闭）；
- * - 缺失 / 错误 Bearer → 401 unauthorized；
- * - 比较走 sha256 + timingSafeEqual，长度不同也不会有提前返回的时间差。
+ * - 优先接受 /admin/ 登录后的 cookie 会话；
+ * - 旧 Bearer ADMIN_TOKEN 继续兼容 /admin/letters/；
+ * - 两种凭据都没配置 → 503 admin_disabled；
+ * - 配了但缺失/错误 → 401 unauthorized。
  */
 export function adminGuard(request: Request): Response | null {
+  if (readAdminSession(request)) return null;
+
   const expected = process.env.ADMIN_TOKEN ?? '';
   if (expected === '') {
+    if (isAdminAuthConfigured()) return json({ ok: false, error: 'unauthorized' }, 401);
     return json({ ok: false, error: 'admin_disabled' }, 503);
   }
 

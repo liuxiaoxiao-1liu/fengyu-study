@@ -1,44 +1,16 @@
 import type { APIRoute } from 'astro';
-import { createHash } from 'node:crypto';
+import { json } from '../../../lib/http';
 import { findAccountTrack, isKugouEnabled, resolveKugouUrl } from '../../../lib/kugou';
+import { clientIp, createRateLimiter } from '../../../lib/rate-limit';
 
 export const prerender = false;
 
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_PER_WINDOW = 30;
-const buckets = new Map<string, number[]>();
-
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
-function clientIp(request: Request, clientAddress: string | undefined): string {
-  const real = request.headers.get('x-real-ip');
-  if (real) return real.trim();
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown';
-  return clientAddress || 'unknown';
-}
-
-function hitRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const hash = createHash('sha256').update(ip).digest('hex').slice(0, 16);
-  const recent = (buckets.get(hash) ?? []).filter((at) => now - at < WINDOW_MS);
-  if (recent.length >= MAX_PER_WINDOW) {
-    buckets.set(hash, recent);
-    return true;
-  }
-  recent.push(now);
-  buckets.set(hash, recent);
-  return false;
-}
+const limiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  max: 30,
+  hashKey: true,
+  hashLength: 16,
+});
 
 /**
  * 只解析「编辑精选 + 账号歌单」里出现过的 hash，不做通用酷狗代理。
@@ -54,7 +26,7 @@ export const GET: APIRoute = async ({ request, url, clientAddress }) => {
     return json({ ok: false, error: 'not_in_playlist' }, 404);
   }
 
-  if (hitRateLimit(clientIp(request, clientAddress))) {
+  if (limiter.hit(clientIp(request, clientAddress))) {
     return json({ ok: false, error: 'rate_limited' }, 429);
   }
 

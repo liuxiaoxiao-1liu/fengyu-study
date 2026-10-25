@@ -1,0 +1,49 @@
+---
+import type { Essay } from '../../data/essays';
+import { formatEssayDate } from '../../data/essays';
+
+interface Props {
+  microEssays: Essay[];
+}
+
+const { microEssays } = Astro.props;
+---
+
+<div class="bg-surface-container-low/70 rounded-xl p-6 shadow-sm">
+  <div class="flex items-center justify-between pb-3 mb-4 border-b border-outline-variant/20">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-secondary text-base">forum</span>
+      <h3 class="font-headline-sm text-headline-sm text-primary font-normal">即刻手记</h3>
+    </div>
+    <span class="flex h-2 w-2 relative">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+    </span>
+  </div>
+  <div class="flex flex-col gap-4">
+    {microEssays.slice(0, 3).map((essay) => (
+      <a
+        class="block p-5 bg-surface-container/60 rounded-lg relative overflow-hidden transition-all hover:bg-surface-container"
+        href={`/essays/${essay.slug}/`}
+      >
+        <div class="flex items-center justify-between mb-2 text-on-surface-variant">
+          <span class="font-label-sm text-xs text-secondary font-medium flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-xs">pets</span>
+            {essay.category}
+          </span>
+          <time class="font-mono text-xs opacity-60" datetime={essay.date}>
+            {formatEssayDate(essay.date)}
+          </time>
+        </div>
+        <p class="font-body-sm text-body-sm text-primary leading-relaxed">{essay.summary}</p>
+      </a>
+    ))}
+  </div>
+  <a
+    class="w-full mt-4 py-2.5 px-4 bg-surface text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg text-center font-label-sm text-xs transition-colors flex items-center justify-center gap-2 border border-outline-variant/30"
+    href="/guestbook/"
+  >
+    <span class="material-symbols-outlined text-sm">add_comment</span>
+    <span class="">去留言板写下片刻思绪</span>
+  </a>
+</div>

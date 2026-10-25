@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { adminGuard, cleanText, json, readJsonObject } from '../_utils';
+import { requireAdmin } from '../../../../lib/admin-auth';
 import {
   deleteAdminLetter,
   isLetterStatus,
@@ -7,13 +7,15 @@ import {
   type LetterStatus,
   type UpdateLetterPatch,
 } from '../../../../lib/guestbook-db';
+import { json, readJsonObject } from '../../../../lib/http';
+import { text as cleanText } from '../../../../lib/validate';
 
 export const prerender = false;
 
 const MAX_REPLY_LENGTH = 2000;
 
 export const PATCH: APIRoute = async ({ request, params }) => {
-  const denied = adminGuard(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
 
   const id = params.id;
@@ -59,7 +61,7 @@ export const PATCH: APIRoute = async ({ request, params }) => {
 };
 
 export const DELETE: APIRoute = async ({ request, params }) => {
-  const denied = adminGuard(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
 
   const id = params.id;

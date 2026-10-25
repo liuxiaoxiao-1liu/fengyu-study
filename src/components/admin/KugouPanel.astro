@@ -1,0 +1,119 @@
+<div id="kugou-section" class="flex flex-col gap-space-lg" style="display: none">
+  <div class="flex flex-wrap items-center justify-between gap-space-sm">
+    <div>
+      <h2 class="font-headline-sm text-headline-sm text-primary">酷狗账号与歌单</h2>
+      <p id="kugou-status" class="mt-1 font-label-sm text-label-sm text-on-surface-variant">
+        检查登录状态…
+      </p>
+    </div>
+    <div class="flex items-center gap-space-sm">
+      <button
+        type="button"
+        id="kugou-refresh"
+        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+      >
+        刷新
+      </button>
+      <button
+        type="button"
+        id="kugou-logout"
+        class="rounded-lg border border-error/40 px-space-md py-1.5 font-label-sm text-label-sm text-error hover:bg-error/10"
+      >
+        退出酷狗
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 items-start gap-space-lg lg:grid-cols-12">
+    <div class="flex flex-col gap-space-lg lg:col-span-5">
+      <div class="rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm">
+        <h3 class="font-headline-sm text-headline-sm text-primary">扫码登录</h3>
+        <p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+          用手机酷狗 App 扫描二维码，确认后登录态只保存在服务器数据卷里，不下发浏览器。
+        </p>
+        <button
+          type="button"
+          id="kugou-qr-start"
+          class="mt-space-md rounded-lg bg-primary px-space-lg py-2 font-label-md text-label-md text-on-primary hover:bg-primary-container"
+        >
+          生成登录二维码
+        </button>
+        <div id="kugou-qr-panel" class="mt-space-md flex flex-col items-center gap-2" style="display: none">
+          <img id="kugou-qr-image" alt="酷狗登录二维码" class="h-44 w-44 rounded bg-white p-2 shadow-sm" />
+          <p id="kugou-qr-message" class="font-label-sm text-label-sm text-on-surface-variant" role="status"></p>
+          <a
+            id="kugou-qr-link"
+            class="font-label-sm text-label-sm text-secondary underline underline-offset-4"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            在酷狗打开
+          </a>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm">
+        <h3 class="font-headline-sm text-headline-sm text-primary">我的歌单</h3>
+        <p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+          点「设为站内歌单」切换 `/reading/` 展示的歌单；默认是 `maotouying`。
+        </p>
+        <div id="kugou-playlists" class="mt-space-sm flex flex-col gap-2"></div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-space-lg lg:col-span-7">
+      <div class="rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="font-headline-sm text-headline-sm text-primary">
+            当前站内歌单{' '}
+            <span id="kugou-playlist-name" class="font-label-sm text-label-sm text-on-surface-variant"></span>
+          </h3>
+          <span id="kugou-track-count" class="font-label-sm text-label-sm text-on-surface-variant"></span>
+        </div>
+        <div id="kugou-tracks" class="mt-space-sm flex max-h-[32rem] flex-col gap-1 overflow-y-auto"></div>
+      </div>
+
+      <form
+        id="kugou-add-form"
+        class="flex flex-col gap-space-sm rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm"
+      >
+        <h3 class="font-headline-sm text-headline-sm text-primary">向当前歌单添加曲目</h3>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          酷狗添加接口需要曲目 hash；名称、albumId、albumAudioId 可留空。添加后会自动刷新，并让站内歌单缓存失效。
+        </p>
+        <div class="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+          <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+            hash *<input id="kugou-add-hash" class="field" required placeholder="32 位 hash" />
+          </label>
+          <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+            歌名
+            <input id="kugou-add-name" class="field" />
+          </label>
+          <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+            albumId
+            <input id="kugou-add-album" class="field" value="0" />
+          </label>
+          <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+            albumAudioId
+            <input id="kugou-add-audio" type="number" class="field" value="0" />
+          </label>
+        </div>
+        <div class="flex flex-wrap items-center gap-space-sm">
+          <button
+            type="submit"
+            class="rounded-lg bg-primary px-space-lg py-2 font-label-md text-label-md text-on-primary hover:bg-primary-container"
+          >
+            添加
+          </button>
+          <span
+            id="kugou-track-status"
+            class="font-label-sm text-label-sm text-on-surface-variant"
+            role="status"
+            aria-live="polite"
+          ></span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

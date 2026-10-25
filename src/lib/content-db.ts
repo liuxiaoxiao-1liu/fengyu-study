@@ -93,10 +93,43 @@ function db(): DatabaseSync {
   return instance;
 }
 
+/** 测试或进程优雅退出时释放 SQLite 句柄。 */
+export function closeContentDb(): void {
+  instance?.close();
+  instance = null;
+}
+
+type SeedManifest = { version: 1; slugs: string[] };
+
+function readSeedManifest(database: DatabaseSync, key: string): { exists: boolean; slugs: Set<string> | null } {
+  const row = database.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
+  if (!row) return { exists: false, slugs: null };
+  try {
+    const parsed = JSON.parse(row.value) as Partial<SeedManifest>;
+    if (Array.isArray(parsed.slugs)) {
+      return { exists: true, slugs: new Set(parsed.slugs.filter((slug): slug is string => typeof slug === 'string')) };
+    }
+  } catch {
+    // 旧版本存的是时间戳；按“已播种”处理，避免把后台删掉的种子又插回来。
+  }
+  return { exists: true, slugs: null };
+}
+
+function writeSeedManifest(database: DatabaseSync, key: string, slugs: Set<string>): void {
+  const manifest: SeedManifest = { version: 1, slugs: [...slugs] };
+  database.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, JSON.stringify(manifest));
+}
+
 function seedOnce(database: DatabaseSync): void {
-  const seeded = database.prepare("SELECT value FROM settings WHERE key = 'photos_seeded'").get() as
-    { value: string } | undefined;
-  if (seeded) return;
+  const key = 'photos_seeded';
+  const state = readSeedManifest(database, key);
+  const seeded = state.slugs ?? new Set<string>();
+
+  // 旧时间戳标记只升级格式，不重新插入，避免恢复已删除的照片。
+  if (state.exists && state.slugs === null) {
+    writeSeedManifest(database, key, new Set(seedPhotos.map((photo) => photo.slug)));
+    return;
+  }
 
   const now = new Date().toISOString();
   const insert = database.prepare(`
@@ -104,7 +137,9 @@ function seedOnce(database: DatabaseSync): void {
       (id, slug, title, src, alt, width, height, series, taken_at, note, badge, exif, sort_order, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
+  let changed = !state.exists;
   seedPhotos.forEach((photo, index) => {
+    if (seeded.has(photo.slug)) return;
     insert.run(
       randomUUID(),
       photo.slug,
@@ -122,8 +157,10 @@ function seedOnce(database: DatabaseSync): void {
       now,
       now,
     );
+    seeded.add(photo.slug);
+    changed = true;
   });
-  database.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('photos_seeded', ?)").run(now);
+  if (changed) writeSeedManifest(database, key, seeded);
 }
 
 function parseExif(value: string): PhotoExif | undefined {
@@ -314,13 +351,23 @@ function seedRecords(database: DatabaseSync): void {
 
   for (const [type, entries] of groups) {
     const flag = `records_seeded_${type}`;
-    const seeded = database.prepare('SELECT value FROM settings WHERE key = ?').get(flag) as
-      { value: string } | undefined;
-    if (seeded) continue;
+    const state = readSeedManifest(database, flag);
+    const seeded = state.slugs ?? new Set<string>();
+
+    // 旧时间戳标记只升级格式，不重新插入，避免恢复后台已删除的种子记录。
+    if (state.exists && state.slugs === null) {
+      writeSeedManifest(database, flag, new Set(entries.map((entry) => entry.slug)));
+      continue;
+    }
+
+    let changed = !state.exists;
     entries.forEach((entry, index) => {
+      if (seeded.has(entry.slug)) return;
       insert.run(randomUUID(), type, entry.slug, entry.title, JSON.stringify(entry.data), index, now, now);
+      seeded.add(entry.slug);
+      changed = true;
     });
-    database.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(flag, now);
+    if (changed) writeSeedManifest(database, flag, seeded);
   }
 }
 

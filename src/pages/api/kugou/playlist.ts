@@ -1,22 +1,12 @@
 import type { APIRoute } from 'astro';
 import { getAccountPlaylist } from '../../../lib/kugou';
+import { json } from '../../../lib/http';
 
 export const prerender = false;
 
 const DEFAULT_PAGE_SIZE = 30;
 const MAX_PAGE_SIZE = 50;
 const SLUG = 'maotouying';
-
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'public, max-age=30',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
 
 /**
  * 只提供账号里的 maotouying 歌单，运行时从酷狗拉取，服务端缓存 60 秒。

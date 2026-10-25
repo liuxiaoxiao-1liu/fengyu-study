@@ -1,0 +1,26 @@
+<!-- Masonry / Responsive Grid of Letters（由 /api/guestbook 实时渲染） -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg" id="letters-container"></div>
+<p
+  class="hidden rounded-xl border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant"
+  id="letters-empty"
+>
+  回廊里还没有公开的信笺，不如由你写下第一封。
+</p>
+<!-- Load More and Bottle Action Section -->
+<div class="w-full flex flex-col sm:flex-row items-center justify-center gap-space-md pt-space-xl">
+  <button
+    class="flex items-center gap-space-xs bg-surface-container px-space-lg py-space-sm rounded-full font-label-sm text-label-sm text-primary hover:bg-surface-container-high transition-colors shadow-sm"
+    data-load-more=""
+  >
+    <span class="material-symbols-outlined text-base">unfold_more</span>
+    <span data-load-more-label>展开翻阅更早的时光卷轴</span>
+  </button>
+  <span class="text-outline-variant text-xs hidden sm:inline">·</span>
+  <button
+    class="flex items-center gap-space-xs font-label-sm text-label-sm text-secondary hover:text-primary transition-colors"
+    data-fish=""
+  >
+    <span class="material-symbols-outlined text-base">stream</span>
+    <span>打捞一只未公开的匿名心事</span>
+  </button>
+</div>

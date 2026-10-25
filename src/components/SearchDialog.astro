@@ -1,0 +1,65 @@
+---
+import { searchIndex } from '../data/search';
+---
+
+<dialog id="search-dialog" class="search-dialog" aria-labelledby="search-title">
+  <div class="bg-surface rounded-xl border border-surface-container-high shadow-[0_20px_60px_-20px_rgba(42,36,33,0.35)] overflow-hidden">
+    <div class="flex items-center justify-between px-space-lg py-space-md border-b border-surface-container-high">
+      <h2 id="search-title" class="font-headline-sm text-headline-sm text-primary">
+        翻一翻书房
+      </h2>
+      <button
+        type="button"
+        class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-on-surface"
+        aria-label="关闭搜索"
+        data-search-close
+      >
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+    <div class="px-space-lg pt-space-md">
+      <label class="sr-only" for="search-input">
+        搜索文字、书与歌
+      </label>
+      <input
+        id="search-input"
+        type="search"
+        autocomplete="off"
+        placeholder="搜一本书、一首歌，或者一句想不起的话……"
+        class="w-full bg-transparent border-0 border-b border-surface-container-high pb-space-sm font-body-lg text-body-lg text-primary placeholder:text-on-surface-variant/50 focus:outline-none focus:border-secondary"
+      />
+    </div>
+    <div class="max-h-[60vh] overflow-y-auto px-space-sm py-space-sm" data-search-results>
+      {searchIndex.map((item) => (
+        <a
+          href={item.href}
+          data-result
+          data-search={[item.title, item.summary, item.kind].join(' ')}
+          class="block px-space-md py-space-sm rounded-lg hover:bg-surface-container-low transition-colors"
+        >
+          <span class="flex items-baseline gap-space-sm">
+            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider shrink-0">
+              {item.kind}
+            </span>
+            <span class="font-body-md text-body-md text-primary">{item.title}</span>
+          </span>
+          <span class="block font-body-sm text-body-sm text-on-surface-variant truncate">{item.summary}</span>
+        </a>
+      ))}
+      <p
+        class="hidden px-space-md py-space-lg text-center font-body-sm text-body-sm text-on-surface-variant"
+        data-search-empty
+      >
+        没有找到。换个词试试，或者去
+        <a class="text-on-tertiary-container underline underline-offset-4" href="/essays/">
+          随记
+        </a>
+        里翻翻。
+      </p>
+    </div>
+    <div class="px-space-lg py-space-sm border-t border-surface-container-high font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between">
+      <span>Esc 关闭</span>
+      <span data-search-count>共 {searchIndex.length} 条索引</span>
+    </div>
+  </div>
+</dialog>

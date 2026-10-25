@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
-import { adminGuard, json } from './_utils';
+import { requireAdmin } from '../../../lib/admin-auth';
 import { isLetterStatus, listAdminLetters, type LetterStatus } from '../../../lib/guestbook-db';
+import { json } from '../../../lib/http';
 
 export const prerender = false;
 
@@ -8,7 +9,7 @@ const DEFAULT_LIMIT = 200;
 const MAX_LIMIT = 500;
 
 export const GET: APIRoute = async ({ request, url }) => {
-  const denied = adminGuard(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
 
   const statusParam = url.searchParams.get('status') ?? 'all';

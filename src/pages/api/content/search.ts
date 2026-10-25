@@ -9,6 +9,7 @@ import {
   listQuotes,
   listTracks,
 } from '../../../lib/content-db';
+import { json } from '../../../lib/http';
 
 export const prerender = false;
 
@@ -85,12 +86,5 @@ export const GET: APIRoute = async () => {
     });
   }
 
-  return new Response(JSON.stringify({ ok: true, entries, total: entries.length }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
+  return json({ ok: true, entries, total: entries.length });
 };

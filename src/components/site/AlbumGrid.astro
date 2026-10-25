@@ -1,0 +1,67 @@
+---
+import type { Album, Track } from '../../data/music';
+import { kugouSearchUrl } from '../../data/music';
+
+interface Props {
+  albums: Album[];
+  tracks: Track[];
+}
+
+const { albums, tracks } = Astro.props;
+---
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+  {albums.map((album) => {
+    const firstTrack = tracks.find((track) => track.albumSlug === album.slug && track.kugou);
+    return (
+      <article class="group relative flex flex-col bg-surface-container-low p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md border border-surface-container-high/40">
+        <div class="relative aspect-square w-full rounded-lg overflow-hidden mb-3 bg-surface-container-high shadow-sm">
+          <img
+            alt={`${album.title} 专辑封面`}
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            decoding="async"
+            height="600"
+            loading="lazy"
+            src={album.cover}
+            width="600"
+          />
+          <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-primary/75 text-on-primary font-label-sm text-[0.625rem]">
+            {album.label}
+          </span>
+        </div>
+        <h4 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate font-normal">
+          {album.title}
+        </h4>
+        <span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">{album.artist}</span>
+        <div class="flex items-center justify-between mt-3 pt-2 border-t border-surface-container-high/60 text-on-surface-variant">
+          <span class="font-label-sm text-label-sm text-secondary font-medium">{album.tag}</span>
+          {firstTrack ? (
+            <button
+              type="button"
+              class="material-symbols-outlined text-sm text-on-surface-variant transition-colors hover:text-primary"
+              data-play
+              data-hash={firstTrack.kugou?.hash}
+              data-title={firstTrack.title}
+              data-artist={firstTrack.artist}
+              data-external={kugouSearchUrl(firstTrack)}
+              aria-label={`播放 ${firstTrack.title}`}
+              title={`播放 ${firstTrack.title}`}
+            >
+              play_circle
+            </button>
+          ) : (
+            <a
+              class="material-symbols-outlined text-sm text-on-surface-variant transition-colors hover:text-primary"
+              href={kugouSearchUrl({ title: album.title, artist: album.artist })}
+              target="_blank"
+              rel="noopener noreferrer external"
+              aria-label={`在酷狗搜索 ${album.title}`}
+            >
+              open_in_new
+            </a>
+          )}
+        </div>
+      </article>
+    );
+  })}
+</div>

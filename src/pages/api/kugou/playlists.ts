@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { json } from '../../../lib/http';
 import { getAccountPlaylist } from '../../../lib/kugou';
 
 export const prerender = false;
@@ -7,33 +8,17 @@ export const prerender = false;
 export const GET: APIRoute = async () => {
   try {
     const playlist = await getAccountPlaylist();
-    return new Response(
-      JSON.stringify({
+    return json(
+      {
         ok: true,
         playlists: [{ slug: playlist.slug, name: playlist.name, count: playlist.total }],
-      }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Cache-Control': 'public, max-age=30',
-          'X-Content-Type-Options': 'nosniff',
-        },
       },
+      200,
+      { 'Cache-Control': 'public, max-age=30' },
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'playlist_sync_failed';
     const status = message === 'kugou_disabled' ? 503 : 502;
-    return new Response(
-      JSON.stringify({ ok: false, error: status === 503 ? 'kugou_disabled' : 'playlist_sync_failed' }),
-      {
-        status,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Cache-Control': 'no-store',
-          'X-Content-Type-Options': 'nosniff',
-        },
-      },
-    );
+    return json({ ok: false, error: status === 503 ? 'kugou_disabled' : 'playlist_sync_failed' }, status);
   }
 };

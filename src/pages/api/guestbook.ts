@@ -1,48 +1,14 @@
 import type { APIRoute } from 'astro';
-import { createHash, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { insertLetter, listPublicLetters, secondsSinceLastPost } from '../../lib/guestbook-db';
+import { json } from '../../lib/http';
+import { clientIp, hashIp } from '../../lib/rate-limit';
+import { text as clean } from '../../lib/validate';
 
 export const prerender = false;
 
 const MAX_BODY_BYTES = 16 * 1024;
 const RATE_LIMIT_SECONDS = 60;
-
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
-function clean(value: unknown, max: number): string {
-  if (typeof value !== 'string') return '';
-  return value
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
-    .trim()
-    .slice(0, max);
-}
-
-function clientIp(request: Request, clientAddress: string | undefined): string {
-  // 只在 Node 只监听本地/容器内网、且 nginx 反代时信任这些头。
-  const real = request.headers.get('x-real-ip');
-  if (real) return real.trim();
-
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    const first = forwarded.split(',')[0]?.trim();
-    if (first) return first;
-  }
-
-  return clientAddress || 'unknown';
-}
-
-function hashIp(ip: string): string {
-  return createHash('sha256').update(ip).digest('hex').slice(0, 12);
-}
 
 export const GET: APIRoute = async () => {
   try {

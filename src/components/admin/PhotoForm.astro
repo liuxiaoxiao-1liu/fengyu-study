@@ -1,0 +1,141 @@
+<form
+  id="photo-form"
+  class="flex flex-col gap-space-sm rounded-xl border border-surface-container-high bg-surface-container-low p-space-lg shadow-sm lg:col-span-5"
+>
+  <div class="flex items-center justify-between gap-space-sm">
+    <h2 id="photo-form-title" class="font-headline-sm text-headline-sm text-primary">
+      新增照片
+    </h2>
+    <button type="button" id="photo-reset" class="font-label-sm text-label-sm text-secondary hover:text-primary">
+      清空
+    </button>
+  </div>
+  <input id="photo-id" type="hidden" />
+
+  <div class="flex flex-col gap-2 rounded-lg bg-surface-container p-space-sm">
+    <label class="font-label-sm text-label-sm text-on-surface-variant" for="photo-file">
+      上传图片
+    </label>
+    <input
+      id="photo-file"
+      type="file"
+      accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+      class="block w-full max-w-full text-xs text-on-surface-variant file:mr-2 file:rounded file:border-0 file:bg-primary file:px-3 file:py-1.5 file:font-label-sm file:text-label-sm file:text-on-primary"
+    />
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        id="upload-button"
+        class="rounded-lg bg-surface-container-high px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-highest"
+      >
+        上传并填入
+      </button>
+      <span id="upload-status" class="font-label-sm text-[0.625rem] text-on-surface-variant" role="status"></span>
+    </div>
+    <img id="photo-preview" alt="" class="mt-1 hidden h-28 w-full rounded object-cover" />
+  </div>
+
+  <div class="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+      标题
+      <input id="photo-title" class="field" required />
+    </label>
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+      slug（英文/数字/-）
+      <input id="photo-slug" class="field" />
+    </label>
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+      系列
+      <select id="photo-series" class="field">
+        <option value="anime">动漫插画</option>
+        <option value="reality">现实纪实</option>
+        <option value="virtual">虚拟 CG</option>
+      </select>
+    </label>
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+      拍摄日期
+      <input id="photo-taken-at" type="date" class="field" />
+    </label>
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+      宽（px）
+      <input id="photo-width" type="number" min="1" step="1" class="field" value="1200" />
+    </label>
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+      高（px）
+      <input id="photo-height" type="number" min="1" step="1" class="field" value="800" />
+    </label>
+  </div>
+
+  <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+    图片地址（上传后自动填入，也可粘外链）
+    <input id="photo-src" class="field" required />
+  </label>
+  <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+    图片描述（alt，必须有）<textarea id="photo-alt" class="field min-h-[4rem]" required></textarea>
+  </label>
+  <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+    手记 / 图注<textarea id="photo-note" class="field min-h-[4rem]"></textarea>
+  </label>
+  <div class="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+      角标（badge）
+      <input id="photo-badge" class="field" />
+    </label>
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+      排序（越小越靠前）
+      <input id="photo-sort-order" type="number" step="1" class="field" value="0" />
+    </label>
+  </div>
+
+  <details class="rounded-lg bg-surface-container p-space-sm">
+    <summary class="cursor-pointer font-label-sm text-label-sm text-secondary">EXIF · 拍摄参数（可选）</summary>
+    <div class="mt-2 grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+        机身
+        <input id="exif-camera" class="field" />
+      </label>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+        镜头
+        <input id="exif-lens" class="field" />
+      </label>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+        光圈
+        <input id="exif-aperture" class="field" />
+      </label>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+        快门
+        <input id="exif-shutter" class="field" />
+      </label>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+        ISO
+        <input id="exif-iso" class="field" />
+      </label>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">
+        地点
+        <input id="exif-location" class="field" />
+      </label>
+    </div>
+  </details>
+
+  <div class="flex flex-wrap items-center gap-space-sm pt-1">
+    <button
+      type="submit"
+      class="rounded-lg bg-primary px-space-lg py-2 font-label-md text-label-md text-on-primary hover:bg-primary-container"
+    >
+      保存照片
+    </button>
+    <button
+      type="button"
+      id="photo-delete"
+      class="hidden rounded-lg border border-error/40 px-space-md py-2 font-label-sm text-label-sm text-error hover:bg-error/10"
+    >
+      删除
+    </button>
+    <span
+      id="photo-status"
+      class="font-label-sm text-label-sm text-on-surface-variant"
+      role="status"
+      aria-live="polite"
+    ></span>
+  </div>
+</form>

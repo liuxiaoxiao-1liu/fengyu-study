@@ -1,0 +1,17 @@
+---
+import SessionBar from './SessionBar.astro';
+import DashboardNav from './DashboardNav.astro';
+import PhotosPanel from './PhotosPanel.astro';
+import RecordsPanel from './RecordsPanel.astro';
+import LettersPanel from './LettersPanel.astro';
+import KugouPanel from './KugouPanel.astro';
+---
+
+<section id="dashboard" class="flex flex-col gap-space-lg" hidden>
+  <SessionBar />
+  <DashboardNav />
+  <PhotosPanel />
+  <RecordsPanel />
+  <LettersPanel />
+  <KugouPanel />
+</section>

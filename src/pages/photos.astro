@@ -1,13 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PhotoLightbox from '../components/PhotoLightbox.astro';
-import { SERIES_FILTERS, SERIES_LABELS } from '../data/photos';
+import PhotosHero from '../components/site/PhotosHero.astro';
+import PhotosFilters from '../components/site/PhotosFilters.astro';
+import PhotoGallery from '../components/site/PhotoGallery.astro';
+import PhotosNotes from '../components/site/PhotosNotes.astro';
+import { SERIES_FILTERS } from '../data/photos';
 import { listPhotos } from '../lib/content-db';
 
 export const prerender = false;
 
 const photos = listPhotos();
-const seriesCount = (series: string) => photos.filter((photo) => photo.series === series).length;
+const series = SERIES_FILTERS.map((item) => ({
+  ...item,
+  count: photos.filter((photo) => photo.series === item.value).length,
+}));
 const takenYears = [...new Set(photos.map((photo) => photo.takenAt.slice(0, 4)))].sort();
 const yearRange =
   takenYears.length > 1 ? `${takenYears[0]}–${takenYears[takenYears.length - 1]}` : (takenYears[0] ?? '');
@@ -21,196 +28,19 @@ const yearRange =
         <div class="absolute -top-32 right-12 w-96 h-96 bg-secondary-container/30 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute top-1/3 -left-20 w-80 h-80 bg-tertiary-fixed/20 rounded-full blur-3xl pointer-events-none"></div>
         <!-- Editorial Header Section -->
-        <header class="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-space-lg pb-space-lg">
-          <div class="flex flex-col max-w-2xl">
-            <div class="flex items-center gap-space-sm mb-space-sm">
-              <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">
-                Visual Archive · Vol. 04 / Multi-Verse
-              </span>
-              <span class="w-8 h-px bg-on-surface-variant/30"></span>
-              <span class="font-label-sm text-label-sm text-on-surface-variant">ACG · Lens · Digital World</span>
-            </div>
-            <div class="flex items-baseline gap-space-md flex-wrap">
-              <h1 class="font-display text-primary tracking-tight text-display-mobile sm:text-display">视觉灵感</h1>
-              <span class="font-headline-md text-headline-md text-on-surface-variant italic font-normal">
-                Aperture &amp; Pixels
-              </span>
-            </div>
-            <p class="font-quote text-quote text-on-surface-variant mt-space-sm leading-relaxed">
-              穿行在二次元唯美画幅、现实快门光影与虚拟CG世界之间。收集打破边界的想象力与真实心动，在此汇成视界灵感馆。
-            </p>
-          </div>
-          <div class="flex flex-col items-start md:items-end self-start md:self-auto">
-            <div class="bg-surface-container-high/70 backdrop-blur-sm rounded-lg p-space-md shadow-sm max-w-sm">
-              <div class="flex items-center gap-space-xs text-primary mb-1">
-                <span class="material-symbols-outlined text-base text-secondary">collections_bookmark</span>
-                <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">
-                  Curated Mediums · 媒介馆藏
-                </span>
-              </div>
-              <p class="font-label-md text-label-md text-on-surface-variant leading-snug">
-                动漫插画
-                <span class="text-outline-variant">·</span> 现实胶卷/数码
-                <span class="text-outline-variant">·</span> 3D概念与虚幻引擎
-              </p>
-              <div class="flex items-center gap-space-xs mt-space-xs pt-space-xs text-on-surface-variant/80">
-                <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                <span class="font-label-sm text-label-sm text-on-surface-variant">
-                  {photos.length} 组跨界视觉灵感收录持续更新
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>
+        <PhotosHero photoCount={photos.length} />
         <!-- Filter & Categories Tab Bar -->
-        <nav aria-label="Photo Filters" class="relative z-10 max-w-6xl mx-auto mt-6 mb-9">
-          <div class="flex items-center justify-between flex-wrap gap-4 bg-surface-container-low p-1.5 rounded-xl shadow-sm">
-            <div class="flex items-center flex-wrap gap-1.5" id="filter-container">
-              <button
-                class="filter-btn active px-4 py-1.5 rounded-lg font-label-md text-label-md bg-primary text-on-primary transition-all duration-300 shadow-sm"
-                data-filter="all"
-                type="button"
-              >
-                全部 (All Works)
-                <span class="ml-1 opacity-70 text-xs">{photos.length}</span>
-              </button>
-              {SERIES_FILTERS.map((series) => (
-                <button
-                  class="filter-btn px-4 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-300"
-                  data-filter={series.value}
-                  type="button"
-                >
-                  {series.label} ({series.english})
-                  <span class="ml-1 opacity-70 text-xs">{seriesCount(series.value)}</span>
-                </button>
-              ))}
-            </div>
-            <div class="hidden sm:flex items-center gap-2 px-3 text-on-surface-variant font-label-sm text-label-sm">
-              <span class="material-symbols-outlined text-sm">tune</span>
-              <span class="">按视觉编目与色调倒序</span>
-            </div>
-          </div>
-        </nav>
+        <PhotosFilters photoCount={photos.length} series={series} />
         <!-- Editorial Asymmetrical Masonry Photo Grid -->
-        <div class="relative z-10 max-w-6xl mx-auto" id="gallery">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-            {photos.map((photo, index) => (
-              <article
-                class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
-                data-series={photo.series}
-                data-photo-open={photo.slug}
-                role="button"
-                tabindex="0"
-                aria-label={`打开《${photo.title}》大图`}
-              >
-                <div class="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container">
-                  <img
-                    alt={photo.alt}
-                    class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    decoding="async"
-                    height={photo.height}
-                    loading={index < 3 ? 'eager' : 'lazy'}
-                    src={photo.src}
-                    width={photo.width}
-                  />
-                  <div class="absolute top-3 left-3 bg-primary/70 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[0.625rem] tracking-widest uppercase">
-                    {photo.badge}
-                  </div>
-                  <div class="absolute inset-0 bg-primary/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-on-primary">
-                    <p class="font-quote text-quote italic text-surface-bright leading-relaxed">“{photo.note}”</p>
-                  </div>
-                </div>
-                <div class="pt-4 flex items-baseline justify-between gap-space-sm">
-                  <h2 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">{photo.title}</h2>
-                  <span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0">{`[ ${SERIES_LABELS[photo.series]} ]`}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
+        <PhotoGallery photos={photos} />
         <!-- Bottom Section: 摄影手记 / Darkroom Notes -->
-        <section class="relative z-10 max-w-6xl mx-auto mt-12 mb-20">
-          <div class="bg-surface-container-low rounded-2xl p-8 sm:p-10 shadow-sm relative overflow-hidden">
-            <div class="absolute -right-8 -bottom-8 select-none pointer-events-none opacity-10">
-              <span class="material-symbols-outlined text-9xl text-primary">camera</span>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div class="lg:col-span-4 flex flex-col gap-3">
-                <div class="flex items-center gap-1.5 text-secondary">
-                  <span class="material-symbols-outlined text-xl">auto_fix_high</span>
-                  <span class="font-label-sm text-label-sm uppercase tracking-widest font-semibold">
-                    Notes &amp; Archive · 图集手记
-                  </span>
-                </div>
-                <h2 class="font-headline-md text-headline-md text-primary tracking-tight">视觉手记 · 定格多维光影</h2>
-                <span class="font-label-sm text-label-sm text-on-surface-variant">
-                  Written by 风屿 · 记录于工作室与数字暗房
-                </span>
-                <div class="mt-4 grid grid-cols-3 gap-3 bg-surface-container p-4 rounded-xl text-center">
-                  <div>
-                    <span class="font-label-lg text-label-lg text-primary block font-bold">{photos.length}</span>
-                    <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">影像收录</span>
-                  </div>
-                  <div>
-                    <span class="font-label-lg text-label-lg text-primary block font-bold">
-                      {SERIES_FILTERS.length}
-                    </span>
-                    <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">视觉系列</span>
-                  </div>
-                  <div>
-                    <span class="font-label-lg text-label-lg text-primary block font-bold">{yearRange}</span>
-                    <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">记录年份</span>
-                  </div>
-                </div>
-              </div>
-              <div class="lg:col-span-8 flex flex-col gap-5 bg-surface-container/60 p-6 sm:p-8 rounded-xl">
-                <p class="font-body-lg text-body-lg text-primary leading-relaxed">
-                  无论动漫笔触、真实街景还是虚拟CG渲染，图像的本质都是对某一缕光线与情绪的提炼与永久留存。
-                </p>
-                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                  大学生活往往被DDL、绩点和未来的不确定性塞得满满当当。而按下快门或涂抹画面的那一瞬，是为数不多让我从奔忙中强行抽离的时刻。35毫米画幅与画布框住的不仅是风景，更是专注度。当你开始期待光线如何穿透一片落叶、积水如何倒映霓虹招牌、黄昏的影子如何在红砖墙上拉长，原本沉闷重复的校园日子便重新拥有了纹理与温度。
-                </p>
-                <div class="flex items-center justify-between pt-2 flex-wrap gap-3">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant">
-                      “定格不可复制的一瞬，是向时间温柔反抗的唯一方式。”
-                    </span>
-                  </div>
-                  <a
-                    class="inline-flex items-center gap-1 font-label-md text-label-md text-on-tertiary-container hover:text-primary transition-colors"
-                    href="#gallery"
-                  >
-                    <span class="">浏览完整图集</span>
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <PhotosNotes photoCount={photos.length} seriesCount={SERIES_FILTERS.length} yearRange={yearRange} />
       </div>
     </div>
 
     <PhotoLightbox photos={photos} />
   </main>
   <script>
-    const buttons = [...document.querySelectorAll<HTMLElement>('.filter-btn')];
-    const cards = [...document.querySelectorAll<HTMLElement>('.photo-card')];
-    for (const btn of buttons) {
-      btn.addEventListener('click', () => {
-        for (const b of buttons) {
-          b.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
-          b.classList.add('text-on-surface-variant');
-        }
-        btn.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
-        btn.classList.remove('text-on-surface-variant');
-        const filter = btn.dataset.filter ?? 'all';
-        for (const card of cards) {
-          const show = filter === 'all' || card.dataset.series === filter;
-          card.style.display = show ? 'flex' : 'none';
-        }
-      });
-    }
+    import '../scripts/site/photos.ts';
   </script>
 </BaseLayout>

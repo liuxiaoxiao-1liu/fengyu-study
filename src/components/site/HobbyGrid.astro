@@ -1,0 +1,43 @@
+---
+import type { Book } from '../../data/books';
+import type { Essay } from '../../data/essays';
+import type { Track } from '../../data/music';
+import ReadingCard from './ReadingCard.astro';
+import MusicCard from './MusicCard.astro';
+import VisualCard from './VisualCard.astro';
+import NotesCard from './NotesCard.astro';
+
+interface Props {
+  featuredBook: Book;
+  featuredTrack: Track;
+  tracks: Track[];
+  photoCount: number;
+  latestEssay: Essay;
+}
+
+const { featuredBook, featuredTrack, tracks, photoCount, latestEssay } = Astro.props;
+---
+
+<section class="w-full max-w-7xl mx-auto px-gutter py-space-xl">
+  <div class="flex flex-col gap-space-xl" id="reading-music">
+    <div class="flex items-baseline justify-between border-b border-surface-container-high/60 pb-space-sm">
+      <div>
+        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">
+          01 / Hobbies &amp; Passions
+        </span>
+        <h2 class="font-headline-md text-headline-md text-primary font-normal">
+          精神自留地四重奏：网文·酷狗·画界·随笔
+        </h2>
+      </div>
+      <span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline">
+        网文追更 · 酷狗音乐 · 多元画境 · 杂谈笔记
+      </span>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-stretch">
+      <ReadingCard featuredBook={featuredBook} />
+      <MusicCard featuredTrack={featuredTrack} tracks={tracks} />
+      <VisualCard photoCount={photoCount} />
+      <NotesCard essay={latestEssay} />
+    </div>
+  </div>
+</section>

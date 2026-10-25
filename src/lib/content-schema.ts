@@ -1,4 +1,5 @@
 import type { RecordType } from './content-db';
+import { integer, slugify, tags, text } from './validate';
 
 export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'select' | 'checkbox' | 'tags';
 
@@ -168,36 +169,6 @@ export function getAdminSchema(type: string): AdminSchema | null {
   return (schemas as Record<string, AdminSchema>)[type] ?? null;
 }
 
-function text(value: unknown, max: number): string {
-  if (typeof value !== 'string') return '';
-  return value.trim().slice(0, max);
-}
-
-function slugify(value: string, fallback: string): string {
-  const slug = value
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 90);
-  return slug || fallback;
-}
-
-function tags(value: unknown): string[] {
-  const raw = Array.isArray(value) ? value : String(value ?? '').split(/[,，、]/);
-  const seen = new Set<string>();
-  for (const item of raw) {
-    const tag = text(item, 40);
-    if (tag && !seen.has(tag)) seen.add(tag);
-  }
-  return [...seen];
-}
-
-function number(value: unknown, fallback: number, min: number, max: number): number {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return fallback;
-  return Math.min(Math.max(Math.trunc(parsed), min), max);
-}
-
 export type ParsedContentRecord = {
   slug: string;
   title: string;
@@ -229,7 +200,7 @@ export function parseContentInput(
       continue;
     }
     if (field.type === 'number') {
-      data[field.name] = number(raw, 0, 0, 100000);
+      data[field.name] = integer(raw, 0, 0, 100000);
       continue;
     }
     if (field.type === 'select') {
@@ -253,7 +224,7 @@ export function parseContentInput(
   if (type === 'tracks') {
     const hash = text(body.kugouHash, 80);
     const albumId = text(body.kugouAlbumId, 40);
-    const albumAudioId = number(body.kugouAlbumAudioId, 0, 0, 1000000000);
+    const albumAudioId = integer(body.kugouAlbumAudioId, 0, 0, 1000000000);
     if (hash) {
       data.kugou = { hash: hash.toLowerCase(), albumId: albumId || '0', albumAudioId };
     } else {
@@ -278,7 +249,7 @@ export function parseContentInput(
       slug,
       title: titleValue.slice(0, 200),
       data,
-      sortOrder: number(body.sortOrder, 0, 0, 100000),
+      sortOrder: integer(body.sortOrder, 0, 0, 100000),
     },
   };
 }

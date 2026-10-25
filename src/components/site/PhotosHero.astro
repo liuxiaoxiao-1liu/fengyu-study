@@ -1,0 +1,47 @@
+---
+interface Props {
+  photoCount: number;
+}
+
+const { photoCount } = Astro.props;
+---
+
+<header class="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-space-lg pb-space-lg">
+  <div class="flex flex-col max-w-2xl">
+    <div class="flex items-center gap-space-sm mb-space-sm">
+      <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">
+        Visual Archive · Vol. 04 / Multi-Verse
+      </span>
+      <span class="w-8 h-px bg-on-surface-variant/30"></span>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">ACG · Lens · Digital World</span>
+    </div>
+    <div class="flex items-baseline gap-space-md flex-wrap">
+      <h1 class="font-display text-primary tracking-tight text-display-mobile sm:text-display">视觉灵感</h1>
+      <span class="font-headline-md text-headline-md text-on-surface-variant italic font-normal">
+        Aperture &amp; Pixels
+      </span>
+    </div>
+    <p class="font-quote text-quote text-on-surface-variant mt-space-sm leading-relaxed">
+      穿行在二次元唯美画幅、现实快门光影与虚拟CG世界之间。收集打破边界的想象力与真实心动，在此汇成视界灵感馆。
+    </p>
+  </div>
+  <div class="flex flex-col items-start md:items-end self-start md:self-auto">
+    <div class="bg-surface-container-high/70 backdrop-blur-sm rounded-lg p-space-md shadow-sm max-w-sm">
+      <div class="flex items-center gap-space-xs text-primary mb-1">
+        <span class="material-symbols-outlined text-base text-secondary">collections_bookmark</span>
+        <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">
+          Curated Mediums · 媒介馆藏
+        </span>
+      </div>
+      <p class="font-label-md text-label-md text-on-surface-variant leading-snug">
+        动漫插画
+        <span class="text-outline-variant">·</span> 现实胶卷/数码
+        <span class="text-outline-variant">·</span> 3D概念与虚幻引擎
+      </p>
+      <div class="flex items-center gap-space-xs mt-space-xs pt-space-xs text-on-surface-variant/80">
+        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">{photoCount} 组跨界视觉灵感收录持续更新</span>
+      </div>
+    </div>
+  </div>
+</header>

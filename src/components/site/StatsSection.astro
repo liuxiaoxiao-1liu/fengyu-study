@@ -1,0 +1,54 @@
+---
+interface Props {
+  bookCount: number;
+  trackCount: number;
+  photoCount: number;
+  essayCount: number;
+}
+
+const { bookCount, trackCount, photoCount, essayCount } = Astro.props;
+---
+
+<section class="w-full max-w-7xl mx-auto px-gutter py-space-xl" id="stats">
+  <div class="bg-surface-container-low rounded-xl p-space-xl shadow-sm">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-space-xl">
+      <div class="flex flex-col">
+        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+          {' '}
+          Life Artifacts{' '}
+        </span>
+        <h3 class="font-headline-sm text-headline-sm text-primary font-normal mt-1">书房与精神刻度</h3>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-space-md w-full md:w-auto flex-1 lg:max-w-3xl">
+        <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
+          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">网文追读</span>
+          <div class="flex items-baseline gap-1.5 mt-1.5">
+            <span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{bookCount}</span>
+            <span class="font-label-sm text-label-sm text-secondary font-medium">部在架</span>
+          </div>
+        </div>
+        <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
+          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">酷狗收藏</span>
+          <div class="flex items-baseline gap-1.5 mt-1.5">
+            <span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{trackCount}</span>
+            <span class="font-label-sm text-label-sm text-secondary font-medium">首循环</span>
+          </div>
+        </div>
+        <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
+          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">视觉图集</span>
+          <div class="flex items-baseline gap-1.5 mt-1.5">
+            <span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{photoCount}</span>
+            <span class="font-label-sm text-label-sm text-secondary font-medium">张收录</span>
+          </div>
+        </div>
+        <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
+          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">随想随笔</span>
+          <div class="flex items-baseline gap-1.5 mt-1.5">
+            <span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{essayCount}</span>
+            <span class="font-label-sm text-label-sm text-secondary font-medium">篇记录</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
-import { adminGuard, json } from './_utils';
+import { requireAdmin } from '../../../lib/admin-auth';
 import { listLettersForExport } from '../../../lib/guestbook-db';
+import { json } from '../../../lib/http';
 import { listSubscribers } from '../../../lib/newsletter-db';
 
 export const prerender = false;
@@ -33,7 +34,7 @@ function stamp(): string {
 }
 
 export const GET: APIRoute = async ({ request, url }) => {
-  const denied = adminGuard(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
 
   const kind = url.searchParams.get('kind') ?? 'letters';

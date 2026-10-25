@@ -1,0 +1,104 @@
+---
+// 首页首屏：欢迎语、标签、个人名片与 NOW 状态广播。内容目前为静态文案。
+---
+
+<section class="w-full max-w-7xl mx-auto px-gutter pt-space-xl pb-space-xl">
+  <div class="flex flex-col gap-space-lg">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+      <div class="lg:col-span-8 flex flex-col gap-space-md justify-center">
+        <div class="inline-flex items-center gap-2 text-secondary font-label-sm text-label-sm font-semibold tracking-wider uppercase">
+          <span class="material-symbols-outlined text-base">waving_hand</span>
+          <span class="">你好，欢迎光临我的数字秘密基地</span>
+        </div>
+        <h1 class="font-display text-primary leading-tight font-normal tracking-tight text-display-mobile sm:text-display">
+          沉迷网文修仙，在酷狗声浪里漫游现实与异次元。
+        </h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed max-w-2xl">
+          白天是穿梭于教室与自习室的大学生，夜晚是在网文世界修仙斩妖、在酷狗音乐里找回平静的数字漫游者。这里收纳了我追过的网文、循环的歌单，以及搜罗的动漫、现实与虚拟世界的画面。
+        </p>
+        <div class="flex flex-wrap items-center gap-2 pt-1">
+          <span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">
+            #网文迷
+          </span>
+          <span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">
+            #酷狗老粉
+          </span>
+          <span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">
+            #动漫控
+          </span>
+          <span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">
+            #现实捕捉
+          </span>
+          <span class="px-space-sm py-1 rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">
+            #虚拟漫游
+          </span>
+        </div>
+      </div>
+      <div
+        class="lg:col-span-4 flex flex-col justify-between gap-space-md bg-surface-container-low p-space-lg rounded-xl border border-surface-container-high/60 shadow-sm h-full"
+        id="profile"
+      >
+        <div class="flex items-center gap-space-sm">
+          <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-headline-sm font-semibold shrink-0 shadow-sm">
+            屿
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="font-headline-sm text-headline-sm text-primary leading-none">岛屿同学</span>
+              <span class="px-1.5 py-0.5 rounded text-[0.625rem] font-label-sm bg-secondary text-on-secondary leading-none">
+                在读大三
+              </span>
+            </div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant mt-1 truncate">
+              普通大学生 / 杂食性生活观察者
+            </span>
+          </div>
+        </div>
+        <div class="bg-surface-container p-space-md rounded font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          “在充斥速食信息的节奏里，依然为几万字的网文高潮心潮澎湃，依然会在傍晚单曲循环酷狗里那首老歌。”
+        </div>
+        <div class="flex items-center gap-space-sm pt-space-xs">
+          <a
+            class="flex-1 py-2 bg-primary text-on-primary rounded text-center font-label-md text-label-md hover:bg-primary-container transition-all flex items-center justify-center gap-1 shadow-sm"
+            href="/guestbook/"
+          >
+            <span class="material-symbols-outlined text-sm">forum</span>
+            <span class="">投递留言</span>
+          </a>
+          <a
+            class="px-space-md py-2 bg-surface-container-high text-on-surface rounded font-label-md text-label-md hover:bg-surface-container transition-all text-center"
+            href="#stats"
+          >
+            数字存根
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="w-full bg-surface-container-low rounded-lg p-space-md shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+      <div class="flex items-center gap-2 bg-surface-container-high/70 px-space-sm py-1.5 rounded text-primary shrink-0">
+        <span class="material-symbols-outlined text-sm text-on-tertiary-container animate-pulse"> wifi_tethering </span>
+        <span class="font-label-sm text-label-sm tracking-wider uppercase font-semibold">NOW / 状态广播</span>
+      </div>
+      <div class="flex-1 flex flex-wrap items-center gap-x-space-md gap-y-1 font-body-sm text-body-sm text-on-surface-variant px-space-xs">
+        <span class="inline-flex items-center gap-1.5">
+          <span class="text-secondary">📖</span>
+          <span class="text-on-surface font-medium">追读网文：</span>
+          <span class="">《诡秘之主》· 愚者先生归来</span>
+        </span>
+        <span class="text-outline-variant hidden sm:inline">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <span class="text-on-tertiary-container">🎵</span>
+          <span class="text-on-surface font-medium">酷狗单曲：</span>
+          <span class="">周深《大鱼》(蝰蛇全景声)</span>
+        </span>
+        <span class="text-outline-variant hidden lg:inline">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <span class="text-secondary">🎨</span>
+          <span class="text-on-surface font-medium">最新灵感：</span>
+          <span class="">新海诚风天空插画 + 校园黄昏街拍</span>
+        </span>
+      </div>
+      <div class="text-on-surface-variant text-xs font-label-sm shrink-0 hidden xl:block pr-space-xs">刚刚更新</div>
+    </div>
+  </div>
+</section>

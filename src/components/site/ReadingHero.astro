@@ -1,0 +1,57 @@
+---
+interface Props {
+  bookCount: number;
+  albumCount: number;
+}
+
+const { bookCount, albumCount } = Astro.props;
+---
+
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-6 border-b border-surface-container-high/60">
+  <div class="flex flex-col">
+    <div class="flex items-center gap-space-sm mb-space-xs">
+      <span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-secondary"></span>
+        Archival Vault · Vol. 04
+      </span>
+      <span class="text-on-surface-variant/40 font-label-sm text-label-sm">/</span>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">2024–2025 纸页与黑胶编目</span>
+    </div>
+    <h1 class="font-headline-lg text-primary tracking-tight text-headline-lg-mobile sm:text-headline-lg">
+      书页与旋律
+      <span class="font-headline-md text-headline-md italic text-on-surface-variant font-light ml-space-xs">
+        Pages &amp; Frequencies
+      </span>
+    </h1>
+    <p class="font-body-md text-body-md text-on-surface-variant mt-space-xs max-w-2xl leading-relaxed">
+      一个大学生在书桌台灯与耳机声场里的慢速收纳。收集纸页翻动时的沙砾质感，以及唱针划过内圈凹槽的轻微噼啪。
+    </p>
+  </div>
+  <div class="flex items-center gap-space-md bg-surface-container-low px-space-md py-space-sm rounded-xl shadow-sm">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">追更网文</span>
+      <div class="flex items-baseline gap-1">
+        <span class="font-headline-md text-headline-md text-primary font-medium">{bookCount}</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">本在架</span>
+      </div>
+    </div>
+    <div class="w-px h-8 bg-surface-container-highest"></div>
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">酷狗听歌</span>
+      <div class="flex items-baseline gap-1">
+        <span class="font-headline-md text-headline-md text-on-tertiary-container font-medium" data-playlist-count>
+          —
+        </span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">首曲目</span>
+      </div>
+    </div>
+    <div class="w-px h-8 bg-surface-container-highest"></div>
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">本章说标记</span>
+      <div class="flex items-baseline gap-1">
+        <span class="font-headline-md text-headline-md text-secondary font-medium">{albumCount}</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">张唱片</span>
+      </div>
+    </div>
+  </div>
+</div>

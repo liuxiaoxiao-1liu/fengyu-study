@@ -1,26 +1,20 @@
 import type { APIRoute } from 'astro';
-import { requireContentAdmin } from '../../../../lib/admin-auth';
+import { requireAdmin } from '../../../../lib/admin-auth';
+import { json } from '../../../../lib/http';
 import { listKugouPlaylists } from '../../../../lib/kugou';
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
   try {
     const playlists = await listKugouPlaylists();
-    return new Response(JSON.stringify({ ok: true, playlists }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
-    });
+    return json({ ok: true, playlists });
   } catch (cause) {
-    return new Response(
-      JSON.stringify({
-        ok: false,
-        error: 'kugou_failed',
-        message: cause instanceof Error ? cause.message : String(cause),
-      }),
-      { status: 502, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } },
+    return json(
+      { ok: false, error: 'kugou_failed', message: cause instanceof Error ? cause.message : String(cause) },
+      502,
     );
   }
 };

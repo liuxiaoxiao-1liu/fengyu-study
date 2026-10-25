@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { requireContentAdmin } from '../../../../../lib/admin-auth';
+import { requireAdmin } from '../../../../../lib/admin-auth';
 import {
   deleteContentRecord,
   getContentRecord,
@@ -7,19 +7,9 @@ import {
   type RecordType,
 } from '../../../../../lib/content-db';
 import { getAdminSchema, parseContentInput } from '../../../../../lib/content-schema';
+import { json } from '../../../../../lib/http';
 
 export const prerender = false;
-
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
 
 function recordType(value: string | undefined): RecordType | null {
   if (!value) return null;
@@ -28,7 +18,7 @@ function recordType(value: string | undefined): RecordType | null {
 }
 
 export const PATCH: APIRoute = async ({ request, params }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
   const type = recordType(params.type);
   if (!type) return json({ ok: false, error: 'unknown_type' }, 404);
@@ -60,7 +50,7 @@ export const PATCH: APIRoute = async ({ request, params }) => {
 };
 
 export const DELETE: APIRoute = async ({ request, params }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
   const type = recordType(params.type);
   if (!type) return json({ ok: false, error: 'unknown_type' }, 404);

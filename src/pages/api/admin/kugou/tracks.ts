@@ -1,18 +1,12 @@
 import type { APIRoute } from 'astro';
-import { requireContentAdmin } from '../../../../lib/admin-auth';
+import { requireAdmin } from '../../../../lib/admin-auth';
 import { addKugouTrack, removeKugouTrack } from '../../../../lib/kugou';
+import { json } from '../../../../lib/http';
 
 export const prerender = false;
 
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
-  });
-}
-
 export const POST: APIRoute = async ({ request }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
   let body: { hash?: unknown; name?: unknown; albumId?: unknown; albumAudioId?: unknown };
   try {
@@ -37,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 export const DELETE: APIRoute = async ({ request }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
   let body: { fileid?: unknown };
   try {

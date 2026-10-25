@@ -1,0 +1,106 @@
+---
+interface Props {
+  archiveYears: string;
+  totalChars: number;
+  essayCount: number;
+}
+
+const { archiveYears, totalChars, essayCount } = Astro.props;
+---
+
+<div class="bg-surface-container-low/70 rounded-xl p-6 shadow-sm">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-secondary text-base">edit_calendar</span>
+      <h3 class="font-headline-sm text-headline-sm text-primary font-normal">书写脉络</h3>
+    </div>
+    <span class="font-label-sm text-xs text-secondary font-mono font-medium tracking-wider">
+      {archiveYears} ARCHIVE
+    </span>
+  </div>
+  <p class="font-body-sm text-body-sm text-on-surface-variant mb-5 leading-relaxed">
+    已沉淀
+    <span class="text-primary font-semibold">{totalChars.toLocaleString('zh-CN')}</span> 字 · 收录
+    <span class="text-secondary font-semibold">{essayCount}</span> 篇随笔
+  </p>
+  <div class="p-4 bg-surface-container/60 rounded-lg overflow-hidden flex items-center justify-center">
+    <svg
+      aria-label="Writing frequency activity map"
+      class="w-full max-w-full h-auto text-on-surface-variant"
+      viewBox="0 0 238 64"
+    >
+      <g class="fill-surface-variant">
+        <rect class="fill-secondary/80" height="12" rx="2" width="12" x="0" y="0"></rect>
+        <rect class="fill-secondary/30" height="12" rx="2" width="12" x="16" y="0"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="32" y="0"></rect>
+        <rect class="fill-secondary/60" height="12" rx="2" width="12" x="48" y="0"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="64" y="0"></rect>
+        <rect class="fill-secondary/40" height="12" rx="2" width="12" x="80" y="0"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="96" y="0"></rect>
+        <rect class="fill-secondary/80" height="12" rx="2" width="12" x="112" y="0"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="128" y="0"></rect>
+        <rect class="fill-secondary/60" height="12" rx="2" width="12" x="144" y="0"></rect>
+        <rect class="fill-secondary/20" height="12" rx="2" width="12" x="160" y="0"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="176" y="0"></rect>
+        <rect class="fill-secondary/70" height="12" rx="2" width="12" x="192" y="0"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="208" y="0"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="224" y="0"></rect>
+        <rect class="fill-secondary/40" height="12" rx="2" width="12" x="0" y="16"></rect>
+        <rect class="fill-secondary/90" height="12" rx="2" width="12" x="16" y="16"></rect>
+        <rect class="fill-secondary/50" height="12" rx="2" width="12" x="32" y="16"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="48" y="16"></rect>
+        <rect class="fill-secondary/20" height="12" rx="2" width="12" x="64" y="16"></rect>
+        <rect class="fill-secondary/80" height="12" rx="2" width="16" x="80" y="16"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="96" y="16"></rect>
+        <rect class="fill-secondary/60" height="12" rx="2" width="12" x="112" y="16"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="128" y="16"></rect>
+        <rect class="fill-secondary/30" height="12" rx="2" width="12" x="144" y="16"></rect>
+        <rect class="fill-secondary/90" height="12" rx="2" width="12" x="160" y="16"></rect>
+        <rect class="fill-secondary/40" height="12" rx="2" width="12" x="176" y="16"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="192" y="16"></rect>
+        <rect class="fill-secondary/80" height="12" rx="2" width="12" x="208" y="16"></rect>
+        <rect class="fill-secondary/60" height="12" rx="2" width="12" x="224" y="16"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="0" y="32"></rect>
+        <rect class="fill-secondary/40" height="12" rx="2" width="12" x="16" y="32"></rect>
+        <rect class="fill-secondary/70" height="12" rx="2" width="12" x="32" y="32"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="48" y="32"></rect>
+        <rect class="fill-secondary/60" height="12" rx="2" width="12" x="64" y="32"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="80" y="32"></rect>
+        <rect class="fill-secondary/40" height="12" rx="2" width="12" x="96" y="32"></rect>
+        <rect class="fill-secondary/80" height="12" rx="2" width="12" x="112" y="32"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="128" y="32"></rect>
+        <rect class="fill-secondary/50" height="12" rx="2" width="12" x="144" y="32"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="160" y="32"></rect>
+        <rect class="fill-secondary/70" height="12" rx="2" width="12" x="176" y="32"></rect>
+        <rect class="fill-secondary/90" height="12" rx="2" width="12" x="192" y="32"></rect>
+        <rect class="fill-secondary/30" height="12" rx="2" width="12" x="208" y="32"></rect>
+        <rect class="fill-secondary/50" height="12" rx="2" width="12" x="224" y="32"></rect>
+        <rect class="fill-secondary/30" height="12" rx="2" width="12" x="0" y="48"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="16" y="48"></rect>
+        <rect class="fill-secondary/80" height="12" rx="2" width="12" x="32" y="48"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="48" y="48"></rect>
+        <rect class="fill-secondary/40" height="12" rx="2" width="12" x="64" y="48"></rect>
+        <rect class="fill-secondary/70" height="12" rx="2" width="12" x="80" y="48"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="96" y="48"></rect>
+        <rect class="fill-secondary/30" height="12" rx="2" width="12" x="112" y="48"></rect>
+        <rect class="fill-secondary/90" height="12" rx="2" width="12" x="128" y="48"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="144" y="48"></rect>
+        <rect class="fill-secondary/50" height="12" rx="2" width="12" x="160" y="48"></rect>
+        <rect class="fill-surface-dim" height="12" rx="2" width="12" x="176" y="48"></rect>
+        <rect class="fill-secondary/60" height="12" rx="2" width="12" x="192" y="48"></rect>
+        <rect class="fill-secondary" height="12" rx="2" width="12" x="208" y="48"></rect>
+        <rect class="fill-secondary/80" height="12" rx="2" width="12" x="224" y="48"></rect>
+      </g>
+    </svg>
+  </div>
+  <div class="flex items-center justify-between text-[0.625rem] font-label-sm text-on-surface-variant/70 mt-3 px-1">
+    <span class="">少 (Quiet)</span>
+    <div class="flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-xs bg-surface-dim"></span>
+      <span class="w-2 h-2 rounded-xs bg-secondary/30"></span>
+      <span class="w-2 h-2 rounded-xs bg-secondary/60"></span>
+      <span class="w-2 h-2 rounded-xs bg-secondary"></span>
+    </div>
+    <span class="">多 (Prolific)</span>
+  </div>
+</div>

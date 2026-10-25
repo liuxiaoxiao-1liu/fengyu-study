@@ -1,6 +1,6 @@
 /**
- * 站内搜索索引：构建期由数据模块、随记与固定页面自动生成。
- * 不要在这里手写具体条目；新增内容只改对应的 src/data/ 文件。
+ * 站内搜索兜底索引：首屏/断网时使用；正常搜索由 GET /api/content/search 从内容库动态生成。
+ * 不要在这里手写具体条目；日常内容改 /admin/，src/data/ 只在首启播种时使用。
  */
 import { books } from './books';
 import { essays } from './essays';

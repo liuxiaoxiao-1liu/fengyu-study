@@ -1,27 +1,8 @@
 import type { PhotoExif, PhotoSeries } from '../data/photos';
 import type { PhotoInput } from './content-db';
+import { integer, slugify, text } from './validate';
 
 const SERIES: PhotoSeries[] = ['anime', 'reality', 'virtual'];
-
-function text(value: unknown, max: number): string {
-  if (typeof value !== 'string') return '';
-  return value.trim().slice(0, max);
-}
-
-function integer(value: unknown, fallback: number, min: number, max: number): number {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return fallback;
-  return Math.min(Math.max(Math.trunc(parsed), min), max);
-}
-
-function slugify(value: string, fallback: string): string {
-  const slug = value
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80);
-  return slug || fallback;
-}
 
 function exifFrom(value: unknown): PhotoExif | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
@@ -52,7 +33,7 @@ export function parsePhotoInput(
     : new Date().toISOString().slice(0, 10);
 
   const value: PhotoInput = {
-    slug: slugify(text(body.slug, 80), `photo-${Date.now().toString(36)}`),
+    slug: slugify(text(body.slug, 80), `photo-${Date.now().toString(36)}`, 80),
     title,
     src,
     alt,

@@ -1,0 +1,49 @@
+---
+import type { Photo } from '../../data/photos';
+import { SERIES_LABELS } from '../../data/photos';
+
+interface Props {
+  photos: Photo[];
+}
+
+const { photos } = Astro.props;
+---
+
+<div class="relative z-10 max-w-6xl mx-auto" id="gallery">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+    {photos.map((photo, index) => (
+      <article
+        class="photo-card group bg-surface-container-low p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+        data-series={photo.series}
+        data-photo-open={photo.slug}
+        role="button"
+        tabindex="0"
+        aria-label={`打开《${photo.title}》大图`}
+      >
+        <div class="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container">
+          <img
+            alt={photo.alt}
+            class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            decoding="async"
+            height={photo.height}
+            loading={index < 3 ? 'eager' : 'lazy'}
+            src={photo.src}
+            width={photo.width}
+          />
+          <div class="absolute top-3 left-3 bg-primary/70 backdrop-blur-md text-on-primary px-2 py-0.5 rounded font-label-sm text-[0.625rem] tracking-widest uppercase">
+            {photo.badge}
+          </div>
+          <div class="absolute inset-0 bg-primary/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-on-primary">
+            <p class="font-quote text-quote italic text-surface-bright leading-relaxed">“{photo.note}”</p>
+          </div>
+        </div>
+        <div class="pt-4 flex items-baseline justify-between gap-space-sm">
+          <h2 class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">{photo.title}</h2>
+          <span class="font-label-sm text-label-sm text-secondary font-medium tracking-wider flex-shrink-0">
+            {`[ ${SERIES_LABELS[photo.series]} ]`}
+          </span>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>

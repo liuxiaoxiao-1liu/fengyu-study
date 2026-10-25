@@ -1,22 +1,12 @@
 import type { APIRoute } from 'astro';
-import { requireContentAdmin } from '../../../../lib/admin-auth';
+import { requireAdmin } from '../../../../lib/admin-auth';
 import { checkQrLogin, createQrLogin } from '../../../../lib/kugou-login';
+import { json } from '../../../../lib/http';
 
 export const prerender = false;
 
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
 export const POST: APIRoute = async ({ request }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
   try {
     const qr = await createQrLogin();
@@ -30,7 +20,7 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 export const GET: APIRoute = async ({ request, url }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
   const key = url.searchParams.get('key') ?? '';
   if (!key) return json({ ok: false, error: 'missing_key' }, 400);

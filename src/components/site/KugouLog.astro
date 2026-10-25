@@ -1,0 +1,66 @@
+---
+interface Props {
+  bookCount: number;
+  trackCount: number;
+  albumCount: number;
+}
+
+const { bookCount, trackCount, albumCount } = Astro.props;
+---
+
+<div class="bg-surface-container-low rounded-xl p-6 shadow-sm relative overflow-hidden border border-surface-container-high/40">
+  <div class="flex items-center justify-between mb-2">
+    <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-medium">
+      KUGOU MUSIC LOG · ARCHIVE
+    </span>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">酷狗音乐档案</span>
+  </div>
+  <h3 class="font-headline-sm text-headline-sm text-primary mb-2 font-normal">听歌札记：蝰蛇音效与网文长夜</h3>
+  <p class="font-body-sm text-body-sm text-on-surface-variant mb-4 leading-relaxed">
+    本月开启酷狗蝰蛇「3D丽音」与「纯净人声」，追读《诡秘之主》与《赤心巡天》的深夜总少不了周深与许嵩的声线回荡。伴随歌词滚动，沉浸式体验修真大界的壮阔风云。
+  </p>
+  <div class="flex flex-wrap gap-2 mb-4">
+    <span class="px-space-sm py-1 rounded font-label-sm text-xs bg-surface-container text-primary flex items-center gap-1">
+      <span class="material-symbols-outlined text-xs text-on-tertiary-container">graphic_eq</span>
+      书架 {bookCount} 本
+    </span>
+    <span class="px-space-sm py-1 rounded font-label-sm text-xs bg-surface-container text-primary flex items-center gap-1">
+      <span class="material-symbols-outlined text-xs text-secondary">headphones</span>
+      曲目 {trackCount} 首
+    </span>
+    <span class="px-space-sm py-1 rounded font-label-sm text-xs bg-surface-container text-primary flex items-center gap-1">
+      <span class="material-symbols-outlined text-xs text-on-surface-variant">album</span>
+      唱片 {albumCount} 张
+    </span>
+  </div>
+  <div class="w-full bg-surface-container/70 p-space-sm rounded-lg flex items-center justify-between gap-1 h-12 mb-4">
+    <div class="w-1 bg-secondary/80 rounded-full h-4"></div>
+    <div class="w-1 bg-secondary/80 rounded-full h-8"></div>
+    <div class="w-1 bg-secondary/80 rounded-full h-6"></div>
+    <div class="w-1 bg-primary/70 rounded-full h-10"></div>
+    <div class="w-1 bg-primary/70 rounded-full h-7"></div>
+    <div class="w-1 bg-on-tertiary-container/80 rounded-full h-9"></div>
+    <div class="w-1 bg-on-tertiary-container/80 rounded-full h-5"></div>
+    <div class="w-1 bg-secondary/80 rounded-full h-7"></div>
+    <div class="w-1 bg-secondary/80 rounded-full h-3"></div>
+    <div class="w-1 bg-primary/80 rounded-full h-8"></div>
+    <div class="w-1 bg-primary/80 rounded-full h-6"></div>
+    <div class="w-1 bg-secondary/80 rounded-full h-4"></div>
+    <div class="w-1 bg-on-tertiary-container/80 rounded-full h-9"></div>
+    <div class="w-1 bg-on-tertiary-container/80 rounded-full h-5"></div>
+    <div class="w-1 bg-secondary/80 rounded-full h-7"></div>
+    <div class="w-1 bg-secondary/80 rounded-full h-4"></div>
+    <div class="w-1 bg-primary/80 rounded-full h-8"></div>
+    <div class="w-1 bg-primary/80 rounded-full h-3"></div>
+  </div>
+  <div class="bg-surface-container-high/60 p-space-md rounded-lg relative">
+    <span class="material-symbols-outlined absolute top-2 right-2 text-primary/10 text-3xl"> format_quote </span>
+    <p class="font-quote text-quote italic text-primary leading-snug mb-1">
+      “看海天一色，听风起雨落，执子手吹散苍茫茫烟波。”
+    </p>
+    <div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant gap-space-sm">
+      <span class="">—— 周深《大鱼》酷狗精评</span>
+      <span class="text-xs shrink-0">摘自随记与歌单</span>
+    </div>
+  </div>
+</div>

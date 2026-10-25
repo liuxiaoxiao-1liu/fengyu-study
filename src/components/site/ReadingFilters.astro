@@ -1,0 +1,55 @@
+---
+interface Props {
+  webnovelCount: number;
+  suspenseCount: number;
+  trackCount: number;
+  repeatCount: number;
+}
+
+const { webnovelCount, suspenseCount, trackCount, repeatCount } = Astro.props;
+---
+
+<div class="flex items-center justify-between flex-wrap gap-space-sm pt-4 bg-surface-container-low/60 p-space-xs rounded-xl mt-4">
+  <div class="flex items-center gap-space-xs overflow-x-auto py-1" id="filter-container">
+    <button
+      class="filter-btn active px-space-md py-space-xs rounded-lg font-label-md text-label-md bg-primary text-on-primary shadow-sm transition-all flex items-center gap-1.5"
+      data-filter="all"
+      type="button"
+    >
+      <span class="">全部 (All)</span>
+    </button>
+    <button
+      class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5"
+      data-filter="webnovel"
+      type="button"
+    >
+      <span class="">玄幻奇幻 (Web Novel)</span>
+      <span class="font-label-sm text-xs opacity-60">{webnovelCount}</span>
+    </button>
+    <button
+      class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5"
+      data-filter="suspense"
+      type="button"
+    >
+      <span class="">悬疑志怪 (Cult)</span>
+      <span class="font-label-sm text-xs opacity-60">{suspenseCount}</span>
+    </button>
+    <button
+      class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5"
+      data-filter="kugou"
+      type="button"
+    >
+      <span class="">编辑精选 (Kugou)</span>
+      <span class="font-label-sm text-xs opacity-60">{trackCount}</span>
+    </button>
+    <button
+      class="filter-btn px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-all flex items-center gap-1.5"
+      data-filter="repeat"
+      type="button"
+    >
+      <span class="material-symbols-outlined text-xs text-on-tertiary-container">replay</span>
+      <span class="">单曲循回</span>
+      <span class="font-label-sm text-xs opacity-60">{repeatCount}</span>
+    </button>
+  </div>
+</div>

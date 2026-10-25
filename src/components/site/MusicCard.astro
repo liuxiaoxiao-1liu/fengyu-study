@@ -1,0 +1,99 @@
+---
+import type { Track } from '../../data/music';
+import { kugouSearchUrl } from '../../data/music';
+
+interface Props {
+  featuredTrack: Track;
+  tracks: Track[];
+}
+
+const { featuredTrack, tracks } = Astro.props;
+---
+
+<article
+  class="lg:col-span-5 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+  id="music"
+>
+  <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+    <div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+      <span class="material-symbols-outlined text-base">graphic_eq</span>
+      <span class="uppercase tracking-widest font-semibold">酷狗音乐 · KuGou VIP</span>
+    </div>
+    <span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-high px-space-xs py-0.5 rounded font-medium">
+      蝰蛇全景声 ON
+    </span>
+  </div>
+  <button
+    type="button"
+    class="group my-space-md flex w-full items-center gap-space-md rounded-lg bg-surface-container p-space-md text-left transition-colors hover:bg-surface-container-high"
+    data-play
+    data-hash={featuredTrack.kugou?.hash}
+    data-title={featuredTrack.title}
+    data-artist={featuredTrack.artist}
+    data-external={kugouSearchUrl(featuredTrack)}
+    aria-label={`播放 ${featuredTrack.title}`}
+  >
+    <span class="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary shadow-md">
+      <span class="flex h-12 w-12 items-center justify-center rounded-full border border-surface-container-highest/30 animate-[spin_8s_linear_infinite]">
+        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-secondary font-label-sm text-[0.625rem] text-on-secondary">
+          KG
+        </span>
+      </span>
+      <span class="absolute inset-0 flex items-center justify-center rounded-full bg-primary/60 text-on-primary opacity-0 transition-opacity group-hover:opacity-100">
+        <span class="material-symbols-outlined text-2xl">play_arrow</span>
+      </span>
+    </span>
+    <span class="flex min-w-0 flex-1 flex-col justify-center">
+      <span class="flex items-center gap-2">
+        <span class="font-label-sm text-label-sm text-on-tertiary-container font-medium uppercase tracking-wider">
+          酷狗歌单 · 点击播放
+        </span>
+        <span class="text-[0.625rem] bg-secondary-container text-on-secondary-container px-1 rounded">
+          {' '}
+          Hi-Res无损{' '}
+        </span>
+      </span>
+      <span class="font-headline-sm text-headline-sm text-primary truncate leading-tight mt-1">
+        {featuredTrack.title}
+      </span>
+      <span class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">
+        {featuredTrack.artist} · {featuredTrack.note}
+      </span>
+      <span class="flex items-center justify-between gap-space-sm mt-space-xs">
+        <span class="font-label-sm text-label-sm text-secondary">{featuredTrack.tag}</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">
+          {featuredTrack.duration} · 共 {tracks.length} 首
+        </span>
+      </span>
+    </span>
+  </button>
+  <div class="flex flex-col gap-space-xs">
+    <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">
+      酷狗歌单精选循环
+    </span>
+    <div class="space-y-1">
+      {tracks.slice(1, 3).map((track) => (
+        <button
+          type="button"
+          class="group flex w-full items-center justify-between rounded p-2 text-left transition-colors hover:bg-surface-container"
+          data-play
+          data-hash={track.kugou?.hash}
+          data-title={track.title}
+          data-artist={track.artist}
+          data-external={kugouSearchUrl(track)}
+          aria-label={`播放 ${track.title}`}
+        >
+          <span class="font-body-sm text-body-sm text-primary truncate">
+            {track.title} · {track.artist}
+          </span>
+          <span class="flex shrink-0 items-center gap-2">
+            <span class="font-label-sm text-label-sm text-on-surface-variant">{track.tag}</span>
+            <span class="material-symbols-outlined text-sm text-secondary opacity-0 transition-opacity group-hover:opacity-100">
+              play_arrow
+            </span>
+          </span>
+        </button>
+      ))}
+    </div>
+  </div>
+</article>

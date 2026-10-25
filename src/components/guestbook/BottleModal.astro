@@ -1,0 +1,35 @@
+<!-- Interactive Modal: Fish a Bottle -->
+<div
+  class="fixed inset-0 z-50 bg-primary/40 backdrop-blur-sm hidden flex items-center justify-center p-gutter"
+  data-bottle-modal=""
+  id="bottle-modal"
+>
+  <div class="bg-surface p-space-xl rounded-xl shadow-xl max-w-lg w-full flex flex-col gap-space-md relative transform transition-all">
+    <button class="absolute top-4 right-4 text-on-surface-variant hover:text-primary" data-close-bottle="">
+      <span class="material-symbols-outlined text-xl">close</span>
+    </button>
+    <div class="flex items-center gap-space-xs text-secondary">
+      <span class="material-symbols-outlined text-xl">sailing</span>
+      <span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">拾光漂流瓶 #BOTTLE-2025</span>
+    </div>
+    <div class="bg-surface-container-low p-space-lg rounded-lg border border-outline-variant/30 flex flex-col gap-space-sm">
+      <span class="font-quote text-quote italic text-primary leading-relaxed" id="bottle-quote">
+        “今晚在操场跑完五公里，躺在草坪上看冬夜猎户座。耳机里正好放到周深的《化身孤岛的鲸》，突然觉得大学四年哪怕有再多迷茫，这一刻的风也是真实的。”
+      </span>
+      <div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm pt-space-xs">
+        <span id="bottle-author">— 匿名漫游者 (投递于 2025.02.14)</span>
+        <span class="text-secondary">#漂流寄语</span>
+      </div>
+    </div>
+    <div class="flex items-center justify-between pt-space-xs">
+      <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">已被打捞 7 次 · 随潮水继续漂向远方</span>
+      <button
+        class="flex items-center gap-1 font-label-sm text-label-sm text-primary hover:text-secondary font-medium"
+        data-fish=""
+      >
+        <span class="material-symbols-outlined text-sm">refresh</span>
+        <span>换一只打捞</span>
+      </button>
+    </div>
+  </div>
+</div>

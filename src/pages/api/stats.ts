@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getLetterCounts } from '../../lib/guestbook-db';
+import { json } from '../../lib/http';
 
 export const prerender = false;
 
@@ -11,24 +12,9 @@ export const GET: APIRoute = async () => {
   try {
     const letters = getLetterCounts();
     const replyRate = letters.publicTotal > 0 ? Math.round((letters.publicReplied / letters.publicTotal) * 100) : 0;
-
-    return new Response(JSON.stringify({ ok: true, letters, replyRate }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'no-store',
-        'X-Content-Type-Options': 'nosniff',
-      },
-    });
+    return json({ ok: true, letters, replyRate });
   } catch (error) {
     console.error('[stats] GET failed', error);
-    return new Response(JSON.stringify({ ok: false, error: 'server_error' }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'no-store',
-        'X-Content-Type-Options': 'nosniff',
-      },
-    });
+    return json({ ok: false, error: 'server_error' }, 500);
   }
 };

@@ -1,0 +1,31 @@
+---
+import GuestbookFormFields from './GuestbookFormFields.astro';
+import GuestbookToast from './GuestbookToast.astro';
+---
+
+<!-- Left Column: Form Card (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col bg-surface-container-low p-space-lg rounded-xl shadow-sm relative overflow-hidden">
+  <!-- Vintage Stamp Watermark in corner -->
+  <div class="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-surface-container-high/60 flex items-center justify-center pointer-events-none select-none rotate-12">
+    <span class="font-label-sm text-[0.625rem] text-outline text-center uppercase tracking-widest leading-tight">
+      POSTAGE
+      <br />
+      COLLEGE NOOK
+      <br />★ AIRMAIL ★
+    </span>
+  </div>
+  <div class="flex items-center justify-between pb-space-md">
+    <div class="flex items-center gap-space-sm">
+      <span class="material-symbols-outlined text-secondary text-xl">edit_note</span>
+      <h2 class="font-headline-sm text-headline-sm text-primary">
+        投递信笺
+        <span class="font-label-md text-label-md text-on-surface-variant font-normal">/ Leave a Message</span>
+      </h2>
+    </div>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">实时同步 · LIVE</span>
+  </div>
+  <form class="flex flex-col gap-space-md mt-space-xs" id="guestbook-form">
+    <GuestbookFormFields />
+  </form>
+  <GuestbookToast />
+</div>

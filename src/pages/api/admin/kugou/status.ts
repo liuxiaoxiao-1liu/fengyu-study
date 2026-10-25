@@ -1,23 +1,13 @@
 import type { APIRoute } from 'astro';
-import { requireContentAdmin } from '../../../../lib/admin-auth';
+import { requireAdmin } from '../../../../lib/admin-auth';
 import { kugouLoginStatus } from '../../../../lib/kugou-login';
 import { getAccountPlaylist, listKugouPlaylists } from '../../../../lib/kugou';
+import { json } from '../../../../lib/http';
 
 export const prerender = false;
 
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
 export const GET: APIRoute = async ({ request }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
 
   const status = kugouLoginStatus();

@@ -1,0 +1,46 @@
+---
+import type { Essay } from '../../data/essays';
+import { formatEssayDate } from '../../data/essays';
+
+interface Props {
+  essay: Essay;
+}
+
+const { essay } = Astro.props;
+---
+
+<article
+  class="lg:col-span-7 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+  id="notes"
+>
+  <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+    <div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+      <span class="material-symbols-outlined text-base">history_edu</span>
+      <span class="uppercase tracking-widest font-semibold">杂感随笔 · Reading &amp; Listening Notes</span>
+    </div>
+    <span class="font-label-sm text-label-sm text-on-surface-variant"> {essay.readMinutes} min read </span>
+  </div>
+  <div class="my-space-md flex flex-col gap-space-sm">
+    <div class="flex items-center gap-2">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">{formatEssayDate(essay.date)}</span>
+      <span class="text-outline-variant">/</span>
+      <span class="font-label-sm text-label-sm text-secondary font-medium">{essay.category}</span>
+    </div>
+    <h3 class="font-headline-md text-headline-md text-primary font-normal mt-1">
+      <a class="hover:text-on-tertiary-container transition-colors" href={`/essays/${essay.slug}/`}>
+        {essay.title}
+      </a>
+    </h3>
+    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed line-clamp-3 mt-1">{essay.summary}</p>
+  </div>
+  <div class="bg-surface-container p-space-md rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm mt-space-xs">
+    <span class="font-label-sm text-label-sm text-on-surface-variant italic">{essay.quote}</span>
+    <a
+      class="font-label-md text-label-md text-primary hover:text-on-tertiary-container transition-colors inline-flex items-center gap-1 font-medium"
+      href={`/essays/${essay.slug}/`}
+    >
+      <span class="">阅读随想全文</span>
+      <span class="material-symbols-outlined text-sm">arrow_forward</span>
+    </a>
+  </div>
+</article>

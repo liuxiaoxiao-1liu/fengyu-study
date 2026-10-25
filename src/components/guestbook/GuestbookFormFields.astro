@@ -1,0 +1,120 @@
+---
+const fieldClass =
+  'w-full bg-surface-container-lowest px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary transition-all';
+const textareaClass =
+  'w-full bg-surface-container-lowest p-space-md rounded-lg font-body-md text-body-md text-primary placeholder:text-outline-variant focus:outline-none focus:ring-1 focus:ring-secondary transition-all resize-y leading-relaxed';
+const tags = ['网文同好', '音乐安利', '大学日常', '漂流寄语'];
+---
+
+<input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+<!-- Inputs Row -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+  <div class="flex flex-col gap-space-xs">
+    <label
+      class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between"
+      for="author-name"
+    >
+      <span>昵称 / 笔名</span>
+      <span class="text-outline-variant font-normal">必填</span>
+    </label>
+    <input
+      class={fieldClass}
+      id="author-name"
+      placeholder="例: 某位塔罗会潜水成员 / 酷狗听友"
+      required=""
+      type="text"
+    />
+  </div>
+  <div class="flex flex-col gap-space-xs">
+    <label
+      class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between"
+      for="music-station"
+    >
+      <span>常驻地或校园 / 推荐酷狗单曲</span>
+      <span class="text-outline-variant font-normal">选填</span>
+    </label>
+    <input class={fieldClass} id="music-station" placeholder="例: 成都 · 酷狗单曲《大鱼》" type="text" />
+  </div>
+</div>
+<!-- Category Tags (Capsules) -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+  <span class="font-label-sm text-label-sm text-on-surface-variant">信件类型 / 归档标签</span>
+  <div class="flex flex-wrap gap-space-xs" id="tag-capsules">
+    {tags.map((tag, index) => (
+      <button
+        class:list={[
+          'tag-pill px-space-md py-1 rounded-full font-label-sm text-label-sm transition-all',
+          index === 0
+            ? 'bg-primary text-on-primary'
+            : 'bg-surface-container text-on-surface-variant hover:text-on-surface',
+        ]}
+        data-tag={tag}
+        type="button"
+      >
+        [ {tag} ]
+      </button>
+    ))}
+  </div>
+</div>
+<!-- Message Body -->
+<div class="flex flex-col gap-space-xs">
+  <label
+    class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between"
+    for="message-content"
+  >
+    <span>信笺正文 / 拾光感触</span>
+    <span class="text-outline-variant font-label-sm" id="char-counter">
+      0 / 600
+    </span>
+  </label>
+  <textarea
+    class={textareaClass}
+    id="message-content"
+    maxlength="600"
+    placeholder="写下你眼前的日落，或是最近循环不休的旋律，抑或是想对房主说的话..."
+    required=""
+    rows="4"
+  ></textarea>
+</div>
+<!-- Privacy Switch -->
+<div class="flex items-center justify-between pt-space-xs">
+  <label class="flex items-center gap-space-sm cursor-pointer select-none">
+    <input class="accent-secondary w-4 h-4 rounded cursor-pointer" id="private-check" type="checkbox" />
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+        <span class="material-symbols-outlined text-sm text-on-surface-variant">lock</span>
+        仅房主可见 (悄悄话加密)
+      </span>
+      <span class="font-label-sm text-[0.625rem] text-on-surface-variant"> 勾选后不会公开上墙，仅站长后台查阅 </span>
+    </div>
+  </label>
+  <span class="hidden sm:inline font-label-sm text-[0.6875rem] text-outline-variant italic">
+    Paper Texture Encrypted
+  </span>
+</div>
+<!-- Actions & Side Note -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-sm">
+  <div class="flex items-center gap-space-sm w-full sm:w-auto">
+    <button
+      class="flex-1 sm:flex-initial flex items-center justify-center gap-space-xs bg-primary text-on-primary px-space-lg py-space-sm rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-all shadow-sm active:scale-95"
+      type="submit"
+    >
+      <span class="material-symbols-outlined text-base">send</span>
+      <span>投递信笺 (Seal &amp; Send)</span>
+    </button>
+    <button
+      class="flex items-center justify-center gap-space-xs bg-surface-container text-primary px-space-md py-space-sm rounded-lg font-label-md text-label-md hover:bg-surface-container-high transition-all shadow-sm active:scale-95"
+      data-fish=""
+      title="随机捞取一条前人留下的时光寄语"
+      type="button"
+    >
+      <span class="material-symbols-outlined text-base text-secondary">explore</span>
+      <span class="hidden md:inline">打捞漂流瓶</span>
+    </button>
+  </div>
+  <p class="font-label-sm text-label-sm text-on-surface-variant text-center sm:text-right">
+    每晚自习后
+    <span class="text-primary font-medium">22:30 ~ 23:30</span>
+    拆信回复
+  </p>
+</div>

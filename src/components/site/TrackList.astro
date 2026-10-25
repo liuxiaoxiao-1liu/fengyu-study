@@ -1,0 +1,47 @@
+---
+import type { Track } from '../../data/music';
+import { kugouSearchUrl } from '../../data/music';
+
+interface Props {
+  tracks: Track[];
+}
+
+const { tracks } = Astro.props;
+---
+
+<div class="bg-surface-container-low rounded-xl p-5 shadow-sm border border-surface-container-high/40">
+  <div class="mb-3 flex items-center justify-between">
+    <h3 class="font-headline-sm text-headline-sm text-primary font-normal">
+      精选曲目 <span class="font-label-sm text-label-sm text-on-surface-variant">({tracks.length})</span>
+    </h3>
+    <span class="font-label-sm text-[0.625rem] text-on-surface-variant">编辑推荐</span>
+  </div>
+  <div class="flex flex-col">
+    {tracks.map((track) => (
+      <div class="flex items-center justify-between gap-2 border-b border-surface-container-high/50 py-1.5 last:border-0">
+        <button
+          type="button"
+          class="group flex min-w-0 flex-1 items-center gap-2 text-left"
+          data-play
+          data-hash={track.kugou?.hash}
+          data-audio={track.audio}
+          data-title={track.title}
+          data-artist={track.artist}
+          data-external={kugouSearchUrl(track)}
+          aria-label={`播放 ${track.title}`}
+        >
+          <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary">
+            <span class="material-symbols-outlined text-sm">play_arrow</span>
+          </span>
+          <span class="min-w-0">
+            <span class="block truncate font-body-sm text-sm text-primary">{track.title}</span>
+            <span class="block truncate font-label-sm text-[0.625rem] text-on-surface-variant">{track.artist}</span>
+          </span>
+        </button>
+        <span class="shrink-0 font-label-sm text-[0.625rem] tabular-nums text-on-surface-variant">
+          {track.duration}
+        </span>
+      </div>
+    ))}
+  </div>
+</div>

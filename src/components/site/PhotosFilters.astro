@@ -1,0 +1,45 @@
+---
+import type { PhotoSeries } from '../../data/photos';
+
+interface SeriesFilter {
+  value: PhotoSeries;
+  label: string;
+  english: string;
+  count: number;
+}
+
+interface Props {
+  photoCount: number;
+  series: ReadonlyArray<SeriesFilter>;
+}
+
+const { photoCount, series } = Astro.props;
+---
+
+<nav aria-label="Photo Filters" class="relative z-10 max-w-6xl mx-auto mt-6 mb-9">
+  <div class="flex items-center justify-between flex-wrap gap-4 bg-surface-container-low p-1.5 rounded-xl shadow-sm">
+    <div class="flex items-center flex-wrap gap-1.5" id="filter-container">
+      <button
+        class="filter-btn active px-4 py-1.5 rounded-lg font-label-md text-label-md bg-primary text-on-primary transition-all duration-300 shadow-sm"
+        data-filter="all"
+        type="button"
+      >
+        全部 (All Works)
+        <span class="ml-1 opacity-70 text-xs">{photoCount}</span>
+      </button>
+      {series.map((item) => (
+        <button
+          class="filter-btn px-4 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all duration-300"
+          data-filter={item.value}
+          type="button"
+        >
+          {item.label} ({item.english})<span class="ml-1 opacity-70 text-xs">{item.count}</span>
+        </button>
+      ))}
+    </div>
+    <div class="hidden sm:flex items-center gap-2 px-3 text-on-surface-variant font-label-sm text-label-sm">
+      <span class="material-symbols-outlined text-sm">tune</span>
+      <span class="">按视觉编目与色调倒序</span>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,25 @@
+---
+interface Props {
+  tags: Array<[string, number]>;
+}
+
+const { tags } = Astro.props;
+---
+
+<div class="bg-surface-container-low/70 rounded-xl p-6 shadow-sm">
+  <div class="flex items-center gap-2 mb-4">
+    <span class="material-symbols-outlined text-secondary text-base">label</span>
+    <h3 class="font-headline-sm text-headline-sm text-primary font-normal">主题检索</h3>
+  </div>
+  <div class="flex flex-wrap gap-2 text-xs font-label-sm">
+    {tags.map(([tag, count]) => (
+      <button
+        type="button"
+        class="px-3 py-1.5 bg-surface-container/70 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+        data-tag={tag}
+      >
+        #{tag} {count}
+      </button>
+    ))}
+  </div>
+</div>

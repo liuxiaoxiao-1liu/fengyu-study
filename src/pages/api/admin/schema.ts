@@ -1,17 +1,12 @@
 import type { APIRoute } from 'astro';
-import { requireContentAdmin } from '../../../lib/admin-auth';
+import { requireAdmin } from '../../../lib/admin-auth';
 import { ADMIN_SCHEMAS } from '../../../lib/content-schema';
+import { json } from '../../../lib/http';
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
-  return new Response(JSON.stringify({ ok: true, schemas: ADMIN_SCHEMAS }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-    },
-  });
+  return json({ ok: true, schemas: ADMIN_SCHEMAS });
 };

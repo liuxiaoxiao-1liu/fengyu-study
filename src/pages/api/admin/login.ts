@@ -5,50 +5,19 @@ import {
   verifyAdminPassword,
   verifyAdminUsername,
 } from '../../../lib/admin-auth';
+import { json } from '../../../lib/http';
+import { clientIp, createRateLimiter } from '../../../lib/rate-limit';
 
 export const prerender = false;
 
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_ATTEMPTS = 10;
-const attempts = new Map<string, number[]>();
-
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
-function clientIp(request: Request): string {
-  const real = request.headers.get('x-real-ip');
-  if (real) return real.trim();
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown';
-  return 'unknown';
-}
-
-function hitRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const recent = (attempts.get(ip) ?? []).filter((at) => now - at < WINDOW_MS);
-  if (recent.length >= MAX_ATTEMPTS) {
-    attempts.set(ip, recent);
-    return true;
-  }
-  recent.push(now);
-  attempts.set(ip, recent);
-  return false;
-}
+const limiter = createRateLimiter({ windowMs: 10 * 60 * 1000, max: 10, hashKey: false });
 
 export const POST: APIRoute = async ({ request }) => {
   if (!isAdminAuthConfigured()) {
     return json({ ok: false, error: 'admin_disabled' }, 503);
   }
 
-  if (hitRateLimit(clientIp(request))) {
+  if (limiter.hit(clientIp(request))) {
     return json({ ok: false, error: 'rate_limited', message: '尝试次数太多，过十分钟再试。' }, 429);
   }
 
@@ -73,13 +42,5 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ ok: false, error: 'invalid_credentials', message: '用户名或密码不正确。' }, 401);
   }
 
-  return new Response(JSON.stringify({ ok: true, user: username }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'Set-Cookie': createSessionCookie(username),
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
+  return json({ ok: true, user: username }, 200, { 'Set-Cookie': createSessionCookie(username) });
 };

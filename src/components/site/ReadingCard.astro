@@ -1,0 +1,88 @@
+---
+import type { Book } from '../../data/books';
+
+interface Props {
+  featuredBook: Book;
+}
+
+const { featuredBook } = Astro.props;
+---
+
+<article
+  class="lg:col-span-7 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group"
+  id="reading"
+>
+  <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+    <div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+      <span class="material-symbols-outlined text-base">menu_book</span>
+      <span class="uppercase tracking-widest font-semibold">网文书架 · Web Novel Shelf</span>
+    </div>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">{featuredBook.words}</span>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-12 gap-space-lg my-space-md items-center">
+    <div class="sm:col-span-4 flex justify-center">
+      <a
+        aria-label="去起点中文网阅读《诡秘之主》"
+        class="w-36 h-48 bg-primary rounded shadow-md overflow-hidden relative transform group-hover:-translate-y-1 transition-transform duration-300 flex flex-col justify-between p-3.5 text-on-primary block"
+        href="https://www.qidian.com/book/1010868264/"
+        rel="noopener noreferrer external"
+        target="_blank"
+        title="去起点中文网阅读《诡秘之主》"
+      >
+        <div class="flex justify-between items-center">
+          <span class="px-1.5 py-0.5 rounded text-[0.625rem] font-label-sm bg-secondary text-on-secondary font-medium">
+            克苏鲁西幻
+          </span>
+          <span class="material-symbols-outlined text-outline-variant text-sm">bookmark</span>
+        </div>
+        <div>
+          <span class="font-label-sm text-[0.625rem] text-outline-variant uppercase tracking-wider block mb-0.5">
+            Lord of Mysteries
+          </span>
+          <h4 class="font-headline-sm text-headline-sm leading-snug font-normal">《诡秘之主》</h4>
+          <p class="font-label-sm text-[0.625rem] text-outline-variant mt-1">爱潜水的乌贼 著</p>
+        </div>
+        <div class="pt-2 border-t border-outline-variant/30 flex items-center justify-between text-[0.625rem] font-label-sm text-outline-variant">
+          <span class="">序列途径</span>
+          <span class="">二刷高光卷</span>
+        </div>
+      </a>
+    </div>
+    <div class="sm:col-span-8 flex flex-col gap-space-xs justify-center">
+      <div class="flex items-center gap-2">
+        <span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-high px-space-xs py-0.5 rounded font-medium">
+          年度二刷神作
+        </span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">同步追读：《道诡异仙》</span>
+      </div>
+      <h3 class="font-headline-sm text-headline-sm text-primary font-normal mt-1">《诡秘之主》· 塔罗会与序列途径</h3>
+      <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mt-1">
+        “我们是守护者，也是一群时刻对抗疯狂的可怜虫。”在深夜自习室合上教科书后，一头扎进廷根与贝克兰德的雨雾中。
+      </p>
+      <div class="flex flex-col gap-1.5 mt-space-sm">
+        <div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+          <span class="">当前进度 · 第六卷 逐光者</span>
+          <span class="font-semibold text-primary">84%</span>
+        </div>
+        <div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+          <div class="h-full bg-secondary rounded-full transition-all duration-500" style="width: 84%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bg-surface-container p-space-md rounded-lg flex items-start gap-space-sm mt-space-xs">
+    <span class="material-symbols-outlined text-on-tertiary-container text-xl shrink-0 mt-0.5"> format_quote </span>
+    <blockquote class="font-quote text-quote italic text-primary leading-relaxed">
+      “赞美愚者！不属于这个时代的愚者，灰雾之上的神秘主宰，执掌好运的黄黑之王。”
+    </blockquote>
+  </div>
+  <a
+    class="mt-space-sm inline-flex items-center gap-1 font-label-md text-label-md text-on-tertiary-container hover:text-primary transition-colors font-medium"
+    data-qidian-text=""
+    href="https://www.qidian.com/book/1010868264/"
+    rel="noopener noreferrer external"
+    target="_blank"
+  >
+    去起点读全书<span class="material-symbols-outlined text-sm">open_in_new</span>
+  </a>
+</article>

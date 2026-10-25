@@ -1,0 +1,64 @@
+---
+import type { Essay } from '../../data/essays';
+import { formatEssayDate } from '../../data/essays';
+
+interface Props {
+  essays: Essay[];
+}
+
+const { essays } = Astro.props;
+---
+
+{essays.map((essay, index) => (
+  <article
+    class="group relative bg-surface-container-low/70 rounded-xl p-8 md:p-10 transition-all duration-300 hover:shadow-md hover:bg-surface-container-low"
+    data-target={essay.kind}
+    data-tags={essay.tags.join('|')}
+  >
+    <div class="flex items-center justify-between gap-space-md mb-2">
+      <div class="flex items-center gap-space-md text-on-surface-variant font-label-sm text-label-sm">
+        <span class="text-secondary font-medium tracking-wide">{essay.category}</span>
+        <span class="text-outline-variant text-xs">·</span>
+        <time datetime={essay.date}>{formatEssayDate(essay.date)}</time>
+        <span class="text-outline-variant text-xs">·</span>
+        <span class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">schedule</span>
+          {essay.readMinutes}分钟阅读
+        </span>
+      </div>
+      <span class="font-label-sm text-xs text-on-surface-variant/60 tracking-wider font-mono">
+        #{String(essays.length - index).padStart(3, '0')}
+      </span>
+    </div>
+    <h2 class="font-headline-lg text-headline-lg text-primary tracking-tight font-normal mb-3 group-hover:text-primary-container transition-colors">
+      <a
+        class="hover:underline decoration-on-tertiary-container decoration-1 underline-offset-4"
+        href={`/essays/${essay.slug}/`}
+      >
+        {essay.title}
+      </a>
+    </h2>
+    <div class="mb-4 p-5 bg-surface-container/60 rounded-lg pl-6 border-l-2 border-secondary/40 flex items-start gap-space-sm">
+      <p class="font-quote text-quote italic text-primary leading-relaxed">{essay.quote}</p>
+    </div>
+    <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-5">{essay.summary}</p>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pt-4 border-t border-outline-variant/20">
+      <div class="flex items-center gap-space-sm flex-wrap text-on-surface-variant font-label-sm text-xs">
+        {essay.tags.map((tag) => (
+          <button type="button" class="hover:text-primary transition-colors cursor-pointer" data-tag={tag}>
+            #{tag}
+          </button>
+        ))}
+      </div>
+      <a
+        class="inline-flex items-center gap-space-xs font-label-md text-label-md text-primary font-medium hover:text-on-tertiary-container transition-colors group/link"
+        href={`/essays/${essay.slug}/`}
+      >
+        <span class="">阅读全文</span>
+        <span class="material-symbols-outlined text-base transition-transform group-hover/link:translate-x-1">
+          arrow_forward
+        </span>
+      </a>
+    </div>
+  </article>
+))}

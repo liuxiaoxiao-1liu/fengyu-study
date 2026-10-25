@@ -1,68 +1,19 @@
 import type { APIRoute } from 'astro';
-import { createHash } from 'node:crypto';
+import { json } from '../../lib/http';
 import { addSubscriber } from '../../lib/newsletter-db';
+import { clientIp, createRateLimiter } from '../../lib/rate-limit';
 
 export const prerender = false;
 
 const MAX_BODY_BYTES = 4 * 1024;
 const MAX_EMAIL_LENGTH = 254;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-// 内存限流：单实例够用；容器重启后清零，作为 nginx 限流之外的兜底。
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_PER_WINDOW = 5;
-const buckets = new Map<string, number[]>();
-
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
-function clientIp(request: Request, clientAddress: string | undefined): string {
-  // 只在 Node 只监听本地/容器内网、且 nginx 反代时信任这些头。
-  const real = request.headers.get('x-real-ip');
-  if (real) return real.trim();
-
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    const first = forwarded.split(',')[0]?.trim();
-    if (first) return first;
-  }
-
-  return clientAddress || 'unknown';
-}
-
-function hashIp(ip: string): string {
-  return createHash('sha256').update(ip).digest('hex').slice(0, 12);
-}
-
-function isRateLimited(ipHash: string): boolean {
-  const now = Date.now();
-  const recent = (buckets.get(ipHash) ?? []).filter((at) => now - at < WINDOW_MS);
-
-  if (recent.length >= MAX_PER_WINDOW) {
-    buckets.set(ipHash, recent);
-    return true;
-  }
-
-  recent.push(now);
-  buckets.set(ipHash, recent);
-
-  // 简单清理，避免 Map 无限增长。
-  if (buckets.size > 2000) {
-    for (const [key, times] of buckets) {
-      if (!times.some((at) => now - at < WINDOW_MS)) buckets.delete(key);
-    }
-  }
-
-  return false;
-}
+const limiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  hashKey: true,
+  hashLength: 12,
+});
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
@@ -96,8 +47,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       return json({ ok: false, error: 'invalid_email', message: '邮箱格式看起来不太对，请检查一下。' }, 422);
     }
 
-    const ipHash = hashIp(clientIp(request, clientAddress));
-    if (isRateLimited(ipHash)) {
+    if (limiter.hit(clientIp(request, clientAddress))) {
       return json({ ok: false, error: 'rate_limited', message: '提交得太频繁了，过十分钟再试。' }, 429);
     }
 

@@ -2,8 +2,9 @@ import type { APIRoute } from 'astro';
 import { randomUUID } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { requireContentAdmin } from '../../../lib/admin-auth';
+import { requireAdmin } from '../../../lib/admin-auth';
 import { ensureUploadDir } from '../../../lib/uploads';
+import { json } from '../../../lib/http';
 
 export const prerender = false;
 
@@ -16,19 +17,8 @@ const IMAGE_TYPES: Record<string, string> = {
   'image/avif': 'avif',
 };
 
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
-}
-
 export const POST: APIRoute = async ({ request }) => {
-  const denied = requireContentAdmin(request);
+  const denied = requireAdmin(request);
   if (denied) return denied;
 
   let form: FormData;

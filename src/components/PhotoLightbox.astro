@@ -1,6 +1,6 @@
 ---
 import type { Photo } from '../data/photos';
-import { SERIES_LABELS, formatPhotoDate } from '../data/photos';
+import PhotoLightboxSlides from './site/PhotoLightboxSlides.astro';
 
 interface Props {
   photos: Photo[];
@@ -42,90 +42,7 @@ const { photos } = Astro.props;
       </div>
     </div>
 
-    <div class="overflow-y-auto">
-      {photos.map((photo, index) => (
-        <div
-          class:list={['flex flex-col lg:flex-row', index !== 0 && 'hidden']}
-          data-lightbox-slide
-          data-slug={photo.slug}
-          data-series={photo.series}
-        >
-          <div class="bg-surface-container flex items-center justify-center lg:w-3/5">
-            <img
-              src={photo.src}
-              alt={photo.alt}
-              width={photo.width}
-              height={photo.height}
-              class="w-full h-auto max-h-[52vh] lg:max-h-[70vh] object-contain"
-              loading={index === 0 ? 'eager' : 'lazy'}
-              decoding="async"
-            />
-          </div>
-          <div class="p-space-lg lg:w-2/5 flex flex-col gap-space-sm">
-            <div class="flex items-center justify-between gap-space-xs">
-              <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-medium">
-                {SERIES_LABELS[photo.series]}
-              </span>
-              <time class="font-label-sm text-label-sm text-on-surface-variant" datetime={photo.takenAt}>
-                {formatPhotoDate(photo.takenAt)}
-              </time>
-            </div>
-            <h2 class="font-headline-md text-headline-md text-primary tracking-tight font-normal">{photo.title}</h2>
-            <p class="font-quote text-quote italic text-primary leading-relaxed">{photo.note}</p>
-
-            {photo.exif && (
-              <div class="mt-space-xs rounded-lg bg-surface-container/70 p-space-md">
-                <span class="font-label-sm text-[0.625rem] text-on-surface-variant uppercase tracking-widest block mb-2">
-                  EXIF · 拍摄参数
-                </span>
-                <dl class="grid grid-cols-2 gap-x-space-sm gap-y-1.5 font-label-sm text-label-sm">
-                  {photo.exif.camera && (
-                    <div>
-                      <dt class="text-on-surface-variant">机身</dt>
-                      <dd class="text-primary">{photo.exif.camera}</dd>
-                    </div>
-                  )}
-                  {photo.exif.lens && (
-                    <div>
-                      <dt class="text-on-surface-variant">镜头</dt>
-                      <dd class="text-primary">{photo.exif.lens}</dd>
-                    </div>
-                  )}
-                  {photo.exif.aperture && (
-                    <div>
-                      <dt class="text-on-surface-variant">光圈</dt>
-                      <dd class="text-primary">{photo.exif.aperture}</dd>
-                    </div>
-                  )}
-                  {photo.exif.shutter && (
-                    <div>
-                      <dt class="text-on-surface-variant">快门</dt>
-                      <dd class="text-primary">{photo.exif.shutter}</dd>
-                    </div>
-                  )}
-                  {photo.exif.iso && (
-                    <div>
-                      <dt class="text-on-surface-variant">感光度</dt>
-                      <dd class="text-primary">{photo.exif.iso}</dd>
-                    </div>
-                  )}
-                  {photo.exif.location && (
-                    <div class="col-span-2">
-                      <dt class="text-on-surface-variant">地点</dt>
-                      <dd class="text-primary">{photo.exif.location}</dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
-            )}
-
-            <p class="font-label-sm text-[0.625rem] text-on-surface-variant mt-auto pt-space-xs border-t border-surface-container-high">
-              手记 · {photo.badge}
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
+    <PhotoLightboxSlides photos={photos} />
 
     <div class="flex items-center justify-between gap-space-sm px-space-lg py-space-sm border-t border-surface-container-high bg-surface-container-low">
       <button
@@ -182,95 +99,5 @@ const { photos } = Astro.props;
 </style>
 
 <script>
-  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
-  if (dialog) {
-    const slides = [...dialog.querySelectorAll<HTMLElement>('[data-lightbox-slide]')];
-    const counter = dialog.querySelector<HTMLElement>('[data-lightbox-counter]');
-    const closeButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-close]');
-    const prevButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-prev]');
-    const nextButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-next]');
-    const downloadLink = dialog.querySelector<HTMLAnchorElement>('[data-lightbox-download]');
-    const editLink = dialog.querySelector<HTMLAnchorElement>('[data-lightbox-edit]');
-    let visibleSlides = slides;
-    let current = 0;
-    let lastTrigger: HTMLElement | null = null;
-
-    const currentSlide = () => visibleSlides[current];
-
-    const updateMetaLinks = () => {
-      const slide = currentSlide();
-      if (!slide) return;
-      const image = slide.querySelector<HTMLImageElement>('img');
-      const src = image?.getAttribute('src') ?? '#';
-      if (downloadLink) {
-        downloadLink.href = src;
-        const name = src.split('/').pop() ?? 'photo.jpg';
-        downloadLink.download = name;
-      }
-      if (editLink) {
-        editLink.href = `/admin/?photo=${encodeURIComponent(slide.dataset.slug ?? '')}`;
-      }
-    };
-
-    const show = (index: number) => {
-      if (!visibleSlides.length) return;
-      current = (index + visibleSlides.length) % visibleSlides.length;
-      slides.forEach((slide) => slide.classList.add('hidden'));
-      visibleSlides.forEach((slide, slideIndex) => {
-        slide.classList.toggle('hidden', slideIndex !== current);
-      });
-      if (counter) counter.textContent = `${current + 1} / ${visibleSlides.length}`;
-      updateMetaLinks();
-    };
-
-    const open = (slug: string, trigger: HTMLElement) => {
-      const series = trigger.dataset.series;
-      // 只在当前分类里翻页；没有分类或该分类无图时退回全部。
-      const filtered = series ? slides.filter((slide) => slide.dataset.series === series) : slides;
-      visibleSlides = filtered.length ? filtered : slides;
-      const index = visibleSlides.findIndex((slide) => slide.dataset.slug === slug);
-      if (index < 0) return;
-      lastTrigger = trigger;
-      show(index);
-      if (!dialog.open) dialog.showModal();
-      closeButton?.focus();
-    };
-
-    document.querySelectorAll<HTMLElement>('[data-photo-open]').forEach((card) => {
-      const slug = card.dataset.photoOpen ?? '';
-      card.addEventListener('click', () => open(slug, card));
-      card.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          open(slug, card);
-        }
-      });
-    });
-
-    closeButton?.addEventListener('click', () => dialog.close());
-    prevButton?.addEventListener('click', () => show(current - 1));
-    nextButton?.addEventListener('click', () => show(current + 1));
-
-    // 点击遮罩关闭；内容区是 dialog 的子元素，不会误触。
-    dialog.addEventListener('click', (event) => {
-      if (event.target === dialog) dialog.close();
-    });
-
-    // 原生 Esc 会触发 close；把焦点还给打开它的卡片。
-    dialog.addEventListener('close', () => {
-      lastTrigger?.focus();
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (!dialog.open) return;
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        show(current - 1);
-      }
-      if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        show(current + 1);
-      }
-    });
-  }
+  import '../scripts/site/photo-lightbox';
 </script>

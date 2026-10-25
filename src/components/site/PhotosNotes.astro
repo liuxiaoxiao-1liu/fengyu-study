@@ -1,0 +1,68 @@
+---
+interface Props {
+  photoCount: number;
+  seriesCount: number;
+  yearRange: string;
+}
+
+const { photoCount, seriesCount, yearRange } = Astro.props;
+---
+
+<section class="relative z-10 max-w-6xl mx-auto mt-12 mb-20">
+  <div class="bg-surface-container-low rounded-2xl p-8 sm:p-10 shadow-sm relative overflow-hidden">
+    <div class="absolute -right-8 -bottom-8 select-none pointer-events-none opacity-10">
+      <span class="material-symbols-outlined text-9xl text-primary">camera</span>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-4 flex flex-col gap-3">
+        <div class="flex items-center gap-1.5 text-secondary">
+          <span class="material-symbols-outlined text-xl">auto_fix_high</span>
+          <span class="font-label-sm text-label-sm uppercase tracking-widest font-semibold">
+            Notes &amp; Archive · 图集手记
+          </span>
+        </div>
+        <h2 class="font-headline-md text-headline-md text-primary tracking-tight">视觉手记 · 定格多维光影</h2>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">
+          Written by 风屿 · 记录于工作室与数字暗房
+        </span>
+        <div class="mt-4 grid grid-cols-3 gap-3 bg-surface-container p-4 rounded-xl text-center">
+          <div>
+            <span class="font-label-lg text-label-lg text-primary block font-bold">{photoCount}</span>
+            <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">影像收录</span>
+          </div>
+          <div>
+            <span class="font-label-lg text-label-lg text-primary block font-bold">{seriesCount}</span>
+            <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">视觉系列</span>
+          </div>
+          <div>
+            <span class="font-label-lg text-label-lg text-primary block font-bold">{yearRange}</span>
+            <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">记录年份</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-8 flex flex-col gap-5 bg-surface-container/60 p-6 sm:p-8 rounded-xl">
+        <p class="font-body-lg text-body-lg text-primary leading-relaxed">
+          无论动漫笔触、真实街景还是虚拟CG渲染，图像的本质都是对某一缕光线与情绪的提炼与永久留存。
+        </p>
+        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          大学生活往往被DDL、绩点和未来的不确定性塞得满满当当。而按下快门或涂抹画面的那一瞬，是为数不多让我从奔忙中强行抽离的时刻。35毫米画幅与画布框住的不仅是风景，更是专注度。当你开始期待光线如何穿透一片落叶、积水如何倒映霓虹招牌、黄昏的影子如何在红砖墙上拉长，原本沉闷重复的校园日子便重新拥有了纹理与温度。
+        </p>
+        <div class="flex items-center justify-between pt-2 flex-wrap gap-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-secondary"></span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant">
+              “定格不可复制的一瞬，是向时间温柔反抗的唯一方式。”
+            </span>
+          </div>
+          <a
+            class="inline-flex items-center gap-1 font-label-md text-label-md text-on-tertiary-container hover:text-primary transition-colors"
+            href="#gallery"
+          >
+            <span class="">浏览完整图集</span>
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

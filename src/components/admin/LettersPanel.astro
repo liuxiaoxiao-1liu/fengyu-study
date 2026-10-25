@@ -1,0 +1,119 @@
+<div id="letters-section" class="flex flex-col gap-space-lg" style="display: none">
+  <div class="flex flex-wrap items-center justify-between gap-space-sm">
+    <div>
+      <h2 class="font-headline-sm text-headline-sm text-primary">留言与悄悄话</h2>
+      <p class="mt-1 font-label-sm text-label-sm text-on-surface-variant">
+        公开留言、悄悄话与回复都在这里处理，不需要再另开页面。
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-space-sm">
+      <button
+        type="button"
+        id="letters-refresh"
+        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+      >
+        刷新
+      </button>
+      <a
+        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+        href="/api/admin/export?kind=letters&format=json"
+        download
+      >
+        留言 JSON
+      </a>
+      <a
+        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+        href="/api/admin/export?kind=letters&format=csv"
+        download
+      >
+        留言 CSV
+      </a>
+      <a
+        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
+        href="/api/admin/export?kind=subscribers&format=csv"
+        download
+      >
+        订阅 CSV
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-space-sm sm:grid-cols-4">
+    <div class="rounded-xl bg-surface-container-low p-space-md shadow-sm">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">全部</span>
+      <strong class="mt-1 block font-headline-sm text-headline-sm text-primary" data-letter-count="total">
+        —
+      </strong>
+    </div>
+    <div class="rounded-xl bg-surface-container-low p-space-md shadow-sm">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">待审核</span>
+      <strong class="mt-1 block font-headline-sm text-headline-sm text-secondary" data-letter-count="pending">
+        —
+      </strong>
+    </div>
+    <div class="rounded-xl bg-surface-container-low p-space-md shadow-sm">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">已上墙</span>
+      <strong class="mt-1 block font-headline-sm text-headline-sm text-primary" data-letter-count="approved">
+        —
+      </strong>
+    </div>
+    <div class="rounded-xl bg-surface-container-low p-space-md shadow-sm">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">已隐藏</span>
+      <strong class="mt-1 block font-headline-sm text-headline-sm text-primary" data-letter-count="hidden">
+        —
+      </strong>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-space-sm sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="flex flex-wrap items-center gap-space-xs rounded-full bg-surface-container-low p-1"
+      id="letter-filters"
+      role="group"
+      aria-label="按留言状态筛选"
+    >
+      <button
+        type="button"
+        data-letter-filter="all"
+        class="rounded-full px-space-md py-space-xs font-label-sm text-label-sm"
+      >
+        全部
+      </button>
+      <button
+        type="button"
+        data-letter-filter="pending"
+        class="rounded-full px-space-md py-space-xs font-label-sm text-label-sm"
+      >
+        待审核
+      </button>
+      <button
+        type="button"
+        data-letter-filter="approved"
+        class="rounded-full px-space-md py-space-xs font-label-sm text-label-sm"
+      >
+        已上墙
+      </button>
+      <button
+        type="button"
+        data-letter-filter="hidden"
+        class="rounded-full px-space-md py-space-xs font-label-sm text-label-sm"
+      >
+        已隐藏
+      </button>
+    </div>
+    <span
+      id="letters-status"
+      class="font-label-sm text-label-sm text-on-surface-variant"
+      role="status"
+      aria-live="polite"
+    ></span>
+  </div>
+
+  <div id="letters-list" class="flex flex-col gap-space-md"></div>
+  <p
+    id="letters-empty"
+    class="hidden rounded-xl border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant"
+  >
+    这个筛选下还没有留言。
+  </p>
+</div>

@@ -1,4 +1,5 @@
 import { createHash, createHmac, scryptSync, timingSafeEqual } from 'node:crypto';
+import { json } from './http';
 
 const COOKIE_NAME = 'fengyu_admin';
 const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -88,24 +89,26 @@ export function readAdminSession(request: Request): AdminSession | null {
   }
 }
 
-/** 内容 API 鉴权：优先 cookie 会话，也兼容旧的 Bearer ADMIN_TOKEN。 */
-export function requireContentAdmin(request: Request): Response | null {
+/**
+ * 管理端统一鉴权：
+ * - 优先 cookie 会话；
+ * - 兼容旧 Bearer ADMIN_TOKEN；
+ * - 两种凭据都没配置 → 503 admin_disabled；
+ * - 配了但缺失/错误 → 401 unauthorized。
+ */
+export function requireAdmin(request: Request): Response | null {
   if (readAdminSession(request)) return null;
 
   const expected = process.env.ADMIN_TOKEN ?? '';
-  if (expected) {
-    const header = request.headers.get('authorization') ?? '';
-    const match = /^Bearer\s+(.+)$/i.exec(header.trim());
-    const provided = match?.[1] ?? '';
-    if (provided && safeEqualText(provided, expected)) return null;
+  if (expected === '') {
+    if (isAdminAuthConfigured()) return json({ ok: false, error: 'unauthorized' }, 401);
+    return json({ ok: false, error: 'admin_disabled' }, 503);
   }
 
-  return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), {
-    status: 401,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
+  const header = request.headers.get('authorization') ?? '';
+  const match = /^Bearer\s+(.+)$/i.exec(header.trim());
+  const provided = match?.[1] ?? '';
+  if (provided && safeEqualText(provided, expected)) return null;
+
+  return json({ ok: false, error: 'unauthorized' }, 401);
 }

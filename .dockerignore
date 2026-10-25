@@ -4,8 +4,8 @@ node_modules
 .npm-cache
 .config
 .astro
-_trial
 _scratch
-stitch-assets
-stitch_astro_personal_website
 *.log
+tests
+coverage
+vitest.config.ts

@@ -4,17 +4,16 @@ dist/
 node_modules/
 .npm-cache/
 .config/
-.preview/
 .data/
 
 # 第三方运行时（保持上游原样，含 LICENSE）
 vendor/
 
-# 设计参考与历史试验
-stitch_astro_personal_website/
-stitch-assets/
-_trial/
+# 空目录（权限受限，暂留）
 _scratch/
+
+# 测试覆盖率
+coverage/
 
 # 二进制素材
 public/

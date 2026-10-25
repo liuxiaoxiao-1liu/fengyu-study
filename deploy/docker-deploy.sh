@@ -70,7 +70,7 @@ ssh "${SSH_OPTS[@]}" "$SERVER" \
   "if [ -s '$REMOTE_DIR/.env' ] && grep -q '^ADMIN_TOKEN=.' '$REMOTE_DIR/.env'; then \
      echo 'ADMIN_TOKEN: 已配置'; \
    else \
-     echo '!! 缺少 $REMOTE_DIR/.env 或 ADMIN_TOKEN 为空：/admin/letters/ 与管理 API 会返回 503' >&2; \
+     echo '!! 未配置 ADMIN_TOKEN：仅 Bearer/脚本兼容接口不可用；主后台 cookie 登录不受影响' >&2; \
    fi
    for key in ADMIN_USER ADMIN_PASSWORD_HASH ADMIN_SESSION_SECRET; do \
      if grep -q \"^\$key=.\" '$REMOTE_DIR/.env'; then \
@@ -108,13 +108,13 @@ case "$stats" in
   *) echo "统计 API 异常：$stats" >&2; exit 1 ;;
 esac
 
-# 管理 API 在配置令牌后应返回 401（未带令牌），作为鉴权生效的冒烟检查
+# 管理 API 在配置登录凭据后应返回 401（未带 cookie/令牌），作为鉴权生效的冒烟检查
 admin_code="$(ssh "${SSH_OPTS[@]}" "$SERVER" \
   "curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:$WEB_PORT/api/admin/letters" || true)"
 if [ "$admin_code" = "401" ]; then
   echo "管理 API 鉴权 OK（401）"
 else
-  echo "!! 管理 API 返回 $admin_code（期望 401）：检查服务器 $REMOTE_DIR/.env 的 ADMIN_TOKEN" >&2
+  echo "!! 管理 API 返回 $admin_code（期望 401）：检查服务器 $REMOTE_DIR/.env 的 ADMIN_USER / ADMIN_PASSWORD_HASH / ADMIN_SESSION_SECRET" >&2
 fi
 
 

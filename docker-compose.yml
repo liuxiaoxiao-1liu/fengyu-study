@@ -29,7 +29,7 @@ services:
       ADMIN_USER: ${ADMIN_USER:-}
       ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:-}
       ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
-      # 旧管理令牌：保留给 /admin/letters/ 与 Bearer API 兼容
+      # 旧管理令牌：仅 Bearer API 兼容；日常后台用 cookie，不再有 /admin/letters/ 页面
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
       # 酷狗账号登录态：只用于把站内白名单曲目换成播放直链，不进仓库
       KUGOU_TOKEN: ${KUGOU_TOKEN:-}
@@ -39,6 +39,8 @@ services:
       KUGOU_MID: ${KUGOU_MID:-}
       KUGOU_GUID: ${KUGOU_GUID:-}
       KUGOU_DFID: ${KUGOU_DFID:-}
+      # 后台未选择歌单时的默认歌单名；后台设置优先
+      KUGOU_PLAYLIST_NAME: ${KUGOU_PLAYLIST_NAME:-}
       # 后台扫码登录后的会话与站内歌单选择（持久化在 /data 卷）
       KUGOU_SESSION_FILE: /data/kugou-session.json
       KUGOU_SETTINGS_FILE: /data/kugou-settings.json

@@ -1,5 +1,5 @@
 #!/bin/sh
-# 每日一致性备份留言库 + 内容库 + 上传文件，默认保留 7 天。
+# 每日一致性备份留言库 + 内容库 + 上传文件 + 歌单设置，默认保留 7 天。
 # 由 /etc/cron.d/fengyu 调用，也可以手动执行：
 #   /opt/fengyu/scripts/backup-guestbook.sh
 # 环境变量：BACKUP_DIR / KEEP_DAYS / CONTAINER

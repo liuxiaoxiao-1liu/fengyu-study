@@ -8,17 +8,19 @@ node_modules/
 # local tooling
 .npm-cache/
 .docs/
-.preview/
 
 # local SQLite data
 .data/
+
+# test / coverage output
+coverage/
+test-results/
 
 # logs
 *.log
 .DS_Store
 
-# previous theme experiments (not part of the Astro site)
-_trial/
+# empty permission-bound scratch dir; kept ignored until it can be removed
 _scratch/
 
 # environment
@@ -27,7 +29,3 @@ _scratch/
 
 # local tool config
 .config/
-
-# design reference / working assets
-stitch_astro_personal_website/
-stitch-assets/

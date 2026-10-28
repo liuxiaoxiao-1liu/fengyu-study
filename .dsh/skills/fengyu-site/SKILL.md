@@ -84,6 +84,7 @@ npm run verify     # format:check + check + test + build + smoke
 ## 5. 部署
 
 ```bash
+export SERVER=root@YOUR_SERVER_IP  # 脚本不再内置默认地址
 npm run deploy:docker              # 先发 8080 验证
 WEB_PORT=80 npm run deploy:docker  # 确认后切 80
 ```

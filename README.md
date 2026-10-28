@@ -168,9 +168,10 @@ npm run verify       # 发布总闸门：format:check + check + test + build + s
 
 ### Docker 方式
 
-前置：服务器有 Docker 24+ / Compose v2、rsync、SSH 私钥；本地 Node ≥ 26。
+前置：服务器有 Docker 24+ / Compose v2、rsync、SSH 私钥；本地 Node ≥ 26。部署前设置服务器地址（脚本不再内置默认值）：
 
 ```bash
+export SERVER=root@YOUR_SERVER_IP
 npm run deploy:docker                 # 默认发到 8080，做验证，不碰宿主 nginx
 WEB_PORT=80 npm run deploy:docker     # 确认宿主 nginx 已停，再切到 80
 ```
@@ -223,7 +224,7 @@ systemctl enable --now nginx
 ### 以后绑定域名
 
 1. 域名 A 记录指向你的服务器公网 IP；
-2. 修改 `astro.config.mjs` 的 `site`、`deploy/nginx.container.conf` 的 `server_name`；
+2. 设置 `PUBLIC_SITE_URL`（或改 `astro.config.mjs` 的占位默认值）、`public/robots.txt` 的 `Sitemap`、`deploy/nginx.container.conf` 的 `server_name`；
 3. 用 certbot 签证书（80 HTTP-01）；
 4. 443 建议用 nginx `stream` + `ssl_preread` 做 SNI 分流：站点域名走站点，其余 SNI 转给 xray（xray 退到 `127.0.0.1:8443`），客户端配置不用改；
 5. 切换前用 `openssl s_client -servername` 验证分流，保留回滚。

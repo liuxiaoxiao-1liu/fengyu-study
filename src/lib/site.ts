@@ -5,7 +5,7 @@ export const SITE = {
   description: '一个大学生收藏网文、酷狗歌单、影像与随笔的数字秘密基地。',
   author: '岛屿同学',
   startYear: 2025,
-  url: 'http://example.com',
+  url: import.meta.env.PUBLIC_SITE_URL ?? 'https://example.com',
 } as const;
 
 export const NAV = [

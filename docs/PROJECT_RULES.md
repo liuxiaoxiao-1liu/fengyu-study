@@ -43,7 +43,7 @@
   dist/server（Node adapter：API + 按请求渲染的页面）
         │  ./deploy/docker-deploy.sh（npm run deploy:docker）→ rsync
         ▼
-服务器 example.com（/opt/fengyu）
+服务器 <SERVER_HOST>（/opt/fengyu）
   web 容器（nginx 1.27-alpine）:80
     ├─ 静态资源        → /usr/share/nginx/html（dist/client）
     ├─ /               → app 容器 :4321
@@ -78,7 +78,7 @@
 | 包管理器        | npm，锁文件 `package-lock.json` 必须提交                                                                                                             |
 | 服务器          | Ubuntu 24.04 / Docker 24+ / Compose v2 / xray 443                                                                                                    |
 | 部署目录        | `/opt/fengyu`（`dist/`、`vendor/`、`docker/`、`deploy/`、`package.json`、`package-lock.json`、`docker-compose.yml`、`.env`、`backups/`、`scripts/`） |
-| 站点入口        | `http://example.com/`，尚未启用 HTTPS                                                                                                                |
+| 站点入口        | `http://example.com/`（占位），尚未启用 HTTPS                                                                                                        |
 | 公开 / 管理 API | app 容器内 `/api/guestbook`、`/api/stats`、`/api/subscribe`、`/api/content/search`、`/api/kugou/*`、`/api/admin/*`、`/api/media/*`                   |
 | 数据卷          | `fengyu_guestbook-data` → `/data/`（`guestbook.sqlite`、`content.sqlite`、`uploads/`、酷狗会话/设置）                                                |
 | 旧站（回滚）    | 服务器 `/var/www/xiaoquanzi`、`/var/lib/xiaoquanzi/guestbook.json`；仓库只保留回滚说明                                                               |

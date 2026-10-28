@@ -5,7 +5,7 @@ description: 风屿书房站点（Astro 混合渲染 + Node API + SQLite + Docke
 
 # 风屿书房站点
 
-个人内容站，线上 <http://example.com/>。本技能只写“怎么操作”，规范和决策以仓库 `docs/` 为准。
+个人内容站，线上 <https://example.com/>（占位域名）。本技能只写“怎么操作”，规范和决策以仓库 `docs/` 为准。
 
 ## 0. 前置
 
@@ -14,7 +14,7 @@ description: 风屿书房站点（Astro 混合渲染 + Node API + SQLite + Docke
 | Node ≥ 26 | Astro 7 + `node:sqlite` | `node -v` |
 | Docker + Compose v2 | 服务器运行时 | `docker compose version` |
 | rsync + ssh 私钥 | 部署 | `~/.ssh/id_ed25519` |
-| 服务器 | `root@example.com`，部署目录 `/opt/fengyu` | `ssh -F /dev/null root@example.com` |
+| 服务器 | `root@<SERVER_HOST>`，部署目录 `/opt/fengyu` | `ssh -F /dev/null root@<SERVER_HOST>` |
 
 - 本机 `/etc/ssh/ssh_config.d/` 权限损坏，**所有 ssh/scp/rsync 都要带 `-F /dev/null`**，否则报 `Bad owner or permissions`。
 - 本机 `$HOME` 只读，npm/Astro 缓存已重定向到项目内 `.npm-cache/`、`.config/`（不要清）；`npm run build/check` 已内置 `ASTRO_TELEMETRY_DISABLED=1`。
@@ -102,7 +102,7 @@ WEB_PORT=80 npm run deploy:docker  # 确认后切 80
 | 定时任务 | `/etc/cron.d/fengyu`（仓库源：`deploy/server/fengyu-cron`） |
 | 日志轮转 | `/etc/logrotate.d/fengyu` |
 
-- 外部探活建议用 UptimeRobot 免费监控 `http://example.com/api/guestbook`，关键字 `"ok":true`；本机探活只能发现应用故障，发现不了整机宕机。
+- 外部探活建议用 UptimeRobot 免费监控 `https://example.com/api/guestbook`，关键字 `"ok":true`；本机探活只能发现应用故障，发现不了整机宕机。
 - 备份在同盘，**至少每月拉一份到本地或对象存储**才算异地备份。
 - 恢复演练：`python3 -c "import sqlite3;..."` 校验 `PRAGMA integrity_check` 后再替换卷。
 

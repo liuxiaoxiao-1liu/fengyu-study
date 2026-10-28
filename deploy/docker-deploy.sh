@@ -9,7 +9,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-SERVER="${SERVER:-root@example.com}"
+SERVER="${SERVER:?请设置 SERVER，例如 root@YOUR_SERVER_IP}"
 REMOTE_DIR="${REMOTE_DIR:-/opt/fengyu}"
 WEB_PORT="${WEB_PORT:-8080}"
 SSH_KEY="${SSH_KEY:-$HOME/.ssh/id_ed25519}"

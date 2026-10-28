@@ -2,10 +2,10 @@
 import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
 
-// 站点部署在自己的服务器上，暂时通过 IP 访问。
-// 绑定域名时改这里的 site 与 deploy/nginx.container.conf 的 server_name，再执行 npm run deploy:docker。
+// 站点对外地址由 PUBLIC_SITE_URL 指定；未设置时用占位域名。
+// 绑定域名时改这里与 deploy/nginx.container.conf 的 server_name，再执行 npm run deploy:docker。
 export default defineConfig({
-  site: 'http://example.com',
+  site: process.env.PUBLIC_SITE_URL ?? 'https://example.com',
   // 页面默认静态预渲染；以下路由标记 prerender = false，由 Node adapter 在请求时执行：
   // /、/essays/、/essays/[slug]/、/reading/、/photos/、/guestbook/、/rss.xml、/sitemap.xml、/api/**。
   output: 'static',

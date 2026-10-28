@@ -9,7 +9,7 @@
 - 读听页的 5 本网文卡片整卡可点，新窗口直达起点中文网对应书目；首页书架的《诡秘之主》封面与“去起点读全书”同样可跳转
 - 留言箱：Astro API + SQLite（公开留言直接上墙，悄悄话只存服务器）
 
-线上地址：<http://example.com/>
+线上地址：<https://example.com/>（占位域名，部署时替换）
 
 ## 运行架构（2026-10 起）
 
@@ -160,7 +160,7 @@ npm run verify       # 发布总闸门：format:check + check + test + build + s
 - 每日 04:17 自动备份留言库、内容库、上传图片和站内歌单选择 `kugou-settings.json`（`VACUUM INTO` / tar，保留 7 天）：`/opt/fengyu/scripts/backup-guestbook.sh` → `/opt/fengyu/backups/`；
 - 每 5 分钟本地探活首页与留言 API：`/var/log/fengyu-health.log`；
 - 定时任务与日志轮转的仓库源文件在 `deploy/server/`，`npm run deploy:docker` 会幂等安装；
-- 外部探活：用 UptimeRobot 等免费服务监控 `http://example.com/api/guestbook`，匹配 `"ok":true`（整机宕机只能靠外部监控发现）；
+- 外部探活：用 UptimeRobot 等免费服务监控 `https://example.com/api/guestbook`，匹配 `"ok":true`（整机宕机只能靠外部监控发现）；
 - 备份与本机同盘，建议每月拉一份到本地/对象存储做异地备份；
 - 8081 旧版预览已于 2026-10-24 停止；8443 的 UFW 放行已关闭，留给以后 xray 回落。
 
@@ -210,19 +210,19 @@ systemctl enable --now nginx
 
 ### 服务器约定
 
-| 项目            | 值                                                                             |
-| --------------- | ------------------------------------------------------------------------------ |
-| 服务器          | `example.com`（Ubuntu 24.04；宿主 nginx 1.24 已停用，站点跑容器内 nginx 1.27） |
-| 登录            | `root` + `~/.ssh/id_ed25519`                                                   |
-| Docker 部署目录 | `/opt/fengyu`                                                                  |
-| 旧 Web 根目录   | `/var/www/xiaoquanzi`（回滚用，暂不删）                                        |
-| 站点数据卷      | `fengyu_guestbook-data` → `/data/`（留言库、内容库、上传文件、酷狗会话/设置）  |
-| 旧留言数据      | `/var/lib/xiaoquanzi/guestbook.json`（服务器回滚用，仓库不再维护）             |
-| 端口            | `80` 站点；`8080` 预验证；`443` 由 xray 占用，未改动                           |
+| 项目            | 值                                                                            |
+| --------------- | ----------------------------------------------------------------------------- |
+| 服务器          | 你的服务器（Ubuntu 24.04；宿主 nginx 1.24 已停用，站点跑容器内 nginx 1.27）   |
+| 登录            | `root` + `~/.ssh/id_ed25519`                                                  |
+| Docker 部署目录 | `/opt/fengyu`                                                                 |
+| 旧 Web 根目录   | `/var/www/xiaoquanzi`（回滚用，暂不删）                                       |
+| 站点数据卷      | `fengyu_guestbook-data` → `/data/`（留言库、内容库、上传文件、酷狗会话/设置） |
+| 旧留言数据      | `/var/lib/xiaoquanzi/guestbook.json`（服务器回滚用，仓库不再维护）            |
+| 端口            | `80` 站点；`8080` 预验证；`443` 由 xray 占用，未改动                          |
 
 ### 以后绑定域名
 
-1. 域名 A 记录指向 `example.com`；
+1. 域名 A 记录指向你的服务器公网 IP；
 2. 修改 `astro.config.mjs` 的 `site`、`deploy/nginx.container.conf` 的 `server_name`；
 3. 用 certbot 签证书（80 HTTP-01）；
 4. 443 建议用 nginx `stream` + `ssl_preread` 做 SNI 分流：站点域名走站点，其余 SNI 转给 xray（xray 退到 `127.0.0.1:8443`），客户端配置不用改；

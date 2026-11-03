@@ -6,11 +6,8 @@ onPageLoad('photos', () => {
   for (const btn of buttons) {
     btn.addEventListener('click', () => {
       for (const b of buttons) {
-        b.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
-        b.classList.add('text-on-surface-variant');
+        b.setAttribute('aria-pressed', String(b === btn));
       }
-      btn.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
-      btn.classList.remove('text-on-surface-variant');
       const filter = btn.dataset.filter ?? 'all';
       for (const card of cards) {
         const show = filter === 'all' || card.dataset.series === filter;

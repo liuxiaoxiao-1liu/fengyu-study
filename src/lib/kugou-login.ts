@@ -155,7 +155,7 @@ export function kugouLoginStatus(): {
   sessionFile: boolean;
 } {
   const config = readKugouConfig();
-  const playlistName = (readKugouSettings().playlistName || process.env.KUGOU_PLAYLIST_NAME || 'maotouying').trim();
+  const playlistName = (readKugouSettings().playlistName || process.env.KUGOU_PLAYLIST_NAME || '').trim();
   if (!config) {
     return { configured: false, source: null, userid: null, playlistName, sessionFile: Boolean(getKugouSession()) };
   }

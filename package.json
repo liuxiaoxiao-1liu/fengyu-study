@@ -13,12 +13,15 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "smoke": "node scripts/smoke-test.mjs",
-    "verify": "npm run format:check && npm run check && npm test && npm run build && npm run smoke",
+    "verify": "npm run format:check && npm run check && npm run check:secrets && npm test && npm run build && npm run smoke",
     "deploy:docker": "./deploy/docker-deploy.sh",
     "guestbook:import": "node scripts/import-guestbook-json.mjs",
     "guestbook:backup": "node scripts/backup-guestbook.mjs",
     "docker:up": "docker compose up -d --build",
-    "docker:logs": "docker compose logs -f app"
+    "docker:logs": "docker compose logs -f app",
+    "visual": "node scripts/visual-check.mjs",
+    "setup": "node scripts/setup.mjs",
+    "check:secrets": "node scripts/check-secrets.mjs"
   },
   "engines": {
     "node": ">=26"

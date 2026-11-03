@@ -10,8 +10,8 @@ const { photos } = Astro.props;
 ---
 
 <dialog class="photo-lightbox" data-lightbox aria-label="照片灯箱">
-  <div class="bg-surface rounded-2xl overflow-hidden shadow-2xl w-[min(72rem,92vw)] max-h-[92vh] flex flex-col">
-    <div class="flex items-center justify-between gap-space-sm px-space-lg py-space-sm border-b border-surface-container-high bg-surface-container-low">
+  <div class="bg-surface rounded-2xl overflow-hidden shadow-2xl flex max-h-[92vh] w-[min(72rem,92vw)] flex-col">
+    <div class="flex items-center justify-between gap-space-sm px-space-lg py-space-sm border-b border-line bg-surface-container-low">
       <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
         Visual Archive / <span data-lightbox-counter>1 / {photos.length}</span>
       </span>
@@ -31,12 +31,7 @@ const { photos } = Astro.props;
         >
           编辑
         </a>
-        <button
-          type="button"
-          class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-primary transition-colors"
-          data-lightbox-close
-          aria-label="关闭灯箱"
-        >
+        <button type="button" class="btn-icon" data-lightbox-close aria-label="关闭灯箱">
           <span class="material-symbols-outlined text-lg">close</span>
         </button>
       </div>
@@ -44,7 +39,7 @@ const { photos } = Astro.props;
 
     <PhotoLightboxSlides photos={photos} />
 
-    <div class="flex items-center justify-between gap-space-sm px-space-lg py-space-sm border-t border-surface-container-high bg-surface-container-low">
+    <div class="flex items-center justify-between gap-space-sm px-space-lg py-space-sm border-t border-line bg-surface-container-low">
       <button
         type="button"
         class="inline-flex items-center gap-1 px-space-md py-1.5 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container transition-colors"

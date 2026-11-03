@@ -23,7 +23,8 @@ export function showDashboard(user: string) {
   setText(document.querySelector<HTMLElement>('[data-session-user]'), user);
 }
 
-export async function request(path: string, options: RequestInit = {}) {
+export async function request(path: string, options: RequestInit = {}, config: { authRedirect?: boolean } = {}) {
+  const { authRedirect = true } = config;
   const response = await fetch(path, {
     ...options,
     headers: {
@@ -38,7 +39,8 @@ export async function request(path: string, options: RequestInit = {}) {
     data = null;
   }
   if (response.status === 401) {
-    showLogin('登录已过期，请重新登录。');
+    // 首次进入后台时只是“没登录”，不是“登录过期”；由调用方决定是否提示。
+    if (authRedirect) showLogin('登录已过期，请重新登录。');
     throw new Error('unauthorized');
   }
   if (!response.ok || (data && data.ok === false)) {

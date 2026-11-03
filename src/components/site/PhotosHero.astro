@@ -6,42 +6,35 @@ interface Props {
 const { photoCount } = Astro.props;
 ---
 
-<header class="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-space-lg pb-space-lg">
-  <div class="flex flex-col max-w-2xl">
-    <div class="flex items-center gap-space-sm mb-space-sm">
-      <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">
-        Visual Archive · Vol. 04 / Multi-Verse
-      </span>
-      <span class="w-8 h-px bg-on-surface-variant/30"></span>
-      <span class="font-label-sm text-label-sm text-on-surface-variant">ACG · Lens · Digital World</span>
+<header class="flex flex-col justify-between gap-space-lg md:flex-row md:items-end">
+  <div class="flex max-w-2xl flex-col">
+    <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-label-sm text-muted">
+      <span class="font-medium uppercase tracking-[0.14em] text-secondary">Visual Archive · Vol. 04</span>
+      <span aria-hidden="true">/</span>
+      <span class="hidden sm:inline">Multi-Verse · ACG / Lens / Digital</span>
     </div>
-    <div class="flex items-baseline gap-space-md flex-wrap">
-      <h1 class="font-display text-primary tracking-tight text-display-mobile sm:text-display">视觉灵感</h1>
-      <span class="font-headline-md text-headline-md text-on-surface-variant italic font-normal">
-        Aperture &amp; Pixels
-      </span>
+    <div class="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+      <h1 class="font-display text-display-mobile text-primary sm:text-display">视觉灵感</h1>
+      <span class="font-headline-md italic text-on-surface-variant">Aperture &amp; Pixels</span>
     </div>
-    <p class="font-quote text-quote text-on-surface-variant mt-space-sm leading-relaxed">
-      穿行在二次元唯美画幅、现实快门光影与虚拟CG世界之间。收集打破边界的想象力与真实心动，在此汇成视界灵感馆。
+    <p class="mt-3 text-body-lg leading-relaxed text-on-surface-variant">
+      穿行在二次元唯美画幅、现实快门光影与虚拟 CG 世界之间。收集打破边界的想象力与真实心动，在此汇成视界灵感馆。
     </p>
   </div>
-  <div class="flex flex-col items-start md:items-end self-start md:self-auto">
-    <div class="bg-surface-container-high/70 backdrop-blur-sm rounded-lg p-space-md shadow-sm max-w-sm">
-      <div class="flex items-center gap-space-xs text-primary mb-1">
-        <span class="material-symbols-outlined text-base text-secondary">collections_bookmark</span>
-        <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">
-          Curated Mediums · 媒介馆藏
-        </span>
-      </div>
-      <p class="font-label-md text-label-md text-on-surface-variant leading-snug">
-        动漫插画
-        <span class="text-outline-variant">·</span> 现实胶卷/数码
-        <span class="text-outline-variant">·</span> 3D概念与虚幻引擎
-      </p>
-      <div class="flex items-center gap-space-xs mt-space-xs pt-space-xs text-on-surface-variant/80">
-        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-        <span class="font-label-sm text-label-sm text-on-surface-variant">{photoCount} 组跨界视觉灵感收录持续更新</span>
-      </div>
+
+  <div class="w-full max-w-sm rounded-xl border border-line bg-surface-container-low p-5 md:w-auto">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-base text-secondary" aria-hidden="true">
+        collections_bookmark
+      </span>
+      <span class="eyebrow">Curated Mediums · 媒介馆藏</span>
+    </div>
+    <p class="mt-2 text-body-sm leading-relaxed text-on-surface-variant">
+      动漫插画 <span class="text-muted">·</span> 现实胶卷/数码 <span class="text-muted">·</span> 3D 概念与虚幻引擎
+    </p>
+    <div class="mt-2 flex items-center gap-2 border-t border-line pt-2 text-label-sm text-muted">
+      <span class="h-1.5 w-1.5 rounded-full bg-secondary" aria-hidden="true"></span>
+      {photoCount} 组收录 · 持续更新
     </div>
   </div>
 </header>

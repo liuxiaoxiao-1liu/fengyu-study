@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 生成内容后台登录凭据并写入本地 .env：
+ * 生成内容后台登录凭据并写入本地 .env（推荐首启用 `npm run setup`）：
  *   node scripts/set-admin-password.mjs '<new-password>' [username]
  *
  * 只写 ADMIN_USER / ADMIN_PASSWORD_HASH / ADMIN_SESSION_SECRET，不打印密码或哈希。
@@ -10,7 +10,7 @@ import { randomBytes, scryptSync } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 const password = process.argv[2];
-const username = process.argv[3] ?? process.env.ADMIN_USER ?? 'maotouying';
+const username = process.argv[3] ?? process.env.ADMIN_USER ?? 'admin';
 
 if (!password || password.length < 8) {
   console.error('用法：node scripts/set-admin-password.mjs <至少 8 位的密码> [用户名]');

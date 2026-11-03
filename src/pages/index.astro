@@ -5,6 +5,7 @@ import HobbyGrid from '../components/site/HobbyGrid.astro';
 import StatsSection from '../components/site/StatsSection.astro';
 import HomeGuestbook from '../components/site/HomeGuestbook.astro';
 import { listBooks, listEssays, listPhotos, listTracks } from '../lib/content-db';
+import { formatEssayDate } from '../data/essays';
 
 export const prerender = false;
 
@@ -18,11 +19,15 @@ const latestEssay = essays[0]!;
 ---
 
 <BaseLayout current="home">
-  <main class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)]" id="main">
-    <div class="flex flex-col w-full">
-      <!-- Top Welcome & Ticker Header -->
-      <HeroProfile />
-      <!-- Four Highlight Feature Quadrants / Bento Grid -->
+  <main class="w-full bg-surface" id="main">
+    <div class="flex w-full flex-col pt-nav-h">
+      <HeroProfile
+        essayTitle={latestEssay.title}
+        essayDate={formatEssayDate(latestEssay.date)}
+        bookTitle={featuredBook.title}
+        trackTitle={featuredTrack.title}
+        photoCount={photos.length}
+      />
       <HobbyGrid
         featuredBook={featuredBook}
         featuredTrack={featuredTrack}
@@ -30,14 +35,12 @@ const latestEssay = essays[0]!;
         photoCount={photos.length}
         latestEssay={latestEssay}
       />
-      <!-- Quick Stats & Vibe Bar -->
       <StatsSection
         bookCount={books.length}
         trackCount={tracks.length}
         photoCount={photos.length}
         essayCount={essays.length}
       />
-      <!-- Guestbook / Letterbox Mini Preview Section -->
       <HomeGuestbook />
     </div>
   </main>

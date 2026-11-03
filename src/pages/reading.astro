@@ -5,6 +5,7 @@ import ReadingFilters from '../components/site/ReadingFilters.astro';
 import Bookshelf from '../components/site/Bookshelf.astro';
 import MusicShelf from '../components/site/MusicShelf.astro';
 import { listAlbums, listBooks, listTracks } from '../lib/content-db';
+import { isKugouConfigured } from '../lib/kugou';
 
 export const prerender = false;
 
@@ -12,8 +13,8 @@ const books = listBooks();
 const albums = listAlbums();
 const tracks = listTracks();
 
-const PLAYLIST_SLUG = 'maotouying';
-const PLAYLIST_NAME = 'maotouying';
+const PLAYLIST_SLUG = 'kugou';
+const kugouConfigured = isKugouConfigured();
 
 const webnovelCount = books.filter((book) => book.category === 'webnovel').length;
 const suspenseCount = books.filter((book) => book.category === 'suspense').length;
@@ -21,10 +22,10 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
 ---
 
 <BaseLayout current="reading" title="读听">
-  <main class="w-full pt-24 bg-surface min-h-[calc(100vh-14rem)] pb-16" id="main">
-    <div class="flex flex-col w-full gap-16">
-      <section class="w-full max-w-7xl mx-auto px-gutter">
-        <ReadingHero bookCount={books.length} albumCount={albums.length} />
+  <main class="w-full bg-surface" id="main">
+    <div class="flex w-full flex-col gap-12 pb-section pt-nav-h">
+      <section class="section pb-0">
+        <ReadingHero bookCount={books.length} albumCount={albums.length} kugouConfigured={kugouConfigured} />
         <ReadingFilters
           webnovelCount={webnovelCount}
           suspenseCount={suspenseCount}
@@ -37,7 +38,8 @@ const repeatCount = tracks.filter((track) => track.repeat).length;
         albums={albums}
         tracks={tracks}
         playlistSlug={PLAYLIST_SLUG}
-        playlistName={PLAYLIST_NAME}
+        playlistName="酷狗歌单"
+        configured={kugouConfigured}
         bookCount={books.length}
       />
     </div>

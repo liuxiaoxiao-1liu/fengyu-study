@@ -6,10 +6,10 @@ export const prerender = false;
 
 const DEFAULT_PAGE_SIZE = 30;
 const MAX_PAGE_SIZE = 50;
-const SLUG = 'maotouying';
+const SLUG = 'kugou';
 
 /**
- * 只提供账号里的 maotouying 歌单，运行时从酷狗拉取，服务端缓存 60 秒。
+ * 只提供当前账号设置的那一个歌单，运行时从酷狗拉取，服务端缓存 60 秒。
  * 不再有静态歌单快照；酷狗上增删歌曲会在缓存过期后同步。
  */
 export const GET: APIRoute = async ({ url }) => {
@@ -38,7 +38,9 @@ export const GET: APIRoute = async ({ url }) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'playlist_sync_failed';
-    if (message === 'kugou_disabled') return json({ ok: false, error: 'kugou_disabled' }, 503);
+    if (message === 'kugou_disabled' || message === 'playlist_not_configured') {
+      return json({ ok: false, error: 'kugou_not_configured' }, 503);
+    }
     console.error('[kugou/playlist] sync failed', message);
     return json({ ok: false, error: 'playlist_sync_failed' }, 502);
   }

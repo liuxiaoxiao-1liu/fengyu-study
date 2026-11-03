@@ -38,7 +38,7 @@ const { albums, tracks } = Astro.props;
           {firstTrack ? (
             <button
               type="button"
-              class="material-symbols-outlined text-sm text-on-surface-variant transition-colors hover:text-primary"
+              class="btn-icon h-11 w-11 text-on-surface-variant"
               data-play
               data-hash={firstTrack.kugou?.hash}
               data-title={firstTrack.title}
@@ -51,7 +51,7 @@ const { albums, tracks } = Astro.props;
             </button>
           ) : (
             <a
-              class="material-symbols-outlined text-sm text-on-surface-variant transition-colors hover:text-primary"
+              class="btn-icon h-11 w-11 text-on-surface-variant"
               href={kugouSearchUrl({ title: album.title, artist: album.artist })}
               target="_blank"
               rel="noopener noreferrer external"

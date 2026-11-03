@@ -7,34 +7,32 @@ interface Props {
 }
 
 const { current } = Astro.props;
-const playing = {
-  title: 'Autumn Leaves',
-  subtitle: 'Lo-Fi Chill Rotation',
-};
 
-const navBase = 'px-space-md py-space-xs rounded-full font-label-md text-label-md transition-colors';
-const navActive = 'bg-surface-container-high text-on-surface font-medium shadow-sm';
-const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container';
+const navBase =
+  'inline-flex min-h-9 items-center rounded-full px-3.5 font-label-md text-label-md transition-colors duration-150';
+const navActive = 'bg-surface-container-high text-on-surface shadow-sm';
+const navIdle = 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface';
 ---
 
-<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)]">
-  <div class="h-20 w-full px-gutter flex items-center justify-between gap-space-md">
-    <a class="flex items-center gap-space-md min-w-0" href="/" aria-label="风屿书房 · 首页">
-      <img alt="" class="h-8 w-auto object-contain shrink-0" src="/images/logo.png" width="96" height="96" />
-      <span class="flex flex-col min-w-0">
-        <span class="font-headline-sm text-headline-sm tracking-tight text-primary leading-none truncate">
+<header
+  class="fixed inset-x-0 top-0 z-50 border-b border-line bg-surface/85 backdrop-blur-md"
+  data-header
+  style="padding-top: var(--safe-top)"
+>
+  <div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-space-md px-gutter" data-nav-row>
+    <a class="flex min-h-11 min-w-0 items-center gap-space-sm" href="/" aria-label="风屿书房 · 首页">
+      <img alt="" class="h-8 w-auto shrink-0 object-contain" src="/images/logo.png" width="96" height="96" />
+      <span class="flex min-w-0 flex-col">
+        <span class="truncate font-headline-sm text-headline-sm leading-none tracking-tight text-primary">
           {SITE.name}
         </span>
-        <span class="hidden sm:block font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase mt-space-xs truncate">
+        <span class="mt-1 hidden truncate font-meta text-meta uppercase tracking-[0.16em] text-muted sm:block">
           {SITE.tagline}
         </span>
       </span>
     </a>
 
-    <nav
-      class="hidden lg:flex items-center gap-space-xs bg-surface-container-low px-space-xs py-space-xs rounded-full"
-      aria-label="主导航"
-    >
+    <nav class="hidden items-center gap-1 rounded-full bg-surface-container-low p-1 lg:flex" aria-label="主导航">
       {NAV.map((item) => (
         <a
           href={item.href}
@@ -46,39 +44,36 @@ const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-
       ))}
     </nav>
 
-    <div class="flex items-center gap-space-sm sm:gap-space-md shrink-0">
+    <div class="flex shrink-0 items-center gap-1 sm:gap-2">
       <a
-        class="hidden sm:flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.02)] hover:bg-surface-container transition-colors group"
+        class="hidden min-h-11 max-w-[220px] items-center gap-2 rounded-full border border-line bg-surface-container-lowest/70 px-3 py-1.5 transition-colors hover:bg-surface-container-low md:flex"
         href="/reading/#music"
-        aria-label={`正在播放 ${playing.title}，查看酷狗歌单`}
+        data-now
+        aria-label="查看酷狗歌单"
       >
-        <span class="material-symbols-outlined text-secondary text-base animate-[spin_8s_linear_infinite] group-hover:[animation-play-state:paused]">
+        <span class="material-symbols-outlined shrink-0 text-base text-secondary" data-now-icon aria-hidden="true">
           album
         </span>
-        <span class="flex flex-col max-w-[130px] xl:max-w-[170px]">
-          <span class="font-label-sm text-label-sm text-primary truncate leading-tight">{playing.title}</span>
-          <span class="font-label-sm text-[0.625rem] text-on-surface-variant truncate leading-none">
-            {playing.subtitle}
+        <span class="flex min-w-0 flex-col">
+          <span class="truncate font-label-sm text-label-sm leading-tight text-primary" data-now-title>
+            未在播放
           </span>
-        </span>
-        <span class="material-symbols-outlined text-base text-on-surface-variant group-hover:text-on-surface transition-colors">
-          headphones
+          <span class="truncate font-meta text-meta leading-tight text-muted" data-now-sub>
+            打开酷狗歌单
+          </span>
         </span>
       </a>
 
-      <button
-        type="button"
-        aria-label="搜索文字、书与歌"
-        class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-on-surface transition-colors"
-        data-search-open
-      >
-        <span class="material-symbols-outlined text-lg">search</span>
+      <button type="button" class="btn-icon" aria-label="搜索文字、书与歌（快捷键 Ctrl+K）" data-search-open>
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">
+          search
+        </span>
       </button>
 
-      <a class="block shrink-0" href="/#profile" aria-label="关于岛屿同学">
+      <a class="btn-icon" href="/#profile" aria-label="关于岛屿同学">
         <img
           alt="岛屿同学的头像"
-          class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/40 hover:ring-secondary transition-all"
+          class="h-8 w-8 rounded-full object-cover ring-1 ring-line-strong"
           src="/images/profile.jpg"
           width="160"
           height="160"
@@ -87,14 +82,14 @@ const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-
 
       <button
         type="button"
-        class="lg:hidden flex items-center justify-center p-space-xs text-on-surface-variant hover:text-on-surface transition-colors"
+        class="btn-icon lg:hidden"
         aria-label="打开导航菜单"
         aria-expanded="false"
         aria-controls="mobile-nav"
         data-menu-toggle
       >
         <svg
-          class="w-5 h-5"
+          class="h-5 w-5"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -110,17 +105,17 @@ const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-
 
   <nav
     id="mobile-nav"
-    class="hidden lg:hidden border-t border-surface-container-high bg-surface px-gutter py-space-md"
+    class="hidden border-t border-line bg-surface px-gutter pb-3 pt-2 lg:hidden"
     aria-label="移动端导航"
   >
-    <ul class="grid grid-cols-2 gap-space-xs">
+    <ul class="grid grid-cols-2 gap-2">
       {NAV.map((item) => (
         <li>
           <a
             href={item.href}
             aria-current={current === item.key ? 'page' : undefined}
             class:list={[
-              'block px-space-md py-space-sm rounded-lg font-label-lg text-label-lg transition-colors',
+              'flex min-h-11 items-center rounded-lg px-4 font-label-lg text-label-lg transition-colors',
               current === item.key
                 ? 'bg-surface-container-high text-on-surface'
                 : 'text-on-surface-variant hover:bg-surface-container-low',
@@ -139,3 +134,27 @@ const navIdle = 'text-on-surface-variant hover:text-on-surface hover:bg-surface-
 <script>
   import '../scripts/site/header';
 </script>
+
+<style is:global>
+  [data-header] {
+    transition:
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  [data-header] [data-nav-row] {
+    height: var(--nav-h);
+    transition: height 0.2s ease;
+  }
+
+  [data-header][data-scrolled] {
+    background-color: rgb(252 249 244 / 0.94);
+    box-shadow:
+      0 1px 0 var(--line),
+      0 12px 24px -24px rgb(42 36 33 / 0.35);
+  }
+
+  [data-header][data-scrolled] [data-nav-row] {
+    height: 3.75rem;
+  }
+</style>

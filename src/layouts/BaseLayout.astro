@@ -12,10 +12,11 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  type?: 'website' | 'article';
   current: NavKey;
 }
 
-const { title, description = SITE.description, image = '/og.jpg', current } = Astro.props;
+const { title, description = SITE.description, image = '/og.jpg', type = 'website', current } = Astro.props;
 
 const site = Astro.site ?? new URL(SITE.url);
 const canonical = new URL(Astro.url.pathname, site);
@@ -37,9 +38,17 @@ const socialImage = new URL(image, site);
     <link rel="apple-touch-icon" href="/images/logo.png" />
     <link rel="alternate" type="application/rss+xml" title={`${SITE.name} · RSS`} href={new URL('/rss.xml', site)} />
     <meta name="theme-color" content="#fcf9f4" />
+    <meta name="color-scheme" content="light" />
+    <link
+      rel="preload"
+      href="/fonts/cY9XfjOCX1hbuyalUrK439vogqCz_goCYw7oRd6JFYkzbBZD.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <ClientRouter />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -52,10 +61,10 @@ const socialImage = new URL(image, site);
     <meta name="twitter:image" content={socialImage} />
   </head>
 
-  <body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+  <body class="min-h-dvh bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container">
     <a
       href="#main"
-      class="fixed left-space-md top-[-4rem] z-[100] px-space-md py-space-sm bg-primary text-on-primary font-label-md text-label-md rounded focus:top-space-md transition-all"
+      class="fixed left-4 top-[-4rem] z-[100] rounded-lg bg-primary px-4 py-2 font-label-md text-label-md text-on-primary transition-all focus:top-4"
     >
       跳到正文
     </a>

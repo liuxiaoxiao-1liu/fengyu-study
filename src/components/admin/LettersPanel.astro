@@ -7,32 +7,16 @@
       </p>
     </div>
     <div class="flex flex-wrap items-center gap-space-sm">
-      <button
-        type="button"
-        id="letters-refresh"
-        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
-      >
+      <button type="button" id="letters-refresh" class="btn-secondary h-9 min-h-9 px-3">
         刷新
       </button>
-      <a
-        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
-        href="/api/admin/export?kind=letters&format=json"
-        download
-      >
+      <a class="btn-secondary h-9 min-h-9 px-3" href="/api/admin/export?kind=letters&format=json" download>
         留言 JSON
       </a>
-      <a
-        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
-        href="/api/admin/export?kind=letters&format=csv"
-        download
-      >
+      <a class="btn-secondary h-9 min-h-9 px-3" href="/api/admin/export?kind=letters&format=csv" download>
         留言 CSV
       </a>
-      <a
-        class="rounded-lg bg-surface-container px-space-md py-1.5 font-label-sm text-label-sm text-primary hover:bg-surface-container-high"
-        href="/api/admin/export?kind=subscribers&format=csv"
-        download
-      >
+      <a class="btn-secondary h-9 min-h-9 px-3" href="/api/admin/export?kind=subscribers&format=csv" download>
         订阅 CSV
       </a>
     </div>
@@ -107,6 +91,27 @@
       role="status"
       aria-live="polite"
     ></span>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface-container-low px-3 py-2">
+    <label class="flex min-h-9 cursor-pointer select-none items-center gap-2 font-label-sm text-on-surface-variant">
+      <input type="checkbox" id="letters-select-all" class="h-4 w-4 accent-secondary" />
+      全选
+    </label>
+    <span id="letters-selected" class="font-label-sm text-muted">
+      已选 0 条
+    </span>
+    <div class="flex flex-wrap items-center gap-2 sm:ml-auto">
+      <button type="button" id="letters-batch-approve" class="btn-secondary h-9 min-h-9 px-3">
+        批量通过
+      </button>
+      <button type="button" id="letters-batch-hide" class="btn-secondary h-9 min-h-9 px-3">
+        批量隐藏
+      </button>
+      <button type="button" id="letters-batch-delete" class="btn-ghost h-9 min-h-9 px-3 text-error">
+        批量删除
+      </button>
+    </div>
   </div>
 
   <div id="letters-list" class="flex flex-col gap-space-md"></div>

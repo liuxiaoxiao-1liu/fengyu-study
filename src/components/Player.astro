@@ -5,13 +5,13 @@
 
 <section
   id="site-player"
-  class="fixed inset-x-0 bottom-0 z-[60] px-gutter pb-3 pointer-events-none"
+  class="fixed inset-x-0 bottom-0 z-[60] px-gutter pb-[calc(0.75rem+var(--safe-bottom))] pointer-events-none"
   data-player
   transition:persist
   hidden
   aria-label="站内播放器"
 >
-  <div class="pointer-events-auto mx-auto flex w-full max-w-5xl flex-col gap-2 rounded-xl border border-surface-container-high bg-surface/95 p-3 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] backdrop-blur-md sm:flex-row sm:items-center sm:gap-4">
+  <div class="pointer-events-auto mx-auto flex w-full max-w-5xl flex-col gap-2 rounded-2xl border border-line bg-surface/95 p-3 shadow-float backdrop-blur-md sm:flex-row sm:items-center sm:gap-4">
     <div class="flex min-w-0 flex-1 items-center gap-3">
       <span
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary"
@@ -59,7 +59,7 @@
       <div class="ml-1 flex shrink-0 items-center gap-1.5">
         <button
           type="button"
-          class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant transition-colors hover:bg-primary hover:text-on-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant transition-colors hover:bg-primary hover:text-on-primary disabled:opacity-50 disabled:cursor-not-allowed"
           data-player-toggle
           aria-label="播放或暂停"
           disabled
@@ -90,7 +90,7 @@
         </a>
         <button
           type="button"
-          class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:text-primary"
+          class="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:text-primary"
           data-player-close
           aria-label="收起播放器"
         >
@@ -105,15 +105,3 @@
 <script>
   import '../scripts/site/player';
 </script>
-
-<style is:global>
-  body.has-player {
-    padding-bottom: 8.25rem;
-  }
-
-  @media (min-width: 640px) {
-    body.has-player {
-      padding-bottom: 5.75rem;
-    }
-  }
-</style>

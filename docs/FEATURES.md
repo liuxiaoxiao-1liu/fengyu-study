@@ -93,7 +93,7 @@ export const quotes: Quote[];
 
 新增接口组（均在 `src/pages/api/` 下，`prerender = false`）：
 
-- 内容后台：`POST /api/admin/login`、`POST /api/admin/logout`、`GET /api/admin/session`、`GET /api/admin/schema`、`GET|POST /api/admin/content/:type`、`PATCH|DELETE /api/admin/content/:type/:id`、`GET|POST /api/admin/photos`、`PATCH|DELETE /api/admin/photos/:id`、`POST /api/admin/upload`；
+- 内容后台：`POST /api/admin/login`、`POST /api/admin/logout`、`GET /api/admin/session`、`GET /api/admin/status`（公开的“是否已配置管理员”，不含凭据）、`GET /api/admin/schema`、`GET|POST /api/admin/content/:type`、`PATCH|DELETE /api/admin/content/:type/:id`、`GET|POST /api/admin/photos`、`PATCH|DELETE /api/admin/photos/:id`、`POST /api/admin/upload`；
 - 酷狗后台：`GET /api/admin/kugou/status`、`POST /api/admin/kugou/qr`、`GET /api/admin/kugou/qr?key=...`、`POST /api/admin/kugou/logout`、`GET /api/admin/kugou/playlists`、`POST /api/admin/kugou/settings`、`POST|DELETE /api/admin/kugou/tracks`；
 - 公开接口：`GET /api/content/search?q=...`、`GET /api/kugou/playlists`、`GET /api/kugou/playlist?slug=...&page=...`、`GET /api/kugou/url?hash=...`、`GET /api/media/[...path]`。
 

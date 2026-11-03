@@ -17,31 +17,34 @@ const { tracks } = Astro.props;
     <span class="font-label-sm text-[0.625rem] text-on-surface-variant">编辑推荐</span>
   </div>
   <div class="flex flex-col">
-    {tracks.map((track) => (
-      <div class="flex items-center justify-between gap-2 border-b border-surface-container-high/50 py-1.5 last:border-0">
-        <button
-          type="button"
-          class="group flex min-w-0 flex-1 items-center gap-2 text-left"
-          data-play
-          data-hash={track.kugou?.hash}
-          data-audio={track.audio}
-          data-title={track.title}
-          data-artist={track.artist}
-          data-external={kugouSearchUrl(track)}
-          aria-label={`播放 ${track.title}`}
-        >
-          <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary">
-            <span class="material-symbols-outlined text-sm">play_arrow</span>
+    {tracks.map((track) => {
+      const canPlay = Boolean(track.kugou?.hash || track.audio);
+      return (
+        <div class="flex items-center justify-between gap-2 border-b border-surface-container-high/50 py-1.5 last:border-0">
+          <button
+            type="button"
+            class="group flex min-h-11 min-w-0 flex-1 items-center gap-2 text-left"
+            data-play
+            data-hash={track.kugou?.hash}
+            data-audio={track.audio}
+            data-title={track.title}
+            data-artist={track.artist}
+            data-external={kugouSearchUrl(track)}
+            aria-label={canPlay ? `播放 ${track.title}` : `在酷狗搜索 ${track.title}`}
+          >
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary">
+              <span class="material-symbols-outlined text-sm">{canPlay ? 'play_arrow' : 'open_in_new'}</span>
+            </span>
+            <span class="min-w-0">
+              <span class="block truncate font-body-sm text-sm text-primary">{track.title}</span>
+              <span class="block truncate font-label-sm text-[0.625rem] text-on-surface-variant">{track.artist}</span>
+            </span>
+          </button>
+          <span class="shrink-0 font-label-sm text-[0.625rem] tabular-nums text-on-surface-variant">
+            {track.duration}
           </span>
-          <span class="min-w-0">
-            <span class="block truncate font-body-sm text-sm text-primary">{track.title}</span>
-            <span class="block truncate font-label-sm text-[0.625rem] text-on-surface-variant">{track.artist}</span>
-          </span>
-        </button>
-        <span class="shrink-0 font-label-sm text-[0.625rem] tabular-nums text-on-surface-variant">
-          {track.duration}
-        </span>
-      </div>
-    ))}
+        </div>
+      );
+    })}
   </div>
 </div>

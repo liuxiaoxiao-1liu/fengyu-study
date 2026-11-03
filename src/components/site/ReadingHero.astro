@@ -2,19 +2,22 @@
 interface Props {
   bookCount: number;
   albumCount: number;
+  kugouConfigured: boolean;
 }
 
-const { bookCount, albumCount } = Astro.props;
+const { bookCount, albumCount, kugouConfigured } = Astro.props;
 ---
 
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-6 border-b border-surface-container-high/60">
   <div class="flex flex-col">
-    <div class="flex items-center gap-space-sm mb-space-xs">
+    <div class="flex flex-wrap items-center gap-x-space-sm gap-y-1 mb-space-xs">
       <span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest flex items-center gap-1.5">
         <span class="w-2 h-2 rounded-full bg-secondary"></span>
         Archival Vault · Vol. 04
       </span>
-      <span class="text-on-surface-variant/40 font-label-sm text-label-sm">/</span>
+      <span class="hidden text-muted/50 font-label-sm text-label-sm sm:inline" aria-hidden="true">
+        /
+      </span>
       <span class="font-label-sm text-label-sm text-on-surface-variant">2024–2025 纸页与黑胶编目</span>
     </div>
     <h1 class="font-headline-lg text-primary tracking-tight text-headline-lg-mobile sm:text-headline-lg">
@@ -27,7 +30,7 @@ const { bookCount, albumCount } = Astro.props;
       一个大学生在书桌台灯与耳机声场里的慢速收纳。收集纸页翻动时的沙砾质感，以及唱针划过内圈凹槽的轻微噼啪。
     </p>
   </div>
-  <div class="flex items-center gap-space-md bg-surface-container-low px-space-md py-space-sm rounded-xl shadow-sm">
+  <div class="card flex flex-wrap items-center gap-space-md px-4 py-3">
     <div class="flex flex-col">
       <span class="font-label-sm text-label-sm text-on-surface-variant">追更网文</span>
       <div class="flex items-baseline gap-1">
@@ -40,7 +43,7 @@ const { bookCount, albumCount } = Astro.props;
       <span class="font-label-sm text-label-sm text-on-surface-variant">酷狗听歌</span>
       <div class="flex items-baseline gap-1">
         <span class="font-headline-md text-headline-md text-on-tertiary-container font-medium" data-playlist-count>
-          —
+          {kugouConfigured ? '—' : '0'}
         </span>
         <span class="font-label-sm text-label-sm text-on-surface-variant">首曲目</span>
       </div>

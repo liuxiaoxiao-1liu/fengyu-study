@@ -35,6 +35,19 @@ if (player && !playerWindow.__fengyuPlayerBooted) {
     return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
   };
 
+  // 顶部播放 chip 与播放器共用一处状态，避免写死曲名。
+  const announce = () => {
+    window.dispatchEvent(
+      new CustomEvent('fengyu:track', {
+        detail: {
+          title: currentTrack?.title ?? '',
+          artist: currentTrack?.artist ?? '',
+          playing: Boolean(audio && !audio.paused && audio.src),
+        },
+      }),
+    );
+  };
+
   const showPlayer = () => {
     player.hidden = false;
     document.body.classList.add('has-player');
@@ -43,12 +56,14 @@ if (player && !playerWindow.__fengyuPlayerBooted) {
   const hidePlayer = () => {
     player.hidden = true;
     document.body.classList.remove('has-player');
+    announce();
   };
 
   const setPlaying = (playing: boolean) => {
     playIcon?.classList.toggle('hidden', playing);
     pauseIcon?.classList.toggle('hidden', !playing);
     if (state) state.textContent = playing ? '· 正在播放' : '· 已暂停';
+    announce();
   };
 
   const updateDuration = () => {
@@ -81,6 +96,7 @@ if (player && !playerWindow.__fengyuPlayerBooted) {
     if (seek) seek.value = '0';
     if (toggle) toggle.disabled = false;
     if (seek) seek.disabled = false;
+    announce();
   };
 
   function describeError(data: { error?: string } | null, status: number) {
@@ -134,6 +150,19 @@ if (player && !playerWindow.__fengyuPlayerBooted) {
     const track = readCommand(button);
     currentTrack = track;
     retried = false;
+
+    // 开源站点默认不带任何账号 hash：没有站内音源时，直接去酷狗搜索页。
+    if (!track.audio && !track.hash) {
+      const opened = track.external ? window.open(track.external, '_blank', 'noopener,noreferrer') : null;
+      if (!opened) {
+        showPlayer();
+        setTrackMeta(track);
+        if (state) state.textContent = '· 没有站内音源，去酷狗搜索';
+        if (toggle) toggle.disabled = true;
+      }
+      return;
+    }
+
     showPlayer();
     setTrackMeta(track);
     if (state) state.textContent = '· 正在加载…';

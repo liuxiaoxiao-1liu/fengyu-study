@@ -14,95 +14,214 @@ if (index < 0) return Astro.redirect('/essays/');
 const essay = sorted[index]!;
 const newer = index > 0 ? sorted[index - 1]! : null;
 const older = index < sorted.length - 1 ? sorted[index + 1]! : null;
+
+const cover = essay.body.match(/<img[^>]+src="([^"]+)"/)?.[1];
+
+const related = sorted
+  .filter((item) => item.slug !== essay.slug)
+  .sort((a, b) => Number(b.category === essay.category) - Number(a.category === essay.category))
+  .slice(0, 2);
 ---
 
-<BaseLayout current="essays" title={essay.title} description={essay.summary}>
-  <main id="main" class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)] relative overflow-hidden">
-    <div
-      class="absolute -top-24 right-0 w-[28rem] h-[28rem] rounded-full bg-secondary-container/25 blur-3xl pointer-events-none"
-      aria-hidden="true"
-    ></div>
-
-    <div class="relative z-10 w-full max-w-3xl mx-auto px-gutter pt-space-lg pb-space-xl">
-      <a
-        class="inline-flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors"
-        href="/essays/"
-      >
-        <span class="material-symbols-outlined text-base">arrow_back</span>
-        <span>回到随记</span>
-      </a>
-
-      <header class="mt-space-lg pb-space-lg border-b border-surface-container-high">
-        <div class="flex flex-wrap items-center gap-x-space-sm gap-y-1 font-label-sm text-label-sm text-on-surface-variant">
-          <span class="text-secondary font-medium tracking-wide">{essay.category}</span>
-          <span class="text-outline-variant" aria-hidden="true">
-            ·
+<BaseLayout current="essays" title={essay.title} description={essay.summary} type="article" image={cover}>
+  <div class="reading-progress" aria-hidden="true" data-reading-progress></div>
+  <main id="main" class="w-full bg-surface" data-page="essay-detail">
+    <div class="mx-auto w-full max-w-3xl px-gutter pb-section pt-[calc(var(--nav-h)+2rem)]">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <a
+          class="inline-flex min-h-9 items-center gap-1 font-label-sm text-label-sm text-muted transition-colors hover:text-primary"
+          href="/essays/"
+        >
+          <span class="material-symbols-outlined text-base" aria-hidden="true">
+            arrow_back
           </span>
+          回到随记
+        </a>
+
+        <div class="flex items-center gap-1">
+          <div
+            class="flex items-center rounded-full border border-line bg-surface-container-low p-0.5"
+            role="group"
+            aria-label="正文字号"
+          >
+            <button type="button" class="btn-icon h-11 w-11 font-label-sm" data-font-size="sm" aria-label="小字号">
+              A-
+            </button>
+            <button
+              type="button"
+              class="btn-icon h-11 w-11 font-label-sm"
+              data-font-size="md"
+              aria-label="默认字号"
+              aria-pressed="true"
+            >
+              A
+            </button>
+            <button type="button" class="btn-icon h-11 w-11 font-label-md" data-font-size="lg" aria-label="大字号">
+              A+
+            </button>
+          </div>
+          <button type="button" class="btn-ghost h-11 px-3 font-label-sm" data-copy-link aria-label="复制本文链接">
+            复制链接
+          </button>
+          <button type="button" class="btn-ghost h-11 px-3 font-label-sm" data-print aria-label="打印本文">
+            打印
+          </button>
+        </div>
+      </div>
+
+      <header class="mt-8 border-b border-line pb-6">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-label-sm text-muted">
+          <span class="font-medium text-secondary">{essay.category}</span>
+          <span aria-hidden="true">/</span>
           <time datetime={essay.date}>{formatEssayDate(essay.date)}</time>
-          <span class="text-outline-variant" aria-hidden="true">
-            ·
-          </span>
           <span class="flex items-center gap-1">
-            <span class="material-symbols-outlined text-[14px]">schedule</span>约 {essay.readMinutes} 分钟
+            <span class="material-symbols-outlined text-sm" aria-hidden="true">
+              schedule
+            </span>
+            约 {essay.readMinutes} 分钟
           </span>
         </div>
-        <h1 class="font-headline-lg text-headline-lg-mobile sm:text-headline-lg text-primary tracking-tight font-normal mt-space-sm text-balance">
+        <h1 class="mt-3 text-balance font-headline-lg text-headline-lg text-primary">
           <Fragment set:html={essay.title.replace('：', '：<br class="hidden sm:block" />')} />
         </h1>
       </header>
 
-      <figure class="mt-space-lg p-space-lg bg-surface-container-low rounded-xl border-l-2 border-secondary/50">
-        <blockquote class="font-quote text-quote italic text-primary leading-relaxed">{essay.quote}</blockquote>
+      <figure class="mt-8 border-l-2 border-accent-decor pl-5">
+        <blockquote class="font-quote text-quote italic leading-relaxed text-on-surface">{essay.quote}</blockquote>
       </figure>
 
-      <article class="prose-editorial mt-space-xl">
+      <article class="prose-editorial mt-10 text-pretty" data-reading-body>
         <Fragment set:html={essay.body} />
       </article>
 
-      <footer class="mt-space-xl pt-space-lg border-t border-surface-container-high flex flex-col gap-space-lg">
-        <div class="flex flex-wrap items-center gap-space-sm font-label-sm text-label-sm text-on-surface-variant">
-          <span>收录于</span>
-          <span class="px-space-sm py-0.5 rounded bg-surface-container text-secondary">{essay.category}</span>
-          {essay.tags.map((tag) => (
-            <span class="px-space-sm py-0.5 rounded bg-surface-container text-on-surface-variant">#{tag}</span>
-          ))}
-        </div>
+      <div class="mt-8 flex flex-wrap items-center gap-2 border-t border-line pt-5 text-label-sm text-muted">
+        <span>收录于</span>
+        <span class="chip bg-surface-container text-secondary">{essay.category}</span>
+        {essay.tags.map((tag) => (
+          <span class="chip bg-surface-container text-on-surface-variant">#{tag}</span>
+        ))}
+        <span class="ml-auto font-body-sm italic">
+          写于 {formatEssayDate(essay.date)} · {SITE.name}
+        </span>
+      </div>
 
-        <div class="flex items-center justify-between gap-space-md font-label-sm text-label-sm text-on-surface-variant">
-          <span class="italic">
-            写于 {formatEssayDate(essay.date)} · {SITE.name}
-          </span>
-          <a class="inline-flex items-center gap-1 hover:text-primary transition-colors" href="#main">
-            <span>回到顶部</span>
-            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      <section class="mt-10 border-t border-line pt-6" aria-label="继续阅读">
+        <div class="flex items-center justify-between">
+          <h2 class="font-headline-sm text-headline-sm text-primary">继续阅读</h2>
+          <a
+            class="inline-flex min-h-9 items-center gap-1 font-label-md text-label-md text-accent hover:underline"
+            href="/essays/"
+          >
+            全部随记
+            <span class="material-symbols-outlined text-sm" aria-hidden="true">
+              arrow_forward
+            </span>
           </a>
         </div>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          {related.map((item) => (
+            <a
+              class="card group flex flex-col gap-1 p-5 transition-colors hover:bg-surface-container"
+              href={`/essays/${item.slug}/`}
+            >
+              <span class="meta">
+                {item.category} · {formatEssayDate(item.date)}
+              </span>
+              <span class="font-headline-sm text-headline-sm leading-snug text-primary group-hover:text-accent">
+                {item.title}
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
 
-        <nav class="grid grid-cols-1 sm:grid-cols-2 gap-space-md pt-space-sm" aria-label="文章翻页">
-          {older && (
-            <a
-              class="group flex flex-col gap-space-xs p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors"
-              href={`/essays/${older.slug}/`}
-            >
-              <span class="font-label-sm text-label-sm text-on-surface-variant">上一篇 · 更早</span>
-              <span class="font-headline-sm text-headline-sm text-primary leading-snug group-hover:text-on-tertiary-container transition-colors">
-                {older.title}
-              </span>
-            </a>
-          )}
-          {newer && (
-            <a
-              class="group flex flex-col gap-space-xs p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors sm:text-right"
-              href={`/essays/${newer.slug}/`}
-            >
-              <span class="font-label-sm text-label-sm text-on-surface-variant">下一篇 · 更新</span>
-              <span class="font-headline-sm text-headline-sm text-primary leading-snug group-hover:text-on-tertiary-container transition-colors">
-                {newer.title}
-              </span>
-            </a>
-          )}
-        </nav>
-      </footer>
+      <nav class="mt-8 grid grid-cols-1 gap-3 border-t border-line pt-6 sm:grid-cols-2" aria-label="文章翻页">
+        {older && (
+          <a
+            class="group flex flex-col gap-1 rounded-lg border border-line p-4 transition-colors hover:bg-surface-container-low"
+            href={`/essays/${older.slug}/`}
+          >
+            <span class="meta">上一篇 · 更早</span>
+            <span class="font-headline-sm text-headline-sm leading-snug text-primary group-hover:text-accent">
+              {older.title}
+            </span>
+          </a>
+        )}
+        {newer && (
+          <a
+            class="group flex flex-col gap-1 rounded-lg border border-line p-4 transition-colors hover:bg-surface-container-low sm:text-right"
+            href={`/essays/${newer.slug}/`}
+          >
+            <span class="meta">下一篇 · 更新</span>
+            <span class="font-headline-sm text-headline-sm leading-snug text-primary group-hover:text-accent">
+              {newer.title}
+            </span>
+          </a>
+        )}
+      </nav>
+
+      <div class="mt-8 flex items-center justify-between border-t border-line pt-5 text-label-sm text-muted">
+        <a class="inline-flex min-h-9 items-center gap-1 transition-colors hover:text-primary" href="#main">
+          回到顶部
+          <span class="material-symbols-outlined text-sm" aria-hidden="true">
+            north_east
+          </span>
+        </a>
+        <span data-copy-status role="status" aria-live="polite"></span>
+      </div>
     </div>
   </main>
+
+  <script>
+    import '../../scripts/site/essay-detail';
+  </script>
+
+  <style is:global>
+    .reading-progress {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0;
+      z-index: 40;
+      height: 2px;
+      width: 100%;
+      background: #c86d51;
+      transform: scaleX(0);
+      transform-origin: 0 50%;
+      animation: reading-progress linear;
+      animation-timeline: scroll(root block);
+    }
+
+    @keyframes reading-progress {
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    @supports not (animation-timeline: scroll()) {
+      .reading-progress {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reading-progress {
+        display: none;
+      }
+    }
+
+    [data-reading-size='sm'] .prose-editorial {
+      font-size: 1rem;
+      line-height: 1.95;
+    }
+
+    [data-reading-size='md'] .prose-editorial {
+      font-size: 1.0625rem;
+      line-height: 2;
+    }
+
+    [data-reading-size='lg'] .prose-editorial {
+      font-size: 1.1875rem;
+      line-height: 2.05;
+    }
+  </style>
 </BaseLayout>

@@ -3,7 +3,7 @@ import { $, request, setText, showDashboard, showLogin } from './dom';
 import { initLetters, loadLetters } from './letters';
 import { loadPhotos, initPhotos } from './photos';
 import { initKugou, loadKugou, stopKugouQr } from './kugou';
-import { initRecords, loadSchemas, showRecords } from './records';
+import { initRecords, loadSchemas, showRecords, hasUnsavedRecord } from './records';
 
 const loginForm = $<HTMLFormElement>('login-form');
 const loginUser = $<HTMLInputElement>('login-user');
@@ -34,6 +34,11 @@ function showSection(section: 'photos' | 'records' | 'letters' | 'kugou') {
 }
 
 async function switchTab(type: string) {
+  const recordsSection = $('records-section');
+  const onRecords = Boolean(recordsSection && recordsSection.style.display !== 'none');
+  const leavingRecords = onRecords && !['essays', 'books', 'albums', 'tracks', 'quotes', 'links'].includes(type);
+  if (leavingRecords && hasUnsavedRecord() && !window.confirm('当前编辑还没保存，确定切换吗？')) return;
+
   setTabStyle(type);
   if (type === 'photos') {
     stopKugouQr();
@@ -60,13 +65,22 @@ async function switchTab(type: string) {
 
 async function checkSession() {
   try {
-    const data = await request('/api/admin/session');
+    const status = await request('/api/admin/status', {}, { authRedirect: false });
+    if (!status.configured) {
+      showLogin('后台还没有配置管理员：在项目根目录运行 npm run setup，然后刷新本页。');
+      return;
+    }
+    const data = await request('/api/admin/session', {}, { authRedirect: false });
     showDashboard(data.user);
     await loadSchemas();
     await loadPhotos();
   } catch (error) {
     if (error instanceof Error && error.message === 'unauthorized') return;
-    showLogin();
+    if (error instanceof Error && error.message === 'admin_disabled') {
+      showLogin('后台还没有配置管理员：在项目根目录运行 npm run setup，然后刷新本页。');
+      return;
+    }
+    showLogin(error instanceof Error ? error.message : '');
   }
 }
 
@@ -89,7 +103,11 @@ function init() {
       await loadSchemas();
       await loadPhotos();
     } catch (error) {
-      setText(loginMessage, error instanceof Error ? error.message : '登录失败');
+      const message = error instanceof Error ? error.message : '登录失败';
+      setText(
+        loginMessage,
+        message === 'admin_disabled' ? '后台还没有配置管理员：在项目根目录运行 npm run setup，然后刷新本页。' : message,
+      );
     }
   });
 

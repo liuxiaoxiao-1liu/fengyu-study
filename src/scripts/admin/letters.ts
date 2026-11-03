@@ -20,6 +20,8 @@ const lettersEmpty = $('letters-empty');
 const lettersStatus = $('letters-status');
 let letterFilter: LetterStatus | 'all' = 'all';
 let letters: AdminLetter[] = [];
+const lettersSelectAll = $<HTMLInputElement>('letters-select-all');
+const lettersSelected = $('letters-selected');
 
 function setLettersStatus(message: string) {
   setText(lettersStatus, message);
@@ -36,6 +38,62 @@ function styleLetterFilters() {
     button.classList.toggle('text-on-primary', on);
     button.classList.toggle('bg-surface-container', !on);
     button.classList.toggle('text-primary', !on);
+  }
+}
+
+function selectedLetterIds(): string[] {
+  return [...document.querySelectorAll<HTMLInputElement>('.letter-select:checked')]
+    .map((input) => input.value)
+    .filter(Boolean);
+}
+
+function updateSelectionCount() {
+  const count = selectedLetterIds().length;
+  setText(lettersSelected, `已选 ${count} 条`);
+  if (lettersSelectAll) {
+    const all = [...document.querySelectorAll<HTMLInputElement>('.letter-select')];
+    lettersSelectAll.checked = all.length > 0 && count === all.length;
+    lettersSelectAll.indeterminate = count > 0 && count < all.length;
+  }
+}
+
+async function batchUpdate(status: LetterStatus) {
+  const ids = selectedLetterIds();
+  if (!ids.length) {
+    setLettersStatus('先勾选要处理的留言');
+    return;
+  }
+  setLettersStatus(`批量处理 ${ids.length} 条…`);
+  try {
+    await Promise.all(
+      ids.map((id) =>
+        request(`/api/admin/letters/${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status }),
+        }),
+      ),
+    );
+    setLettersStatus('已批量更新');
+    await loadLetters();
+  } catch (error) {
+    setLettersStatus(error instanceof Error ? error.message : '批量更新失败');
+  }
+}
+
+async function batchDelete() {
+  const ids = selectedLetterIds();
+  if (!ids.length) {
+    setLettersStatus('先勾选要删除的留言');
+    return;
+  }
+  if (!window.confirm(`永久删除选中的 ${ids.length} 条留言？删除后不能恢复。`)) return;
+  setLettersStatus(`删除 ${ids.length} 条…`);
+  try {
+    await Promise.all(ids.map((id) => request(`/api/admin/letters/${encodeURIComponent(id)}`, { method: 'DELETE' })));
+    setLettersStatus('已批量删除');
+    await loadLetters();
+  } catch (error) {
+    setLettersStatus(error instanceof Error ? error.message : '批量删除失败');
   }
 }
 
@@ -59,6 +117,13 @@ function renderLetters() {
     head.className = 'flex flex-wrap items-center justify-between gap-space-sm';
     const who = document.createElement('div');
     who.className = 'flex flex-wrap items-center gap-2';
+    const select = document.createElement('input');
+    select.type = 'checkbox';
+    select.className = 'letter-select h-4 w-4 accent-secondary';
+    select.value = letter.id;
+    select.setAttribute('aria-label', `选择 ${letter.name} 的留言`);
+    select.addEventListener('change', updateSelectionCount);
+    who.append(select);
     const name = document.createElement('strong');
     name.className = 'text-sm font-medium text-primary';
     name.textContent = letter.name;
@@ -182,6 +247,7 @@ export async function loadLetters() {
     letters = data.letters;
     updateLetterCounts(data.counts);
     renderLetters();
+    updateSelectionCount();
     setLettersStatus(`共 ${letters.length} 条`);
   } catch (error) {
     setLettersStatus(error instanceof Error ? error.message : '加载失败');
@@ -199,4 +265,13 @@ export function initLetters() {
     });
   }
   $('letters-refresh')?.addEventListener('click', () => void loadLetters());
+  lettersSelectAll?.addEventListener('change', () => {
+    for (const input of document.querySelectorAll<HTMLInputElement>('.letter-select')) {
+      input.checked = Boolean(lettersSelectAll.checked);
+    }
+    updateSelectionCount();
+  });
+  $('letters-batch-approve')?.addEventListener('click', () => void batchUpdate('approved'));
+  $('letters-batch-hide')?.addEventListener('click', () => void batchUpdate('hidden'));
+  $('letters-batch-delete')?.addEventListener('click', () => void batchDelete());
 }

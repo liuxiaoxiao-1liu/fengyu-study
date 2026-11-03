@@ -14,21 +14,24 @@ const links = listLinks();
 ---
 
 <BaseLayout current="guestbook" title="留言">
-  <main class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)]" id="main">
-    <div class="flex flex-col w-full">
+  <main class="w-full bg-surface" id="main">
+    <div class="flex w-full flex-col pt-nav-h">
       <GuestbookHero />
-      <!-- Section 2: Interactive Bento Section (Form + Owner's Board) -->
-      <section class="w-full max-w-6xl mx-auto px-gutter pb-space-xl">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+
+      <section class="section pt-8">
+        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
           <GuestbookForm />
           <FriendsPanel links={links} />
         </div>
       </section>
-      <!-- Section 3: Guestbook Stream / Letters Corridor -->
-      <section class="w-full max-w-6xl mx-auto px-gutter pb-space-xl" id="archive">
+
+      <section class="section pt-0" id="archive">
         <ArchiveFilters />
-        <LettersList />
+        <div class="mt-4">
+          <LettersList />
+        </div>
       </section>
+
       <BottleModal />
     </div>
   </main>

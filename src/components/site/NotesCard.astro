@@ -9,38 +9,45 @@ interface Props {
 const { essay } = Astro.props;
 ---
 
-<article
-  class="lg:col-span-7 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
-  id="notes"
->
-  <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
-    <div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
-      <span class="material-symbols-outlined text-base">history_edu</span>
-      <span class="uppercase tracking-widest font-semibold">杂感随笔 · Reading &amp; Listening Notes</span>
+<article class="card flex flex-col p-6 lg:col-span-7" id="notes">
+  <header class="flex items-center justify-between gap-3 border-b border-line pb-3">
+    <span class="flex items-center gap-2 font-label-md text-label-md font-medium text-on-surface">
+      <span class="material-symbols-outlined text-base text-secondary" aria-hidden="true">
+        history_edu
+      </span>
+      杂感随笔
+    </span>
+    <span class="meta">{essay.readMinutes} 分钟阅读</span>
+  </header>
+
+  <div class="flex flex-1 flex-col justify-center py-5">
+    <div class="flex flex-wrap items-center gap-2 text-label-sm text-muted">
+      <time datetime={essay.date}>{formatEssayDate(essay.date)}</time>
+      <span aria-hidden="true">/</span>
+      <span class="font-medium text-secondary">{essay.category}</span>
     </div>
-    <span class="font-label-sm text-label-sm text-on-surface-variant"> {essay.readMinutes} min read </span>
-  </div>
-  <div class="my-space-md flex flex-col gap-space-sm">
-    <div class="flex items-center gap-2">
-      <span class="font-label-sm text-label-sm text-on-surface-variant">{formatEssayDate(essay.date)}</span>
-      <span class="text-outline-variant">/</span>
-      <span class="font-label-sm text-label-sm text-secondary font-medium">{essay.category}</span>
-    </div>
-    <h3 class="font-headline-md text-headline-md text-primary font-normal mt-1">
-      <a class="hover:text-on-tertiary-container transition-colors" href={`/essays/${essay.slug}/`}>
+    <h3 class="mt-2 font-headline-md text-headline-md text-primary">
+      <a class="transition-colors hover:text-accent" href={`/essays/${essay.slug}/`}>
         {essay.title}
       </a>
     </h3>
-    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed line-clamp-3 mt-1">{essay.summary}</p>
+    <p class="mt-2 line-clamp-3 text-body-md leading-relaxed text-on-surface-variant">{essay.summary}</p>
   </div>
-  <div class="bg-surface-container p-space-md rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm mt-space-xs">
-    <span class="font-label-sm text-label-sm text-on-surface-variant italic">{essay.quote}</span>
+
+  <blockquote class="flex items-center gap-2 border-l-2 border-accent-decor bg-surface-container/70 px-4 py-3">
+    <span class="font-quote text-body-md italic leading-relaxed text-on-surface-variant">{essay.quote}</span>
+  </blockquote>
+
+  <footer class="mt-4 flex items-center justify-between border-t border-line pt-3">
+    <span class="meta">随记 · 全文</span>
     <a
-      class="font-label-md text-label-md text-primary hover:text-on-tertiary-container transition-colors inline-flex items-center gap-1 font-medium"
+      class="inline-flex min-h-9 items-center gap-1 font-label-md text-label-md font-medium text-accent hover:underline"
       href={`/essays/${essay.slug}/`}
     >
-      <span class="">阅读随想全文</span>
-      <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      阅读随想全文
+      <span class="material-symbols-outlined text-sm" aria-hidden="true">
+        arrow_forward
+      </span>
     </a>
-  </div>
+  </footer>
 </article>

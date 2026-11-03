@@ -7,48 +7,34 @@ interface Props {
 }
 
 const { bookCount, trackCount, photoCount, essayCount } = Astro.props;
+
+const stats = [
+  { label: '网文追读', value: bookCount, unit: '部在架' },
+  { label: '酷狗收藏', value: trackCount, unit: '首循环' },
+  { label: '视觉图集', value: photoCount, unit: '张收录' },
+  { label: '随想随笔', value: essayCount, unit: '篇记录' },
+];
 ---
 
-<section class="w-full max-w-7xl mx-auto px-gutter py-space-xl" id="stats">
-  <div class="bg-surface-container-low rounded-xl p-space-xl shadow-sm">
-    <div class="flex flex-col md:flex-row items-center justify-between gap-space-xl">
-      <div class="flex flex-col">
-        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
-          {' '}
-          Life Artifacts{' '}
-        </span>
-        <h3 class="font-headline-sm text-headline-sm text-primary font-normal mt-1">书房与精神刻度</h3>
-      </div>
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-space-md w-full md:w-auto flex-1 lg:max-w-3xl">
-        <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
-          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">网文追读</span>
-          <div class="flex items-baseline gap-1.5 mt-1.5">
-            <span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{bookCount}</span>
-            <span class="font-label-sm text-label-sm text-secondary font-medium">部在架</span>
-          </div>
-        </div>
-        <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
-          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">酷狗收藏</span>
-          <div class="flex items-baseline gap-1.5 mt-1.5">
-            <span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{trackCount}</span>
-            <span class="font-label-sm text-label-sm text-secondary font-medium">首循环</span>
-          </div>
-        </div>
-        <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
-          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">视觉图集</span>
-          <div class="flex items-baseline gap-1.5 mt-1.5">
-            <span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{photoCount}</span>
-            <span class="font-label-sm text-label-sm text-secondary font-medium">张收录</span>
-          </div>
-        </div>
-        <div class="bg-surface-container p-space-md rounded-lg flex flex-col justify-center items-start">
-          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">随想随笔</span>
-          <div class="flex items-baseline gap-1.5 mt-1.5">
-            <span class="font-headline-md text-headline-md text-primary font-semibold leading-none">{essayCount}</span>
-            <span class="font-label-sm text-label-sm text-secondary font-medium">篇记录</span>
-          </div>
-        </div>
-      </div>
+<section class="section-tight" id="stats">
+  <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface-container-low p-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+    <div class="shrink-0">
+      <p class="eyebrow">Life Artifacts</p>
+      <h2 class="mt-1 font-headline-sm text-headline-sm text-primary">书房与精神刻度</h2>
     </div>
+
+    <dl class="grid grid-cols-2 gap-3 sm:flex sm:flex-1 sm:justify-end">
+      {stats.map((item) => (
+        <div class="flex min-w-28 flex-col rounded-lg bg-surface-container px-4 py-3">
+          <dt class="text-label-sm text-muted">{item.label}</dt>
+          <dd class="mt-1 flex items-baseline gap-1.5">
+            <span class="font-headline-md text-headline-md font-medium leading-none text-primary tabular-nums">
+              {item.value}
+            </span>
+            <span class="text-label-sm text-secondary">{item.unit}</span>
+          </dd>
+        </div>
+      ))}
+    </dl>
   </div>
 </section>

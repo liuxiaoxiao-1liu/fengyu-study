@@ -7,39 +7,25 @@ interface Props {
 }
 
 const { totalCount, essayCount, microCount, quoteCount } = Astro.props;
+
+const tabs = [
+  { target: 'all', label: '全部随笔', count: totalCount },
+  { target: 'essay', label: '网文与动漫', count: essayCount },
+  { target: 'micro', label: '碎碎念', count: microCount },
+  { target: 'excerpt', label: '台词摘录', count: quoteCount },
+];
 ---
 
-<div class="flex flex-wrap items-center gap-space-xs bg-surface-container-low p-1.5 rounded-full shadow-sm">
-  <button
-    class="filter-tab active px-space-md py-space-xs rounded-full font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all"
-    data-target="all"
-    type="button"
-  >
-    全部随笔
-    <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">{totalCount}</span>
-  </button>
-  <button
-    class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all"
-    data-target="essay"
-    type="button"
-  >
-    网文与动漫
-    <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">{essayCount}</span>
-  </button>
-  <button
-    class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all"
-    data-target="micro"
-    type="button"
-  >
-    碎碎念
-    <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">{microCount}</span>
-  </button>
-  <button
-    class="filter-tab px-space-md py-space-xs rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all"
-    data-target="excerpt"
-    type="button"
-  >
-    台词摘录
-    <span class="ml-1 opacity-70 font-label-sm text-[0.625rem]">{quoteCount}</span>
-  </button>
+<div class="scroll-row" role="group" aria-label="按类型筛选随记">
+  {tabs.map((tab, index) => (
+    <button
+      class="filter-pill filter-tab"
+      type="button"
+      data-target={tab.target}
+      aria-pressed={index === 0 ? 'true' : 'false'}
+    >
+      {tab.label}
+      <span class="font-meta text-meta opacity-70 tabular-nums">{tab.count}</span>
+    </button>
+  ))}
 </div>

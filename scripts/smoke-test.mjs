@@ -504,24 +504,24 @@ try {
 
       if (kugouEnabled) {
         check(
-          '登录态存在时只返回 maotouying 歌单',
+          '登录态存在时只返回当前账号歌单',
           playlists.status === 200 &&
             playlists.json?.ok === true &&
             playlists.json.playlists.length === 1 &&
-            playlists.json.playlists[0].slug === 'maotouying',
+            playlists.json.playlists[0].slug === 'kugou',
         );
-        const detail = await request(base, '/api/kugou/playlist?slug=maotouying&page=1');
+        const detail = await request(base, '/api/kugou/playlist?slug=kugou&page=1');
         check(
           '歌单详情可用（允许空歌单）',
           detail.status === 200 &&
             detail.json?.ok === true &&
-            detail.json.playlist.slug === 'maotouying' &&
+            detail.json.playlist.slug === 'kugou' &&
             Array.isArray(detail.json.tracks),
         );
       } else {
         check(
           '无登录态时歌单接口返回 503',
-          playlists.status === 503 && playlists.json?.error === 'kugou_disabled',
+          playlists.status === 503 && playlists.json?.error === 'kugou_not_configured',
           `实际 ${playlists.status} ${playlists.json?.error ?? ''}`,
         );
       }

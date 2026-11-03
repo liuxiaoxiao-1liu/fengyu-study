@@ -8,60 +8,54 @@ interface Props {
 const { photoCount, seriesCount, yearRange } = Astro.props;
 ---
 
-<section class="relative z-10 max-w-6xl mx-auto mt-12 mb-20">
-  <div class="bg-surface-container-low rounded-2xl p-8 sm:p-10 shadow-sm relative overflow-hidden">
-    <div class="absolute -right-8 -bottom-8 select-none pointer-events-none opacity-10">
-      <span class="material-symbols-outlined text-9xl text-primary">camera</span>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-      <div class="lg:col-span-4 flex flex-col gap-3">
-        <div class="flex items-center gap-1.5 text-secondary">
-          <span class="material-symbols-outlined text-xl">auto_fix_high</span>
-          <span class="font-label-sm text-label-sm uppercase tracking-widest font-semibold">
-            Notes &amp; Archive · 图集手记
+<section class="mt-12" aria-label="图集手记">
+  <div class="card relative overflow-hidden p-6 sm:p-10">
+    <span
+      class="material-symbols-outlined pointer-events-none absolute -bottom-6 -right-4 select-none text-[9rem] text-primary/5"
+      aria-hidden="true"
+    >
+      camera
+    </span>
+
+    <div class="relative grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+      <div class="flex flex-col gap-3 lg:col-span-4">
+        <p class="eyebrow flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base text-secondary" aria-hidden="true">
+            auto_fix_high
           </span>
-        </div>
-        <h2 class="font-headline-md text-headline-md text-primary tracking-tight">视觉手记 · 定格多维光影</h2>
-        <span class="font-label-sm text-label-sm text-on-surface-variant">
-          Written by 风屿 · 记录于工作室与数字暗房
-        </span>
-        <div class="mt-4 grid grid-cols-3 gap-3 bg-surface-container p-4 rounded-xl text-center">
+          Notes &amp; Archive · 图集手记
+        </p>
+        <h2 class="font-headline-md text-headline-md text-primary">视觉手记 · 定格多维光影</h2>
+        <span class="text-label-sm text-muted">Written by 风屿 · 记录于工作室与数字暗房</span>
+
+        <dl class="mt-4 grid grid-cols-3 gap-3 border-t border-line pt-4 text-center">
           <div>
-            <span class="font-label-lg text-label-lg text-primary block font-bold">{photoCount}</span>
-            <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">影像收录</span>
+            <dt class="meta">影像收录</dt>
+            <dd class="mt-1 font-headline-md text-headline-md font-medium text-primary tabular-nums">{photoCount}</dd>
           </div>
           <div>
-            <span class="font-label-lg text-label-lg text-primary block font-bold">{seriesCount}</span>
-            <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">视觉系列</span>
+            <dt class="meta">视觉系列</dt>
+            <dd class="mt-1 font-headline-md text-headline-md font-medium text-primary tabular-nums">{seriesCount}</dd>
           </div>
           <div>
-            <span class="font-label-lg text-label-lg text-primary block font-bold">{yearRange}</span>
-            <span class="font-label-sm text-[0.6875rem] text-on-surface-variant">记录年份</span>
+            <dt class="meta">记录年份</dt>
+            <dd class="mt-1 font-headline-sm text-headline-sm font-medium text-primary tabular-nums">{yearRange}</dd>
           </div>
-        </div>
+        </dl>
       </div>
-      <div class="lg:col-span-8 flex flex-col gap-5 bg-surface-container/60 p-6 sm:p-8 rounded-xl">
-        <p class="font-body-lg text-body-lg text-primary leading-relaxed">
-          无论动漫笔触、真实街景还是虚拟CG渲染，图像的本质都是对某一缕光线与情绪的提炼与永久留存。
+
+      <div class="flex flex-col gap-4 lg:col-span-8 lg:border-l lg:border-line lg:pl-8">
+        <p class="text-body-lg leading-relaxed text-primary">
+          无论动漫笔触、真实街景还是虚拟 CG 渲染，图像的本质都是对某一缕光线与情绪的提炼与永久留存。
         </p>
-        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-          大学生活往往被DDL、绩点和未来的不确定性塞得满满当当。而按下快门或涂抹画面的那一瞬，是为数不多让我从奔忙中强行抽离的时刻。35毫米画幅与画布框住的不仅是风景，更是专注度。当你开始期待光线如何穿透一片落叶、积水如何倒映霓虹招牌、黄昏的影子如何在红砖墙上拉长，原本沉闷重复的校园日子便重新拥有了纹理与温度。
+        <p class="text-body-md leading-relaxed text-on-surface-variant">
+          大学生活往往被
+          DDL、绩点和未来的不确定性塞得满满当当。而按下快门或涂抹画面的那一瞬，是为数不多让我从奔忙中强行抽离的时刻。35
+          毫米画幅与画布框住的不仅是风景，更是专注度。当你开始期待光线如何穿透一片落叶、积水如何倒映霓虹招牌、黄昏的影子如何在红砖墙上拉长，原本沉闷重复的校园日子便重新拥有了纹理与温度。
         </p>
-        <div class="flex items-center justify-between pt-2 flex-wrap gap-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-secondary"></span>
-            <span class="font-label-sm text-label-sm text-on-surface-variant">
-              “定格不可复制的一瞬，是向时间温柔反抗的唯一方式。”
-            </span>
-          </div>
-          <a
-            class="inline-flex items-center gap-1 font-label-md text-label-md text-on-tertiary-container hover:text-primary transition-colors"
-            href="#gallery"
-          >
-            <span class="">浏览完整图集</span>
-            <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </a>
-        </div>
+        <p class="border-l-2 border-accent-decor pl-4 text-body-sm italic text-on-surface-variant">
+          “定格不可复制的一瞬，是向时间温柔反抗的唯一方式。”
+        </p>
       </div>
     </div>
   </div>

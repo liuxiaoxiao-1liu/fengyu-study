@@ -22,6 +22,8 @@ const recordDelete = $<HTMLButtonElement>('record-delete');
 const recordList = $('record-list');
 const recordCount = $('record-count');
 const recordListTitle = $('record-list-title');
+const recordSearch = $<HTMLInputElement>('record-search');
+let formDirty = false;
 
 let schemas: AdminSchema[] = [];
 let activeType = 'photos';
@@ -38,6 +40,7 @@ function setRecordStatus(message: string) {
 
 function fillRecordForm(record: ContentRecord | null) {
   if (!activeSchema || !recordFields) return;
+  formDirty = false;
   recordFields.replaceChildren();
   for (const field of activeSchema.fields) {
     const label = document.createElement('label');
@@ -128,7 +131,20 @@ function collectRecord() {
 }
 
 function resetRecordForm() {
+  formDirty = false;
   fillRecordForm(null);
+}
+
+function applyRecordSearch() {
+  if (!recordList) return;
+  const query = (recordSearch?.value ?? '').trim().toLowerCase();
+  for (const row of recordList.querySelectorAll<HTMLElement>('[data-record-item]')) {
+    row.style.display = !query || (row.dataset.search ?? '').includes(query) ? '' : 'none';
+  }
+}
+
+export function hasUnsavedRecord(): boolean {
+  return formDirty;
 }
 
 async function loadRecords() {
@@ -143,7 +159,9 @@ async function loadRecords() {
     for (const record of contentRecords) {
       const row = document.createElement('div');
       row.className =
-        'flex items-center justify-between gap-2 rounded-lg border border-surface-container-high bg-surface-container-low px-3 py-2';
+        'flex items-center justify-between gap-2 rounded-lg border border-line bg-surface-container-low px-3 py-2';
+      row.dataset.recordItem = '1';
+      row.dataset.search = `${record.title} ${record.slug}`.toLowerCase();
       const meta = document.createElement('div');
       meta.className = 'min-w-0';
       const title = document.createElement('strong');
@@ -164,6 +182,7 @@ async function loadRecords() {
       row.append(meta, actions);
       recordList.append(row);
     }
+    applyRecordSearch();
     setRecordStatus('');
   } catch (error) {
     setRecordStatus(error instanceof Error ? error.message : '加载失败');
@@ -194,6 +213,16 @@ export function initRecords() {
   $('record-new')?.addEventListener('click', resetRecordForm);
   $('record-reset')?.addEventListener('click', resetRecordForm);
 
+  recordForm?.addEventListener('input', () => {
+    formDirty = true;
+  });
+  recordSearch?.addEventListener('input', () => applyRecordSearch());
+
+  window.addEventListener('beforeunload', (event) => {
+    if (!formDirty) return;
+    event.preventDefault();
+  });
+
   recordForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!activeSchema) return;
@@ -212,6 +241,7 @@ export function initRecords() {
           body: JSON.stringify(payload),
         });
       }
+      formDirty = false;
       setRecordStatus('已保存');
       resetRecordForm();
       await loadRecords();

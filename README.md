@@ -11,6 +11,22 @@
 
 线上地址：<https://example.com/>（占位域名，部署时替换）
 
+## 开源自托管（Quick start）
+
+这个仓库不含默认管理员密码，也不含任何人的酷狗账号。克隆下来后：
+
+```bash
+git clone <你的仓库地址>
+cd fengyu-study
+npm install
+npm run setup      # 设置你自己的管理员用户名 / 密码
+npm run dev        # http://localhost:4321/
+```
+
+- `npm run setup` 生成 `ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 写入 `.env`，密码不回显、不打印；
+- 酷狗音乐是**可选**的：不配置时读听页显示「未连接酷狗账号」，登录 `/admin/` 扫码后才会同步歌单；
+- 详细步骤、改成自己站点、部署与安全清单见 [docs/SELF_HOST.md](docs/SELF_HOST.md)。
+
 ## 运行架构（2026-10 起）
 
 ```text
@@ -33,7 +49,7 @@ nginx（容器 :80）
 - 所有 `src/pages/api/**` 均为 `prerender = false`，由 app 容器执行；
 - 数据库是 Node 26 内置的 `node:sqlite`，单文件 + WAL；留言/订阅库与内容库分库存储，上传文件放在数据卷；
 - 旧 PHP 站点与 `/var/www/xiaoquanzi` 保留，作为回滚路径；
-- 决策记录见 [docs/DECISIONS.md](docs/DECISIONS.md)。
+- 决策记录见 [docs/DECISIONS.md](docs/DECISIONS.md)；视觉规范与 token 见 [docs/DESIGN.md](docs/DESIGN.md)。
 
 ## 项目规范
 
@@ -43,6 +59,7 @@ nginx（容器 :80）
 
 ```bash
 npm install
+npm run setup        # 首次运行：生成管理员凭据写入 .env
 npm run dev          # http://localhost:4321，含 /api/*
 npm run build        # 输出 dist/client 与 dist/server
 npm run preview      # 预览构建结果
@@ -50,7 +67,9 @@ npm run check        # astro check（TypeScript + Astro）
 npm run test         # Vitest 单元测试
 npm run format       # Prettier 写入；format:check 只检查
 npm run smoke        # 拉起构建产物，跑接口冒烟（需先 build）
-npm run verify       # 发布总闸门：format:check + check + test + build + smoke
+npm run visual       # 四档截图 + 横向溢出/触控目标检查（需先起站点）
+npm run check:secrets # 扫描被 Git 跟踪的文件里有没有真实凭据
+npm run verify       # 发布总闸门：format:check + check + check:secrets + test + build + smoke
 ```
 
 - 需要 Node ≥ 26（Astro 7 + `node:sqlite`）；
@@ -86,11 +105,11 @@ npm run verify       # 发布总闸门：format:check + check + test + build + s
 
 ### 自动化校验
 
-- `npm run verify`：Prettier 格式检查 → `astro check` → `npm test`（Vitest）→ 构建 → 冒烟测试；
+- `npm run verify`：Prettier 格式检查 → `astro check` → 凭据扫描 → `npm test`（Vitest）→ 构建 → 冒烟测试；
 - 单元测试在 `tests/`，覆盖 `validate`、`content-schema`、`rate-limit`、`admin-auth`、`content-db`；
 - 冒烟脚本 [scripts/smoke-test.mjs](scripts/smoke-test.mjs) 会拉起构建产物、用临时 SQLite 验证页面、留言/悄悄话、限流、管理端 cookie 登录 + Bearer、内容 CRUD、照片/上传/媒体路径、订阅与导出、酷狗歌单只读接口；
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) 是 GitHub Actions 模板，接通远程仓库后自动执行同一套检查；
-- 当前仓库还没有配置 `origin`，所以 CI 只在本地手动跑（这也是附录 A 的最高优先技术债）。
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) 是 GitHub Actions 模板；远程仓库已配置，启用 Actions 后会自动执行同一套检查；
+- 开源前额外跑 `npm run check:secrets`，确认 `.env` 没被跟踪、没有真实 token / 密码哈希混进提交。
 
 ### 页面与代码结构
 
@@ -132,14 +151,14 @@ npm run verify       # 发布总闸门：format:check + check + test + build + s
 
 ### 管理后台
 
-- **`/admin/` 内容后台**：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`，只放服务器 `.env`）；顶部导航切换 **影集 / 随笔 / 书架 / 唱片 / 曲目 / 台词 / 友链 / 留言 / 酷狗**，支持新增、编辑、删除；影集支持上传图片，唱片/曲目封面可填图片地址；
+- **`/admin/` 内容后台**：用户名 + 密码登录（首次运行 `npm run setup` 生成 `ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`，只放 `.env`）；顶部导航切换 **影集 / 随笔 / 书架 / 唱片 / 曲目 / 台词 / 友链 / 留言 / 酷狗**，支持新增、编辑、删除；影集支持上传图片，唱片/曲目封面可填图片地址；
 - 内容存在数据卷里的 `content.sqlite`；上传图片在 `/data/uploads`，通过 `/api/media/photos/...` 提供；
 - 首页 `/`、影集 `/photos/`、随记 `/essays/`、读听 `/reading/`、留言 `/guestbook/`、`/rss.xml`、`/sitemap.xml` 都在请求时读取内容库；后台改完刷新即可生效，通常不需要构建发版；
 - 曲目若填了酷狗 `hash` / `albumId` / `albumAudioId`，会自动进入站内播放白名单；
 - `/admin/` 顶部「酷狗」：手机酷狗扫码登录、查看账号全部歌单、切换站内歌单、查看/添加/删除当前歌单曲目；扫码会话保存在 `/data/kugou-session.json`，歌单选择在 `/data/kugou-settings.json`，不把 token 下发浏览器；
 - 站内搜索由 `GET /api/content/search` 在请求时生成，后台新增的随笔/书/歌/照片/友链都会自动进入搜索；
 - `/admin/` 顶部「留言」：直接审核悄悄话、通过/隐藏/删除、回复、导出 JSON/CSV，使用后台登录 cookie；旧 `/admin/letters/` 已改为 0 秒自动跳转到 `/admin/`，`ADMIN_TOKEN` 只保留 Bearer/脚本兼容。
-- 生成登录凭据：`node scripts/set-admin-password.mjs '<新密码>'`（只写本地 `.env`，服务器 `.env` 需同步这三项）；
+- 重置登录凭据：`npm run setup`（会覆盖旧凭据），或 `node scripts/set-admin-password.mjs '<新密码>' <用户名>`；只写本地 `.env`，服务器 `.env` 需同步这三项；
 - 其它接口：`GET /api/stats`（聚合计数）、`POST /api/subscribe`（季刊订阅入库）；
 - 管理端走 HTTP 当前没有 TLS，令牌/密码只在本机/可信网络使用，后续上 HTTPS 后再日常使用。
 
@@ -147,9 +166,9 @@ npm run verify       # 发布总闸门：format:check + check + test + build + s
 
 - 登录态可以放服务器 `/opt/fengyu/.env`（`KUGOU_TOKEN` / `KUGOU_USERID` / `KUGOU_VIP_TOKEN` / `KUGOU_VIP_TYPE` / `KUGOU_MID` / `KUGOU_GUID`，可选 `KUGOU_DFID`），也可以由后台扫码写入 `/data/kugou-session.json`；会话文件优先于 `.env`，都不进仓库、不下发浏览器；
 - 服务端先 `/register/dev` 换 `dfid`，再 `/song/url` 换 CDN 直链，浏览器 `<audio>` 直接播放（服务端不代理音频字节）；
-- 站内默认展示账号里的 `maotouying` 歌单，可在 `/admin/` 的「酷狗」切换；后台选择写入 `/data/kugou-settings.json`，优先于环境变量 `KUGOU_PLAYLIST_NAME`；只有后台还没选过歌单时，才用 `.env` 的 `KUGOU_PLAYLIST_NAME`（为空则 `maotouying`）；`/api/kugou/playlist` 运行时从酷狗拉取并缓存 60 秒，在酷狗上增删歌曲约 1 分钟内自动同步，不需要重新构建或部署；
+- 站内展示哪个歌单由**你自己**在 `/admin/` 的「酷狗」选择（没有默认歌单）：后台选择写入 `/data/kugou-settings.json`，优先于环境变量 `KUGOU_PLAYLIST_NAME`；两者都没有时，读听页显示「未连接酷狗账号」并引导去后台配置；`/api/kugou/playlist` 运行时从酷狗拉取并缓存 60 秒，在酷狗上增删歌曲约 1 分钟内自动同步，不需要重新构建或部署；
 - `/reading/` 只展示当前选中的歌单并分页（每页 30 首）；`/api/kugou/url` 只解析当前歌单或首页/专辑精选里出现过的 hash，按 IP 限流（30 次 / 10 分钟）；
-- 播放入口统一用 `data-play` 指令：读听歌单行、读听「专辑归档」卡片、首页「酷狗音乐」卡片都会驱动同一个站内播放器；
+- 播放入口统一用 `data-play` 指令：读听歌单行、读听「专辑归档」卡片、首页「酷狗音乐」卡片都会驱动同一个站内播放器；开源版种子曲目不含账号 hash，没有站内音源时点击会打开酷狗搜索页；
 - 播放器固定在页面底部（`BaseLayout` 单实例），首次点播出现、可收起；已启用 Astro View Transitions，播放器 DOM 用 `transition:persist` 保留，站内切页/刷新内容区时音频继续播放；
 - 浏览器 `<audio>` 负责解码；直链过期或断流时自动重取一次地址并按原进度续播，暂停中拖动进度条会自动恢复播放；
 - 登录态过期或酷狗改接口时，`/api/kugou/url` 返回 502，播放器自动降级为酷狗外链；在 `/admin/` 的「酷狗」重新扫码登录即可，不需要改 `.env` 或重建容器。

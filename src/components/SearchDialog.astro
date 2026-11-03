@@ -3,21 +3,18 @@ import { searchIndex } from '../data/search';
 ---
 
 <dialog id="search-dialog" class="search-dialog" aria-labelledby="search-title">
-  <div class="bg-surface rounded-xl border border-surface-container-high shadow-[0_20px_60px_-20px_rgba(42,36,33,0.35)] overflow-hidden">
-    <div class="flex items-center justify-between px-space-lg py-space-md border-b border-surface-container-high">
+  <div class="overflow-hidden rounded-2xl border border-line bg-surface shadow-lg">
+    <div class="flex items-center justify-between border-b border-line px-5 py-3">
       <h2 id="search-title" class="font-headline-sm text-headline-sm text-primary">
         翻一翻书房
       </h2>
-      <button
-        type="button"
-        class="flex items-center justify-center p-space-xs text-on-surface-variant hover:text-on-surface"
-        aria-label="关闭搜索"
-        data-search-close
-      >
-        <span class="material-symbols-outlined text-lg">close</span>
+      <button type="button" class="btn-icon" aria-label="关闭搜索" data-search-close>
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">
+          close
+        </span>
       </button>
     </div>
-    <div class="px-space-lg pt-space-md">
+    <div class="px-5 pt-4">
       <label class="sr-only" for="search-input">
         搜索文字、书与歌
       </label>
@@ -25,41 +22,45 @@ import { searchIndex } from '../data/search';
         id="search-input"
         type="search"
         autocomplete="off"
-        placeholder="搜一本书、一首歌，或者一句想不起的话……"
-        class="w-full bg-transparent border-0 border-b border-surface-container-high pb-space-sm font-body-lg text-body-lg text-primary placeholder:text-on-surface-variant/50 focus:outline-none focus:border-secondary"
+        placeholder="搜一本书、一首歌，或者一句想不起的话…"
+        class="w-full border-0 border-b border-line bg-transparent pb-3 font-body-lg text-body-lg text-primary placeholder:text-muted focus:border-secondary focus:outline-none"
       />
     </div>
-    <div class="max-h-[60vh] overflow-y-auto px-space-sm py-space-sm" data-search-results>
+    <div class="max-h-[min(60vh,28rem)] overflow-y-auto px-2 py-2" data-search-results>
       {searchIndex.map((item) => (
         <a
           href={item.href}
           data-result
           data-search={[item.title, item.summary, item.kind].join(' ')}
-          class="block px-space-md py-space-sm rounded-lg hover:bg-surface-container-low transition-colors"
+          class="block rounded-lg px-3 py-2 transition-colors hover:bg-surface-container-low focus-visible:bg-surface-container-low"
         >
-          <span class="flex items-baseline gap-space-sm">
-            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider shrink-0">
-              {item.kind}
-            </span>
+          <span class="flex items-baseline gap-2">
+            <span class="shrink-0 font-meta text-meta uppercase tracking-[0.08em] text-secondary">{item.kind}</span>
             <span class="font-body-md text-body-md text-primary">{item.title}</span>
           </span>
-          <span class="block font-body-sm text-body-sm text-on-surface-variant truncate">{item.summary}</span>
+          <span class="block truncate font-body-sm text-body-sm text-muted">{item.summary}</span>
         </a>
       ))}
-      <p
-        class="hidden px-space-md py-space-lg text-center font-body-sm text-body-sm text-on-surface-variant"
-        data-search-empty
-      >
+      <p class="hidden px-4 py-10 text-center font-body-sm text-body-sm text-muted" data-search-empty>
         没有找到。换个词试试，或者去
-        <a class="text-on-tertiary-container underline underline-offset-4" href="/essays/">
+        <a class="text-accent underline underline-offset-4" href="/essays/">
           随记
         </a>
         里翻翻。
       </p>
     </div>
-    <div class="px-space-lg py-space-sm border-t border-surface-container-high font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between">
-      <span>Esc 关闭</span>
-      <span data-search-count>共 {searchIndex.length} 条索引</span>
+    <div class="flex items-center justify-between border-t border-line px-5 py-2.5 font-label-sm text-label-sm text-muted">
+      <span class="flex items-center gap-1.5">
+        <kbd class="rounded border border-line px-1.5 py-0.5 font-meta text-meta">↑</kbd>
+        <kbd class="rounded border border-line px-1.5 py-0.5 font-meta text-meta">↓</kbd>
+        选择
+        <kbd class="ml-1 rounded border border-line px-1.5 py-0.5 font-meta text-meta">Enter</kbd>
+        打开
+      </span>
+      <span class="flex items-center gap-2">
+        <span data-search-count>共 {searchIndex.length} 条索引</span>
+        <kbd class="rounded border border-line px-1.5 py-0.5 font-meta text-meta">Esc</kbd>
+      </span>
     </div>
   </div>
 </dialog>

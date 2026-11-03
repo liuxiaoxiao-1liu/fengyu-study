@@ -80,11 +80,8 @@ onPageLoad('essays', () => {
   for (const tab of tabs) {
     tab.addEventListener('click', () => {
       for (const t of tabs) {
-        t.classList.remove('bg-primary-container', 'text-on-primary', 'shadow-sm');
-        t.classList.add('text-on-surface-variant');
+        t.setAttribute('aria-pressed', String(t === tab));
       }
-      tab.classList.remove('text-on-surface-variant');
-      tab.classList.add('bg-primary-container', 'text-on-primary', 'shadow-sm');
       apply(tab.dataset.target || 'all');
     });
   }

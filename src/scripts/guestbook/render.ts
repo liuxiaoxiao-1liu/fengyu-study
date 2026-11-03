@@ -4,8 +4,7 @@ import type { PublicLetter } from './types';
 export function makeFilterButton(tag: string, count: number) {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className =
-    'filter-btn px-space-md py-space-xs rounded-full font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all';
+  btn.className = 'filter-pill filter-btn';
   btn.dataset.filterCategory = tag;
   btn.dataset.generatedFilter = '1';
   btn.setAttribute('aria-pressed', 'false');
@@ -17,18 +16,13 @@ export function setActiveFilterButton(commentFilters: HTMLElement | null, catego
   if (!commentFilters) return;
   for (const btn of commentFilters.querySelectorAll<HTMLElement>('[data-filter-category]')) {
     const on = (btn.dataset.filterCategory || 'all') === category;
-    btn.classList.toggle('bg-primary', on);
-    btn.classList.toggle('text-on-primary', on);
-    btn.classList.toggle('shadow-sm', on);
-    btn.classList.toggle('text-on-surface-variant', !on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 }
 
 export function makeLetter(message: PublicLetter) {
   const card = document.createElement('article');
-  card.className =
-    'letter-card bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow';
+  card.className = 'letter-card card flex flex-col justify-between gap-4 p-5';
   card.dataset.category = (message.tag || '网文同好').trim() || '网文同好';
   if (message.id) card.dataset.id = message.id;
 

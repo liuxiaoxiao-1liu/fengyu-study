@@ -6,103 +6,86 @@ interface Props {
 }
 
 const { books } = Astro.props;
+
+const groups = [
+  { key: 'reading', label: '在读', tone: 'text-secondary', items: books.filter((book) => book.status === 'reading') },
+  { key: 'finished', label: '读完', tone: 'text-accent', items: books.filter((book) => book.status === 'finished') },
+  { key: 'paused', label: '暂放', tone: 'text-muted', items: books.filter((book) => book.status === 'paused') },
+].filter((group) => group.items.length > 0);
 ---
 
-<section class="w-full max-w-7xl mx-auto px-gutter" id="shelf">
-  <div class="flex items-center justify-between mb-6 pb-2">
-    <div class="flex items-center gap-space-sm">
-      <div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
-        <span class="material-symbols-outlined text-base">auto_stories</span>
-      </div>
-      <div>
-        <h2 class="font-headline-md text-headline-md text-primary leading-tight font-normal">追更书架与年度网文</h2>
-        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
-          Web Novels · Serialized Masterpieces &amp; Reader Marginalia
-        </span>
-      </div>
+<section class="section pt-0" id="shelf">
+  <div class="flex flex-wrap items-end justify-between gap-3 border-b border-line pb-3">
+    <div>
+      <p class="eyebrow">Web Novels</p>
+      <h2 class="mt-1 font-headline-md text-headline-md text-primary">追更书架与年度网文</h2>
     </div>
-    <span class="font-label-sm text-label-sm text-on-surface-variant hidden md:flex items-center gap-1 opacity-80">
+    <span class="hidden items-center gap-1 text-label-sm text-muted sm:flex">
       点击书卡跳转起点阅读
-      <span class="material-symbols-outlined text-xs">south_east</span>
+      <span class="material-symbols-outlined text-sm" aria-hidden="true">
+        south_east
+      </span>
     </span>
   </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
-    {books.map((book, index) => (
-      <a
-        aria-label={`去起点中文网阅读${book.title}`}
-        class:list={[
-          'bg-surface-container-low rounded-xl p-6 flex flex-col justify-between hover:shadow-md transition-shadow relative group cursor-pointer border border-surface-container-high/40 group/card',
-          index === 0 ? 'lg:col-span-7' : index === 1 ? 'lg:col-span-5' : 'lg:col-span-4',
-        ]}
-        data-card="book"
-        data-category={book.category}
-        href={book.url}
-        rel="noopener noreferrer external"
-        target="_blank"
-        title={`去起点中文网阅读${book.title}`}
-      >
-        <div class="flex flex-col gap-4">
-          <div class="flex items-center justify-between gap-space-sm">
-            <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">
-              {book.genre}
-            </span>
-            <span class="font-label-sm text-label-sm text-on-surface-variant text-right">{book.words}</span>
-          </div>
-          <div
-            class:list={[index === 0 ? 'grid grid-cols-1 sm:grid-cols-12 gap-5 items-start' : 'flex gap-5 items-start']}
-          >
-            <div
-              class:list={[
-                'bg-surface-container-high rounded-lg overflow-hidden shadow-sm flex-shrink-0 group-hover:scale-[1.02] transition-transform aspect-[3/4]',
-                index === 0 ? 'sm:col-span-4 w-full' : index === 1 ? 'w-24' : 'w-20',
-              ]}
+
+  <div class="mt-6 flex flex-col gap-8">
+    {groups.map((group) => (
+      <section aria-label={`${group.label}的书`}>
+        <div class="mb-3 flex items-center gap-2">
+          <span class:list={['font-label-md text-label-md font-medium', group.tone]}>{group.label}</span>
+          <span class="meta">{group.items.length} 本</span>
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {group.items.map((book) => (
+            <a
+              class="card group flex flex-col justify-between p-5 transition-colors hover:bg-surface-container"
+              data-card="book"
+              data-category={book.category}
+              href={book.url}
+              rel="noopener noreferrer external"
+              target="_blank"
+              aria-label={`去起点中文网阅读${book.title}`}
             >
-              <img
-                alt={`${book.title}封面`}
-                class="w-full h-full object-cover"
-                decoding="async"
-                height="800"
-                loading="lazy"
-                src={book.cover}
-                width="600"
-              />
-            </div>
-            <div class:list={[index === 0 ? 'sm:col-span-8' : 'flex-1', 'flex flex-col min-w-0']}>
-              <h3
-                class:list={[
-                  'text-primary tracking-tight font-normal mb-1.5',
-                  index === 0 ? 'font-headline-md text-headline-md' : 'font-headline-sm text-headline-sm',
-                ]}
-              >
-                {book.title}
-              </h3>
-              <span class="font-body-sm text-body-sm text-on-surface-variant block mb-2">{book.author} · 著</span>
-              {index === 0 && book.quote && (
-                <p class="font-quote text-quote italic text-primary leading-relaxed bg-surface-container/50 p-3 rounded-lg mb-2">
-                  {book.quote}
-                </p>
-              )}
-              <p
-                class:list={[
-                  'font-body-sm text-body-sm text-on-surface-variant leading-relaxed',
-                  index === 0 ? 'line-clamp-2' : 'line-clamp-3',
-                ]}
-              >
-                {book.blurb}
-              </p>
-            </div>
-          </div>
+              <div class="flex items-start gap-4">
+                <div class="aspect-[3/4] w-20 shrink-0 overflow-hidden rounded-md bg-surface-container-high">
+                  <img
+                    alt={`${book.title}封面`}
+                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    src={book.cover}
+                    width="600"
+                    height="800"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div class="flex min-w-0 flex-col">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="chip bg-surface-container text-secondary">{book.genre}</span>
+                  </div>
+                  <h3 class="mt-1.5 font-headline-sm text-headline-sm text-primary">{book.title}</h3>
+                  <span class="mt-0.5 text-body-sm text-muted">{book.author} · 著</span>
+                  <p class="mt-2 line-clamp-3 text-body-sm leading-relaxed text-on-surface-variant">{book.blurb}</p>
+                </div>
+              </div>
+
+              <div class="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3">
+                <span class="flex min-w-0 items-center gap-1.5 text-label-sm font-medium text-secondary">
+                  <span class="material-symbols-outlined shrink-0 text-sm" aria-hidden="true">
+                    forum
+                  </span>
+                  <span class="truncate">{book.words ?? book.progress ?? '起点中文网'}</span>
+                </span>
+                <span
+                  class="material-symbols-outlined shrink-0 text-sm text-muted transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                >
+                  open_in_new
+                </span>
+              </div>
+            </a>
+          ))}
         </div>
-        <div class="flex items-center justify-between gap-space-sm pt-4 mt-2 border-t border-surface-container-high/60 text-on-surface-variant">
-          <span class="font-label-sm text-label-sm flex items-center gap-1.5 text-secondary font-medium min-w-0">
-            <span class="material-symbols-outlined text-xs shrink-0">forum</span>
-            <span class="truncate">{book.footer ?? `去起点阅读${book.title}`}</span>
-          </span>
-          <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform shrink-0">
-            open_in_new
-          </span>
-        </div>
-      </a>
+      </section>
     ))}
   </div>
 </section>

@@ -9,6 +9,8 @@ description: 风屿书房站点（Astro 混合渲染 + Node API + SQLite + Docke
 
 ## 0. 前置
 
+- 开源版没有默认管理员密码：首次运行 `npm run setup` 生成；酷狗账号与歌单全部由使用者自己配置。
+
 | 依赖 | 用途 | 检查 |
 | --- | --- | --- |
 | Node ≥ 26 | Astro 7 + `node:sqlite` | `node -v` |
@@ -54,7 +56,7 @@ npm run verify     # format:check + check + test + build + smoke
 ```
 
 - 本地库默认 `.data/guestbook.sqlite`；`GUESTBOOK_DB=/tmp/x.sqlite` 可隔离测试；冒烟测试用临时库，不碰本地数据。
-- 后台本地调试：先 `set -a; . ./.env; set +a` 再 `npm run dev`；`/admin/` 用 `ADMIN_USER` + 密码登录（内容 + 留言 + 酷狗）；`/admin/letters/` 已改为 0 秒跳转到 `/admin/`，`ADMIN_TOKEN` 只保留 Bearer/脚本兼容。
+- 后台本地调试：先 `npm run setup` 生成管理员凭据（开源版没有默认密码），再 `set -a; . ./.env; set +a` 后 `npm run dev`；`/admin/` 用 `ADMIN_USER` + 密码登录（内容 + 留言 + 酷狗）；`/admin/letters/` 已改为 0 秒跳转到 `/admin/`，`ADMIN_TOKEN` 只保留 Bearer/脚本兼容。
 - 并发构建用 `flock /tmp/fengyu-build.lock npm run build`，避免两个进程抢 `.astro/`。
 - 改纯函数补 `tests/` 单元测试；改接口同步更新 `scripts/smoke-test.mjs`；`astro check` 已排除 `vendor/`，不要把它加回 `tsconfig.json` 的检查范围。
 
@@ -73,7 +75,7 @@ npm run verify     # format:check + check + test + build + smoke
 
 ## 4. 后台与数据
 
-- 内容后台 `/admin/`：用户名 + 密码登录（`ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` 只放 `.env`）；顶部导航管理影集/随笔/书架/唱片/曲目/台词/友链。内容写入 `CONTENT_DB`（容器 `/data/content.sqlite`），图片写入 `CONTENT_UPLOADS`（容器 `/data/uploads`）。页面与脚本已拆分：`src/components/{site,guestbook,admin}/` + `src/scripts/{site,guestbook,admin}/`，页面保持在 200 行内。
+- 内容后台 `/admin/`：用户名 + 密码登录（首次 `npm run setup` 生成 `ADMIN_USER` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`，只放 `.env`）；顶部导航管理影集/随笔/书架/唱片/曲目/台词/友链。内容写入 `CONTENT_DB`（容器 `/data/content.sqlite`），图片写入 `CONTENT_UPLOADS`（容器 `/data/uploads`）。页面与脚本已拆分：`src/components/{site,guestbook,admin}/` + `src/scripts/{site,guestbook,admin}/`，页面保持在 200 行内。
 - 留言后台在 `/admin/` 顶部「留言」：cookie 登录即可审核/回复/导出；接口 `GET /api/admin/letters`、`PATCH /api/admin/letters/:id`、`GET /api/admin/export?...` 统一走 `requireAdmin()`，同时兼容 cookie 与旧 Bearer `ADMIN_TOKEN`。
 - 内容接口：`GET /api/admin/schema`、`GET/POST /api/admin/content/:type`、`PATCH/DELETE /api/admin/content/:type/:id`、`GET/POST /api/admin/photos`、`PATCH/DELETE /api/admin/photos/:id`、`POST /api/admin/upload`；登录态是 HttpOnly cookie。
 - `/`、`/essays/`、`/reading/`、`/photos/`、`/guestbook/`、`/rss.xml`、`/sitemap.xml` 由 app 请求时读取内容库；nginx 必须保留这些反代，删掉会让页面 404。
@@ -90,7 +92,7 @@ WEB_PORT=80 npm run deploy:docker  # 确认后切 80
 ```
 
 - 脚本会构建、rsync `dist/`+配置+运维脚本、装 `/etc/cron.d/fengyu` 与 logrotate、重建容器、探活。
-- 首次或换机器：在服务器建 `/opt/fengyu/.env`，至少写 `ADMIN_USER`、`ADMIN_PASSWORD_HASH`、`ADMIN_SESSION_SECRET`；旧 `ADMIN_TOKEN` 可选，仅用于 Bearer/脚本兼容。再 `up -d`。
+- 首次或换机器：本地 `npm run setup` 生成凭据后，把 `ADMIN_USER`、`ADMIN_PASSWORD_HASH`、`ADMIN_SESSION_SECRET` 写进服务器 `/opt/fengyu/.env`；旧 `ADMIN_TOKEN` 可选，仅用于 Bearer/脚本兼容。再 `up -d`。
 - 回滚：`cd /opt/fengyu && docker compose down && systemctl enable --now nginx`（旧 PHP 站仍在 `/var/www/xiaoquanzi`）。
 - 宿主 nginx 已停用；443 是 xray，不要动；8443 已关闭（留给以后 xray 回落）。
 
@@ -127,8 +129,8 @@ WEB_PORT=80 npm run deploy:docker  # 确认后切 80
 - 后台 `/admin/` 的「酷狗」可扫码登录：服务器调用 `/v2/qrcode` 生成二维码，轮询 `/v2/get_userinfo_qrcode`，成功后把 token 写到 `/data/kugou-session.json`（优先于 `.env`）；歌单选择写 `/data/kugou-settings.json`。
 - 登录态也可以继续放服务器 `/opt/fengyu/.env`：`KUGOU_TOKEN`、`KUGOU_USERID`、`KUGOU_VIP_TOKEN`、`KUGOU_VIP_TYPE`、`KUGOU_MID`、`KUGOU_GUID`、可选 `KUGOU_DFID`；**永不进仓库、不贴聊天**。
 - 解析链路：`/register/dev` 换 `dfid` → `/song/url` 换 CDN 直链 → 浏览器 `<audio>` 播放。缺 `dfid` 时酷狗会返回 `20018`。
-- 歌单同步：站内只展示后台选中的歌单（默认 `maotouying`）；后台设置写 `/data/kugou-settings.json`，优先于 `KUGOU_PLAYLIST_NAME`。只有后台还没选过歌单时，才用 `.env` 的 `KUGOU_PLAYLIST_NAME`（为空则 `maotouying`）。`/api/kugou/playlist` 运行时向酷狗拉取，内存缓存 60 秒；酷狗上增删歌曲约 1 分钟自动反映，不需要重新构建。
-- 接口：`GET /api/kugou/playlists`（只剩一个歌单）、`GET /api/kugou/playlist?slug=maotouying&page=1`、`GET /api/kugou/url?hash=...`；只认当前歌单缓存里的 hash。
+- 歌单同步：站内只展示后台选中的歌单（**没有默认歌单**）；后台设置写 `/data/kugou-settings.json`，优先于 `KUGOU_PLAYLIST_NAME`。两者都没有时，读听页显示「未连接酷狗账号」的引导。`/api/kugou/playlist` 运行时向酷狗拉取，内存缓存 60 秒；酷狗上增删歌曲约 1 分钟自动反映，不需要重新构建。
+- 接口：`GET /api/kugou/playlists`（只剩一个歌单）、`GET /api/kugou/playlist?slug=kugou&page=1`、`GET /api/kugou/url?hash=...`；只认当前歌单缓存里的 hash；未配置时返回 503。
 - 后台接口：`GET /api/admin/kugou/status`、`POST /api/admin/kugou/qr`、`GET /api/admin/kugou/qr?key=...`、`POST /api/admin/kugou/logout`、`GET /api/admin/kugou/playlists`、`POST /api/admin/kugou/settings`、`POST/DELETE /api/admin/kugou/tracks`。
 - 切换歌单后 `resetKugouRuntime()` 清缓存；读听页标题/计数从 `/api/kugou/playlist` 的 `playlist.name` 更新。
 - 运行时来源 `vendor/kugou/`（MIT，从 Folia 内置 KuGouMusicApi 抽取）；不要在页面里 import 它。

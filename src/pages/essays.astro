@@ -5,8 +5,6 @@ import EssaysFilters from '../components/site/EssaysFilters.astro';
 import EssayList from '../components/site/EssayList.astro';
 import ExcerptSection from '../components/site/ExcerptSection.astro';
 import WritingArchive from '../components/site/WritingArchive.astro';
-import MicroNotes from '../components/site/MicroNotes.astro';
-import TopicTags from '../components/site/TopicTags.astro';
 import NewsletterCard from '../components/site/NewsletterCard.astro';
 import { listEssays, listQuotes } from '../lib/content-db';
 
@@ -18,7 +16,6 @@ const quotes = listQuotes();
 const sortedEssays = [...essays].sort((a, b) => b.date.localeCompare(a.date));
 const essayCount = sortedEssays.filter((essay) => essay.kind === 'essay').length;
 const microCount = sortedEssays.filter((essay) => essay.kind === 'micro').length;
-const microEssays = sortedEssays.filter((essay) => essay.kind === 'micro');
 
 // 正文是 HTML 字符串，统计字数前先去掉标签与空白。
 const totalChars = essays.reduce(
@@ -26,59 +23,40 @@ const totalChars = essays.reduce(
   0,
 );
 
-const tagCounts = new Map<string, number>();
-for (const essay of essays) {
-  for (const tag of essay.tags) {
-    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
-  }
-}
-const topTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8);
-
 const archiveYears = [...new Set(sortedEssays.map((essay) => essay.date.slice(0, 4)))].sort().join('–');
 ---
 
 <BaseLayout current="essays" title="随记">
-  <main class="w-full pt-20 bg-surface min-h-[calc(100vh-14rem)]" id="main">
-    <div class="flex flex-col w-full">
-      <!-- Subtle Grain & Ambient Glow Canvas -->
-      <div class="relative w-full overflow-hidden pb-space-xl">
-        <div class="absolute -top-32 -left-20 w-96 h-96 rounded-full bg-secondary-container/30 blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/3 -right-24 w-80 h-80 rounded-full bg-tertiary-fixed/20 blur-3xl pointer-events-none"></div>
-        <!-- Editorial Header Banner -->
-        <section class="w-full max-w-7xl mx-auto px-gutter pt-space-lg mb-space-xl">
-          <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-lg pb-space-lg">
-            <EssaysHero />
-            <!-- Filter Pill Group -->
-            <EssaysFilters
-              totalCount={sortedEssays.length}
-              essayCount={essayCount}
-              microCount={microCount}
-              quoteCount={quotes.length}
-            />
-          </div>
-        </section>
-        <!-- Main Content Asymmetric 12-Column Grid -->
-        <div class="w-full max-w-7xl mx-auto px-gutter">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            <div class="lg:col-span-8 flex flex-col gap-8" id="essays">
-              <EssayList essays={sortedEssays} />
-              <p
-                class="hidden rounded-xl border border-dashed border-outline-variant p-8 text-center font-body-sm text-body-sm text-on-surface-variant"
-                id="essays-empty"
-              >
-                这一类的文字还在整理中，先去翻翻别的吧。
-              </p>
-              <ExcerptSection quotes={quotes} />
-            </div>
-            <aside class="lg:col-span-4 flex flex-col gap-8">
-              <WritingArchive archiveYears={archiveYears} totalChars={totalChars} essayCount={essays.length} />
-              <MicroNotes microEssays={microEssays} />
-              <TopicTags tags={topTags} />
-              <NewsletterCard />
-            </aside>
-          </div>
+  <main class="w-full bg-surface" id="main">
+    <div class="flex w-full flex-col pt-nav-h">
+      <section class="section pb-0">
+        <div class="flex flex-col gap-6 border-b border-line pb-6">
+          <EssaysHero />
+          <EssaysFilters
+            totalCount={sortedEssays.length}
+            essayCount={essayCount}
+            microCount={microCount}
+            quoteCount={quotes.length}
+          />
         </div>
-      </div>
+      </section>
+
+      <section class="section pt-10">
+        <div class="grid grid-cols-1 items-start gap-10 lg:grid-cols-12">
+          <div class="flex flex-col gap-8 lg:col-span-8" id="essays">
+            <EssayList essays={sortedEssays} />
+            <p class="empty-state hidden" id="essays-empty">
+              这一类的文字还在整理中，先去翻翻别的吧。
+            </p>
+            <ExcerptSection quotes={quotes} />
+          </div>
+
+          <aside class="flex flex-col gap-6 lg:col-span-4 lg:sticky lg:top-[calc(var(--nav-h)+1.5rem)]">
+            <WritingArchive archiveYears={archiveYears} totalChars={totalChars} essayCount={essays.length} />
+            <NewsletterCard />
+          </aside>
+        </div>
+      </section>
     </div>
   </main>
   <script>

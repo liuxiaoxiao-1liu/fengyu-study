@@ -8,66 +8,74 @@ interface Props {
 const { links } = Astro.props;
 ---
 
-<!-- Right Column: Owner's Note & Cyber Neighbors (5 Cols) -->
-<div class="lg:col-span-5 flex flex-col gap-space-lg" id="friends">
-  <!-- Card 1: Owner's Pin Note -->
-  <div class="bg-surface-container p-space-lg rounded-xl shadow-sm relative overflow-hidden flex flex-col gap-space-sm">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-space-xs text-secondary">
-        <span class="material-symbols-outlined text-lg">push_pin</span>
-        <span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold">房主公告牌 · PIN NOTE</span>
-      </div>
-      <span class="font-label-sm text-label-sm text-on-surface-variant">大三初春</span>
+<div class="flex flex-col gap-5 lg:col-span-5" id="friends">
+  <div class="card flex flex-col gap-3 p-6">
+    <div class="flex items-center justify-between gap-3">
+      <span class="flex items-center gap-2 text-secondary">
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">
+          push_pin
+        </span>
+        <span class="eyebrow text-secondary">房主公告牌 · Pin Note</span>
+      </span>
+      <span class="meta">大三初春</span>
     </div>
-    <p class="font-body-md text-body-md text-primary leading-relaxed">
+    <p class="text-body-md leading-relaxed text-primary">
       大三学期正经历密集的专业课与实习准备，但看到同好留言总会第一时间认真回复。聊《诡秘之主》剧情、探讨克苏鲁神话或推荐冷门仙侠（如《道诡异仙》李火旺的癫狂美学），或是酷狗好听的冷门
       Live 版，随时欢迎敲门！
     </p>
-    <div class="flex items-center justify-between pt-space-xs text-on-surface-variant font-label-sm text-label-sm">
+    <div class="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3 text-label-sm text-muted">
       <span class="flex items-center gap-1">
-        <span class="material-symbols-outlined text-sm text-secondary">headphones</span>
-        伴写背景乐: 周深《达拉崩吧 (Live)》
+        <span class="material-symbols-outlined text-sm text-secondary" aria-hidden="true">
+          headphones
+        </span>
+        伴写背景乐：周深《达拉崩吧 (Live)》
       </span>
-      <span class="italic font-quote text-body-sm text-primary">@风屿书房</span>
+      <span class="font-quote text-body-sm italic text-primary">@风屿书房</span>
     </div>
   </div>
-  <!-- Card 2: Cyber Neighbors / Blogroll -->
-  <div class="bg-surface-container-low p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-space-xs text-primary">
-        <span class="material-symbols-outlined text-base text-secondary">diversity_2</span>
-        <h3 class="font-headline-sm text-headline-sm">赛博邻居 · 友链自留地</h3>
-      </div>
+
+  <div class="card flex flex-col gap-4 p-6">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="flex items-center gap-2 font-headline-sm text-headline-sm text-primary">
+        <span class="material-symbols-outlined text-base text-secondary" aria-hidden="true">
+          diversity_2
+        </span>
+        赛博邻居 · 友链自留地
+      </h2>
       <a
-        class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors flex items-center gap-0.5"
+        class="inline-flex min-h-9 items-center gap-0.5 text-label-sm text-secondary hover:text-primary"
         data-prefill-friend=""
-        href="#guestbook-form"
+        href="#guestbook-form-panel"
       >
-        <span>申请交换</span>
-        <span class="material-symbols-outlined text-xs">north_east</span>
+        申请交换
+        <span class="material-symbols-outlined text-sm" aria-hidden="true">
+          north_east
+        </span>
       </a>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+
+    <ul class="flex flex-col">
       {links.map((link) => (
-        <a
-          class="group flex flex-col p-space-sm bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-all shadow-sm"
-          href={link.url || '#friends'}
-          target={link.url ? '_blank' : undefined}
-          rel={link.url ? 'noopener noreferrer external' : undefined}
-        >
-          <div class="flex items-center justify-between">
-            <span class="font-label-md text-label-md text-primary group-hover:text-secondary font-medium">
+        <li>
+          <a
+            class="group flex min-h-11 flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 border-b border-line py-2.5 last:border-0"
+            href={link.url || '#friends'}
+            target={link.url ? '_blank' : undefined}
+            rel={link.url ? 'noopener noreferrer external' : undefined}
+          >
+            <span class="font-label-md text-label-md font-medium text-primary group-hover:text-accent">
               {link.title}
             </span>
-            <span class="font-label-sm text-[0.625rem] text-on-surface-variant">{link.tag}</span>
-          </div>
-          <span class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate mt-0.5">{link.note}</span>
-        </a>
+            <span class="meta">{link.tag}</span>
+            <span class="w-full truncate text-body-sm text-muted">{link.note}</span>
+          </a>
+        </li>
       ))}
-    </div>
-    <div class="flex items-center justify-between bg-surface-container px-space-md py-space-xs rounded-lg text-on-surface-variant font-label-sm text-label-sm">
-      <span>友链准则: 保持更新 · 独立博客 · 拒绝商业滥投</span>
-      <span class="text-secondary font-medium">{links.length} / 12 席位</span>
+    </ul>
+
+    <div class="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3 text-label-sm text-muted">
+      <span>保持更新 · 独立博客 · 拒绝商业滥投</span>
+      <span class="font-medium text-secondary">{links.length} / 12 席位</span>
     </div>
   </div>
 </div>

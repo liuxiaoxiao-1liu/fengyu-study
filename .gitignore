@@ -29,3 +29,9 @@ _scratch/
 
 # local tool config
 .config/
+
+# finesse build memory (local only)
+.finesse/
+
+# local screenshot artifacts
+.screenshots/

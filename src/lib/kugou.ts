@@ -174,11 +174,16 @@ export async function resolveKugouUrl(track: KugouTrackRef): Promise<string> {
   return url;
 }
 
-/** 账号里用于站内展示的唯一歌单；后台设置优先，其次 KUGOU_PLAYLIST_NAME。 */
-const PLAYLIST_SLUG = 'maotouying';
+/** 站内只展示一个账号歌单；后台扫码后选择，或用 KUGOU_PLAYLIST_NAME 指定。未配置时为空。 */
+const PLAYLIST_SLUG = 'kugou';
 
 function playlistName(): string {
-  return (readKugouSettings().playlistName || process.env.KUGOU_PLAYLIST_NAME || 'maotouying').trim();
+  return (readKugouSettings().playlistName || process.env.KUGOU_PLAYLIST_NAME || '').trim();
+}
+
+/** 供页面判断是否显示「去后台配置酷狗」的引导。 */
+export function isKugouConfigured(): boolean {
+  return isKugouEnabled() && playlistName() !== '';
 }
 const PLAYLIST_CACHE_MS = 60 * 1000;
 const PLAYLIST_PAGE_SIZE = 100;
@@ -232,6 +237,7 @@ function normalizeSong(song: RawPlaylistSong): AccountPlaylistTrack {
 async function fetchAccountPlaylist(): Promise<AccountPlaylist> {
   const config = readConfig();
   if (!config) throw new Error('kugou_disabled');
+  if (!playlistName()) throw new Error('playlist_not_configured');
 
   // 歌单接口和 /song/url 一样依赖账号 cookie；dfid 缺失时先注册一个。
   const dfid = config.dfid || (await ensureDfid(config));
@@ -297,10 +303,11 @@ async function fetchAccountPlaylist(): Promise<AccountPlaylist> {
 }
 
 /**
- * 读取账号歌单（默认 maotouying）。缓存 60 秒，让酷狗上的增删在约 1 分钟内反映到站内。
+ * 读取当前账号歌单。缓存 60 秒，让酷狗上的增删在约 1 分钟内反映到站内。
  * 拉到一半失败时优先返回上一次成功结果，避免整页变空。
  */
 export async function getAccountPlaylist(force = false): Promise<AccountPlaylist> {
+  if (!playlistName()) throw new Error('playlist_not_configured');
   if (
     !force &&
     playlistCache &&

@@ -1,76 +1,112 @@
 ---
-import { SITE } from '../lib/site';
+import { SITE, NAV } from '../lib/site';
 
 const year = new Date().getFullYear();
 const span = year > SITE.startYear ? `${SITE.startYear}–${year}` : String(SITE.startYear);
 ---
 
-<footer class="w-full bg-surface-container-low py-space-xl mt-space-xl shadow-[0_-1px_6px_rgba(0,0,0,0.02)]">
-  <div class="w-full max-w-5xl mx-auto px-gutter flex flex-col items-center text-center gap-space-lg">
-    <div class="flex flex-col items-center gap-space-sm max-w-2xl">
-      <span class="material-symbols-outlined text-secondary/70 text-2xl" aria-hidden="true">
-        auto_stories
-      </span>
-      <p class="font-quote text-quote italic text-primary leading-relaxed">
-        “生活原本沉闷，但跑起来就有风。保持阅读，保持聆听，用镜头与笔触留住微光。”
-      </p>
-      <span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">
-        — Island of Solitude Journal Log
-      </span>
+<footer class="w-full border-t border-line bg-surface-container-low">
+  <div class="mx-auto w-full max-w-7xl px-gutter py-section-sm">
+    <div class="grid gap-space-xl md:grid-cols-12 md:gap-space-lg">
+      <div class="md:col-span-5 flex flex-col gap-space-sm">
+        <a class="inline-flex min-h-11 items-center gap-space-sm" href="/" aria-label="回到首页">
+          <img alt="" class="h-7 w-auto object-contain" src="/images/logo.png" width="96" height="96" />
+          <span class="font-headline-sm text-headline-sm text-primary">{SITE.name}</span>
+        </a>
+        <p class="max-w-sm font-body-sm text-body-sm leading-relaxed text-muted">{SITE.description}</p>
+        <p class="font-quote text-body-md italic leading-relaxed text-on-surface-variant">
+          “生活原本沉闷，但跑起来就有风。保持阅读，保持聆听。”
+        </p>
+      </div>
+
+      <nav class="md:col-span-3" aria-label="页脚导航">
+        <h2 class="eyebrow">板块</h2>
+        <ul class="mt-3 grid grid-cols-2 gap-x-space-md gap-y-1">
+          {NAV.map((item) => (
+            <li>
+              <a
+                class="inline-flex min-h-9 items-center font-body-sm text-body-sm text-on-surface-variant hover:text-primary"
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="md:col-span-2">
+        <h2 class="eyebrow">订阅</h2>
+        <ul class="mt-3 flex flex-col gap-1">
+          <li>
+            <a
+              class="inline-flex min-h-9 items-center font-body-sm text-body-sm text-on-surface-variant hover:text-primary"
+              href="/rss.xml"
+            >
+              RSS
+            </a>
+          </li>
+          <li>
+            <a
+              class="inline-flex min-h-9 items-center font-body-sm text-body-sm text-on-surface-variant hover:text-primary"
+              href="/guestbook/"
+            >
+              写一封信
+            </a>
+          </li>
+          <li>
+            <a
+              class="inline-flex min-h-9 items-center font-body-sm text-body-sm text-on-surface-variant hover:text-primary"
+              href="/sitemap.xml"
+            >
+              站点地图
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="md:col-span-2">
+        <h2 class="eyebrow">在别处</h2>
+        <ul class="mt-3 flex flex-col gap-1">
+          <li>
+            <a
+              class="inline-flex min-h-9 items-center font-body-sm text-body-sm text-on-surface-variant hover:text-primary"
+              href="https://www.douban.com/"
+              target="_blank"
+              rel="noopener noreferrer external"
+            >
+              豆瓣
+            </a>
+          </li>
+          <li>
+            <a
+              class="inline-flex min-h-9 items-center font-body-sm text-body-sm text-on-surface-variant hover:text-primary"
+              href="https://music.163.com/"
+              target="_blank"
+              rel="noopener noreferrer external"
+            >
+              网易云音乐
+            </a>
+          </li>
+          <li>
+            <a
+              class="inline-flex min-h-9 items-center font-body-sm text-body-sm text-on-surface-variant hover:text-primary"
+              href="https://www.instagram.com/"
+              target="_blank"
+              rel="noopener noreferrer external"
+            >
+              Instagram
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <nav class="flex flex-wrap items-center justify-center gap-space-md text-on-surface-variant" aria-label="页脚导航">
-      <a
-        class="font-label-md text-label-md hover:text-on-surface transition-colors"
-        href="https://www.douban.com/"
-        target="_blank"
-        rel="noopener noreferrer external"
-      >
-        豆瓣 Douban
-      </a>
-      <span class="text-outline-variant text-xs" aria-hidden="true">
-        ·
-      </span>
-      <a
-        class="font-label-md text-label-md hover:text-on-surface transition-colors"
-        href="https://music.163.com/"
-        target="_blank"
-        rel="noopener noreferrer external"
-      >
-        网易云音乐 Netease
-      </a>
-      <span class="text-outline-variant text-xs" aria-hidden="true">
-        ·
-      </span>
-      <a
-        class="font-label-md text-label-md hover:text-on-surface transition-colors"
-        href="https://www.instagram.com/"
-        target="_blank"
-        rel="noopener noreferrer external"
-      >
-        摄影录 Instagram
-      </a>
-      <span class="text-outline-variant text-xs" aria-hidden="true">
-        ·
-      </span>
-      <a class="font-label-md text-label-md hover:text-on-surface transition-colors" href="/rss.xml">
-        RSS 订阅
-      </a>
-      <span class="text-outline-variant text-xs" aria-hidden="true">
-        ·
-      </span>
-      <a class="font-label-md text-label-md hover:text-on-surface transition-colors" href="/guestbook/">
-        拾光留言箱
-      </a>
-    </nav>
-
-    <div class="flex flex-wrap items-center justify-center gap-space-sm font-label-sm text-label-sm text-on-surface-variant">
-      <span class="bg-surface-container px-space-sm py-0.5 rounded text-on-surface-variant">
-        Built with Astro &amp; Tailwind
-      </span>
-      <span>
-        © {span} {SITE.name} {SITE.latin}. All rights reserved.
-      </span>
+    <div class="mt-space-lg flex flex-col gap-2 border-t border-line pt-space-md sm:flex-row sm:items-center sm:justify-between">
+      <p class="font-meta text-meta uppercase tracking-[0.12em] text-muted">
+        © {span} {SITE.name} · {SITE.latin}
+      </p>
+      <p class="font-meta text-meta text-muted">Astro · Node · SQLite · 手工排版 · 部分内容为示例</p>
     </div>
   </div>
 </footer>

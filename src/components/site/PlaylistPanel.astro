@@ -2,52 +2,83 @@
 interface Props {
   playlistSlug: string;
   playlistName: string;
+  configured: boolean;
 }
 
-const { playlistSlug, playlistName } = Astro.props;
+const { playlistSlug, playlistName, configured } = Astro.props;
 ---
 
-<div class="lg:col-span-7 bg-surface-container-low rounded-xl p-6 shadow-sm border border-surface-container-high/40">
-  <div class="flex flex-col gap-3 pb-3 mb-3 border-b border-surface-container-high/60">
-    <div class="flex flex-wrap items-center justify-between gap-space-sm">
-      <div class="flex flex-wrap items-center justify-between gap-space-sm">
-        <div class="flex items-center gap-space-xs min-w-0">
-          <span class="font-headline-sm text-headline-sm text-primary font-medium" data-playlist-title>
-            {playlistName} · 我的歌单
-          </span>
-          <span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hidden sm:inline-block">
+<div class="card lg:col-span-7 p-6">
+  <div class="mb-3 flex flex-col gap-3 border-b border-line pb-3">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex min-w-0 items-center gap-2">
+        <span class="font-headline-sm text-headline-sm font-medium text-primary" data-playlist-title>
+          {playlistName || '酷狗歌单'}
+          {configured && <span class="font-label-sm text-label-sm font-normal text-muted">· 我的歌单</span>}
+        </span>
+        {configured && (
+          <span class="chip hidden bg-surface-container text-on-surface-variant sm:inline-flex">
             <span data-playlist-count>—</span> 首 · 站内可播
           </span>
-        </div>
-        <span class="font-label-sm text-label-sm text-on-surface-variant">从酷狗账号自动同步</span>
+        )}
       </div>
+      <span class="meta">{configured ? '从酷狗账号自动同步' : '未连接账号'}</span>
     </div>
-    <div class="flex flex-col gap-1.5" id="playlist-tracks" data-slug={playlistSlug} data-page="1" data-total-pages="1">
-      <p class="rounded-lg border border-dashed border-outline-variant p-6 text-center font-body-sm text-body-sm text-on-surface-variant">
-        正在从酷狗同步歌单…
-      </p>
-    </div>
-    <div class="flex items-center justify-between gap-space-sm pt-1" id="playlist-pager">
-      <button
-        type="button"
-        class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-xs hover:bg-surface-container-high disabled:opacity-40 disabled:cursor-not-allowed"
-        data-page-prev
-        disabled
-      >
-        上一页
-      </button>
-      <span class="font-label-sm text-xs text-on-surface-variant" data-page-info>
-        {' '}
-        正在同步…{' '}
-      </span>
-      <button
-        type="button"
-        class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-xs hover:bg-surface-container-high disabled:opacity-40 disabled:cursor-not-allowed"
-        data-page-next
-        disabled
-      >
-        下一页
-      </button>
-    </div>
+
+    {configured ? (
+      <>
+        <div
+          class="flex flex-col gap-1.5"
+          id="playlist-tracks"
+          data-slug={playlistSlug}
+          data-page="1"
+          data-total-pages="1"
+          data-configured="true"
+        >
+          <p class="rounded-lg border border-dashed border-line-strong p-6 text-center text-body-sm text-muted">
+            正在从酷狗同步歌单…
+          </p>
+        </div>
+        <div class="flex items-center justify-between gap-2 pt-1" id="playlist-pager">
+          <button
+            type="button"
+            class="min-h-11 rounded-lg bg-surface-container px-3 py-1.5 font-label-sm text-xs text-on-surface-variant hover:bg-surface-container-high disabled:cursor-not-allowed disabled:opacity-40"
+            data-page-prev
+            disabled
+          >
+            上一页
+          </button>
+          <span class="font-label-sm text-xs text-on-surface-variant" data-page-info>
+            正在同步…
+          </span>
+          <button
+            type="button"
+            class="min-h-11 rounded-lg bg-surface-container px-3 py-1.5 font-label-sm text-xs text-on-surface-variant hover:bg-surface-container-high disabled:cursor-not-allowed disabled:opacity-40"
+            data-page-next
+            disabled
+          >
+            下一页
+          </button>
+        </div>
+      </>
+    ) : (
+      <div class="flex flex-col items-center gap-3 px-4 py-10 text-center">
+        <span
+          class="flex h-12 w-12 items-center justify-center rounded-full bg-surface-container text-secondary"
+          aria-hidden="true"
+        >
+          <span class="material-symbols-outlined text-2xl">headphones</span>
+        </span>
+        <p class="max-w-sm text-body-sm leading-relaxed text-on-surface-variant">
+          这个站点还没有连接酷狗账号。在后台扫码登录并选择一个歌单后，这里会自动同步。
+        </p>
+        <a class="btn-secondary" href="/admin/#kugou">
+          去后台配置
+          <span class="material-symbols-outlined text-sm" aria-hidden="true">
+            arrow_forward
+          </span>
+        </a>
+      </div>
+    )}
   </div>
 </div>

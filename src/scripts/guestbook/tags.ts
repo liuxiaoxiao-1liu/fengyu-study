@@ -7,11 +7,8 @@ export function getActiveTag() {
 
 function selectTag(btn: HTMLElement) {
   for (const b of tagButtons) {
-    b.classList.remove('bg-primary', 'text-on-primary');
-    b.classList.add('bg-surface-container', 'text-on-surface-variant');
+    b.setAttribute('aria-pressed', String(b === btn));
   }
-  btn.classList.remove('bg-surface-container', 'text-on-surface-variant');
-  btn.classList.add('bg-primary', 'text-on-primary');
   activeTag = btn.dataset.tag || '网文同好';
 }
 
@@ -26,10 +23,6 @@ export function initTags() {
 export function resetTags() {
   activeTag = tagButtons[0]?.dataset.tag || '网文同好';
   for (const b of tagButtons) {
-    const on = b === tagButtons[0];
-    b.classList.toggle('bg-primary', on);
-    b.classList.toggle('text-on-primary', on);
-    b.classList.toggle('bg-surface-container', !on);
-    b.classList.toggle('text-on-surface-variant', !on);
+    b.setAttribute('aria-pressed', String(b === tagButtons[0]));
   }
 }

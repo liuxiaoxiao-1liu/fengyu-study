@@ -8,11 +8,7 @@ onPageLoad('reading', () => {
 
   function setActive(active: HTMLElement) {
     for (const tab of tabs) {
-      const on = tab === active;
-      tab.classList.toggle('bg-primary', on);
-      tab.classList.toggle('text-on-primary', on);
-      tab.classList.toggle('shadow-sm', on);
-      tab.classList.toggle('text-on-surface-variant', !on);
+      tab.setAttribute('aria-pressed', String(tab === active));
     }
   }
 
@@ -47,7 +43,7 @@ onPageLoad('reading', () => {
   const pageInfo = pager?.querySelector<HTMLElement>('[data-page-info]') ?? null;
   const PAGE_SIZE = 30;
 
-  let activeSlug = 'maotouying';
+  let activeSlug = 'kugou';
   let activePage = 1;
   let totalPages = 1;
 
@@ -68,7 +64,7 @@ onPageLoad('reading', () => {
   function buildRow(track: { hash: string; title: string; artist: string; duration: string }): HTMLElement {
     const row = make(
       'div',
-      'group flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg hover:bg-surface-container transition-colors',
+      'group flex min-h-11 flex-col justify-between gap-2 rounded-lg p-3 transition-colors hover:bg-surface-container sm:flex-row sm:items-center',
     );
     row.dataset.card = 'track';
     row.dataset.category = 'kugou';
@@ -76,7 +72,7 @@ onPageLoad('reading', () => {
     const left = make('div', 'flex items-center gap-3 min-w-0');
     const button = make(
       'button',
-      'w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0',
+      'h-11 w-11 rounded-full bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface-variant transition-colors flex-shrink-0',
     );
     button.type = 'button';
     button.setAttribute('data-play', '');
@@ -133,7 +129,7 @@ onPageLoad('reading', () => {
       node.textContent = String(data.playlist.total ?? 0);
     }
     for (const node of document.querySelectorAll<HTMLElement>('[data-playlist-title]')) {
-      node.textContent = `${data.playlist.name ?? 'maotouying'} · 我的歌单`;
+      node.textContent = `${data.playlist.name ?? '酷狗歌单'} · 我的歌单`;
     }
     activeSlug = data.playlist.slug;
     activePage = data.page;
@@ -170,5 +166,5 @@ onPageLoad('reading', () => {
 
   pagePrev?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.max(1, activePage - 1)));
   pageNext?.addEventListener('click', () => void loadPlaylist(activeSlug, Math.min(totalPages, activePage + 1)));
-  void loadPlaylist(activeSlug, 1);
+  if (playlistList && playlistList.dataset.configured !== 'false') void loadPlaylist(activeSlug, 1);
 });

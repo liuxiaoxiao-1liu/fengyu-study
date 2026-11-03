@@ -18,22 +18,17 @@ interface Props {
 const { featuredBook, featuredTrack, tracks, photoCount, latestEssay } = Astro.props;
 ---
 
-<section class="w-full max-w-7xl mx-auto px-gutter py-space-xl">
-  <div class="flex flex-col gap-space-xl" id="reading-music">
-    <div class="flex items-baseline justify-between border-b border-surface-container-high/60 pb-space-sm">
+<section class="section" id="reading-music">
+  <div class="flex flex-col gap-6">
+    <div class="flex flex-wrap items-end justify-between gap-3 border-b border-line pb-3">
       <div>
-        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">
-          01 / Hobbies &amp; Passions
-        </span>
-        <h2 class="font-headline-md text-headline-md text-primary font-normal">
-          精神自留地四重奏：网文·酷狗·画界·随笔
-        </h2>
+        <p class="eyebrow">01 / Hobbies &amp; Passions</p>
+        <h2 class="mt-1 font-headline-md text-headline-md text-primary">精神自留地四重奏</h2>
       </div>
-      <span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline">
-        网文追更 · 酷狗音乐 · 多元画境 · 杂谈笔记
-      </span>
+      <p class="text-body-sm text-muted">网文追更 · 酷狗音乐 · 多元画境 · 杂谈笔记</p>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-stretch">
+
+    <div class="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-12">
       <ReadingCard featuredBook={featuredBook} />
       <MusicCard featuredTrack={featuredTrack} tracks={tracks} />
       <VisualCard photoCount={photoCount} />

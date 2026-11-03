@@ -4,78 +4,76 @@ interface Props {
 }
 
 const { photoCount } = Astro.props;
+
+const shots = [
+  { src: '/images/anime-sky.jpg', alt: '校园上空的动漫感天空', label: '校园摄影', width: 512, height: 512 },
+  { src: '/images/photos/store.jpg', alt: '雨夜便利店的霓虹倒影', label: '扫街胶片', width: 512, height: 512 },
+];
 ---
 
-<article
-  class="lg:col-span-5 bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
-  id="visual-gallery"
->
-  <div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
-    <div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
-      <span class="material-symbols-outlined text-base">palette</span>
-      <span class="uppercase tracking-widest font-semibold">光影图鉴 · Visual Mix</span>
-    </div>
-    <span class="font-label-sm text-label-sm text-on-surface-variant">动漫 / 摄影 / 3D虚拟</span>
-  </div>
-  <div class="my-space-md bg-surface-container p-space-md rounded-lg shadow-sm flex flex-col gap-space-sm">
+<article class="card flex flex-col p-6 lg:col-span-5" id="visual-gallery">
+  <header class="flex items-center justify-between gap-3 border-b border-line pb-3">
+    <span class="flex items-center gap-2 font-label-md text-label-md font-medium text-on-surface">
+      <span class="material-symbols-outlined text-base text-secondary" aria-hidden="true">
+        palette
+      </span>
+      光影图鉴
+    </span>
+    <span class="meta">{photoCount} 张收录</span>
+  </header>
+
+  <div class="flex flex-1 flex-col justify-center py-5">
     <div class="grid grid-cols-3 gap-2">
-      <div class="rounded overflow-hidden aspect-square bg-surface-container-highest relative group">
-        <img
-          alt="Anime aesthetic sky"
-          class="w-full h-full object-cover"
-          decoding="async"
-          height="279"
-          loading="lazy"
-          src="/images/anime-sky.jpg"
-          width="512"
-        />
-        <span class="absolute bottom-1 left-1 px-1 rounded bg-primary/70 text-on-primary font-label-sm text-[0.625rem]">
-          校园摄影
+      {shots.map((shot) => (
+        <div class="relative aspect-square overflow-hidden rounded-lg bg-surface-container-high">
+          <img
+            alt={shot.alt}
+            class="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.03]"
+            src={shot.src}
+            width={shot.width}
+            height={shot.height}
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="absolute bottom-1 left-1 rounded bg-primary/70 px-1.5 py-0.5 font-meta text-meta text-on-primary">
+            {shot.label}
+          </span>
+        </div>
+      ))}
+      <a
+        class="flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-line-strong bg-surface-container/60 p-2 text-center transition-colors hover:bg-surface-container"
+        href="/photos/"
+      >
+        <span class="material-symbols-outlined text-xl text-secondary" aria-hidden="true">
+          token
         </span>
-      </div>
-      <div class="rounded overflow-hidden aspect-square bg-surface-container-highest relative group">
-        <img
-          alt="Anime city night view"
-          class="w-full h-full object-cover"
-          decoding="async"
-          height="279"
-          loading="lazy"
-          src="/images/photos/store.jpg"
-          width="512"
-        />
-        <span class="absolute bottom-1 left-1 px-1 rounded bg-primary/70 text-on-primary font-label-sm text-[0.625rem]">
-          动漫氛围
-        </span>
-      </div>
-      <div class="rounded overflow-hidden aspect-square bg-primary/10 flex flex-col items-center justify-center p-2 text-center border border-dashed border-secondary">
-        <span class="material-symbols-outlined text-secondary text-xl">token</span>
-        <span class="font-label-sm text-[0.625rem] text-primary font-medium mt-1">虚拟CG探索</span>
-        <span class="font-label-sm text-[0.625rem] text-on-surface-variant">Blender渲染</span>
-      </div>
+        <span class="font-meta text-meta font-medium text-primary">虚拟 CG</span>
+        <span class="font-meta text-meta text-muted">Blender 渲染</span>
+      </a>
     </div>
-    <div class="pt-1 flex items-end justify-between">
+
+    <div class="mt-4 flex items-end justify-between gap-3">
       <div>
-        <p class="font-body-md text-body-md text-primary font-medium tracking-tight">现实与二次元的色彩交界</p>
-        <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">从校园余晖到新海诚风天空</p>
+        <p class="font-body-md font-medium tracking-tight text-primary">现实与二次元的色彩交界</p>
+        <p class="mt-0.5 text-body-sm text-muted">从校园余晖到新海诚风天空</p>
       </div>
-      <span class="font-label-sm text-label-sm text-secondary tracking-widest font-mono"> {photoCount} 张收录 </span>
+      <span class="meta shrink-0">动漫 / 摄影 / 3D</span>
     </div>
   </div>
-  <div class="flex items-center justify-between pt-space-xs">
-    <div class="flex items-center gap-space-xs">
-      <span class="font-label-sm text-label-sm bg-surface-container px-space-xs py-0.5 rounded text-on-surface-variant">
-        #动漫壁纸
-      </span>
-      <span class="font-label-sm text-label-sm bg-surface-container px-space-xs py-0.5 rounded text-on-surface-variant">
-        #扫街胶片
-      </span>
+
+  <footer class="flex items-center justify-between border-t border-line pt-3">
+    <div class="flex flex-wrap items-center gap-1.5">
+      <span class="chip bg-surface-container text-on-surface-variant">#动漫壁纸</span>
+      <span class="chip bg-surface-container text-on-surface-variant">#扫街胶片</span>
     </div>
     <a
-      class="font-label-sm text-label-sm text-on-tertiary-container hover:text-primary transition-colors flex items-center gap-1 font-medium"
+      class="inline-flex min-h-9 items-center gap-1 font-label-md text-label-md font-medium text-accent hover:underline"
       href="/photos/"
     >
-      <span class="">浏览完整相册</span>
-      <span class="material-symbols-outlined text-xs">arrow_forward</span>
+      浏览相册
+      <span class="material-symbols-outlined text-sm" aria-hidden="true">
+        arrow_forward
+      </span>
     </a>
-  </div>
+  </footer>
 </article>

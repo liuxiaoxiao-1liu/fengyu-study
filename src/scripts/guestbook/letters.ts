@@ -21,8 +21,9 @@ export function initLetters(): LettersController {
 
   function setEmptyMessage(message: string) {
     if (!lettersEmpty) return;
+    const text = lettersEmpty.querySelector<HTMLElement>('[data-empty-text]');
     if (message) {
-      lettersEmpty.textContent = message;
+      if (text) text.textContent = message;
       lettersEmpty.classList.remove('hidden');
     } else {
       lettersEmpty.classList.add('hidden');
